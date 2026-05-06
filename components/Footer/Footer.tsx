@@ -81,7 +81,9 @@ export default function Footer({ locale }: FooterProps) {
 
         {/* Copyright */}
         <div className="mt-8 pt-8 border-t border-white/20 text-center">
-          <p className="text-cream-light/80 text-sm">{dictionary.footer.copyright}</p>
+          <p className="text-cream-light/80 text-sm">
+            {dictionary.footer.copyright} | Pin Code: 505403
+          </p>
         </div>
       </div>
     </footer>
