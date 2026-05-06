@@ -208,6 +208,32 @@ export default function Navigation({ locale }: NavigationProps) {
                     </svg>
                   </Link>
                 )}
+                
+                {session ? (
+                  <button
+                    onClick={() => {
+                      setIsOpen(false);
+                      signOut();
+                    }}
+                    className="text-base font-black text-red-600 hover:text-red-700 py-3 px-2 border-b border-gray-50 transition-colors uppercase tracking-wider flex items-center justify-between w-full text-left"
+                  >
+                    {session.user?.name} (Sign Out)
+                    <svg className="w-4 h-4 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                  </button>
+                ) : (
+                  <Link
+                    href={`/${locale}/login`}
+                    onClick={() => setIsOpen(false)}
+                    className="text-base font-black text-primary hover:text-earth py-3 px-2 border-b border-gray-50 transition-colors uppercase tracking-wider flex items-center justify-between"
+                  >
+                    {t('auth.login')}
+                    <svg className="w-4 h-4 text-primary/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                  </Link>
+                )}
                 {/* Mobile Complaint Button inside menu */}
                 <Link
                   href={`/${locale}#complaint`}
