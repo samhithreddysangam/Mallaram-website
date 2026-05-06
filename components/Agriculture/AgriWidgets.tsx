@@ -12,7 +12,9 @@ export function WeatherWidget() {
     fetch('/api/weather')
       .then(res => res.json())
       .then(data => {
-        setWeather(data);
+        if (data && !data.error) {
+          setWeather(data);
+        }
         setLoading(false);
       });
   }, []);
@@ -28,26 +30,26 @@ export function WeatherWidget() {
         <div className="flex justify-between items-start mb-4">
           <div>
             <h3 className="text-blue-100 font-medium">Weather Forecast</h3>
-            <div className="text-4xl font-bold">{weather.temp}°C</div>
+            <div className="text-4xl font-bold">{weather?.temp || '--'}°C</div>
           </div>
           <div className="text-right">
-            <div className="text-2xl font-bold">{weather.condition}</div>
-            <div className="text-blue-100 text-sm">{weather.location}</div>
+            <div className="text-2xl font-bold">{weather?.condition || 'No Data'}</div>
+            <div className="text-blue-100 text-sm">{weather?.location || '---'}</div>
           </div>
         </div>
         
         <div className="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-white/20">
           <div>
             <div className="text-blue-100 text-xs uppercase tracking-wider mb-1">Humidity</div>
-            <div className="font-bold">{weather.humidity}%</div>
+            <div className="font-bold">{weather?.humidity || '0'}%</div>
           </div>
           <div>
             <div className="text-blue-100 text-xs uppercase tracking-wider mb-1">Rain Chance</div>
-            <div className="font-bold">{weather.rainChance}%</div>
+            <div className="font-bold">{weather?.rainChance || '0'}%</div>
           </div>
         </div>
 
-        {weather.alerts && weather.alerts.length > 0 && (
+        {weather?.alerts && weather.alerts.length > 0 && (
           <div className="mt-4 p-3 bg-red-500/30 backdrop-blur-md rounded-xl border border-red-400/30 flex items-center gap-2">
             <HiOutlineInformationCircle className="w-5 h-5 text-red-100" />
             <span className="text-xs font-bold text-red-50 uppercase tracking-tighter">Rain Alert Active</span>
@@ -66,7 +68,7 @@ export function MarketPrices() {
     fetch('/api/market-prices')
       .then(res => res.json())
       .then(data => {
-        setPrices(data);
+        setPrices(Array.isArray(data) ? data : []);
         setLoading(false);
       });
   }, []);

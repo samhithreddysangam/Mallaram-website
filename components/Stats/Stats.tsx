@@ -11,8 +11,8 @@ export default function Stats({ locale }: StatsProps) {
   const dictionary = getDictionary(locale);
 
   const stats = [
-    { label: 'Population', value: '1,250+', icon: '👥' },
-    { label: 'Households', value: '320+', icon: '🏠' },
+    { label: 'Population', value: '2000+', icon: '👥' },
+    { label: 'Households', value: '400+', icon: '🏠' },
     { label: 'Schools', value: '2', icon: '🏫' },
     { label: 'Literacy', value: '85%', icon: '📚' },
   ];

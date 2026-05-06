@@ -48,7 +48,7 @@ export default function BookingSystem({ locale }: BookingSystemProps) {
     try {
       const res = await fetch('/api/slots');
       const data = await res.json();
-      setSlots(data);
+      setSlots(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Failed to fetch slots:', error);
     } finally {
@@ -85,7 +85,7 @@ export default function BookingSystem({ locale }: BookingSystemProps) {
     try {
       const res = await fetch(`/api/bookings?phone=${searchPhone}`);
       const data = await res.json();
-      setSearchResult(data);
+      setSearchResult(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Failed to check status');
     } finally {
