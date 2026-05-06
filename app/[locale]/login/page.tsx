@@ -47,18 +47,9 @@ export default function LoginPage() {
       if (result?.error) {
         setError(auth.error);
       } else {
-        // Wait for session to update then redirect based on role
-        setTimeout(async () => {
-          const { data: newSession } = await import('next-auth/react').then(m => m.useSession());
-          const userRole = (newSession?.user as any)?.role;
-          
-          if (userRole === 'ADMIN') {
-            router.push(`/${locale}/dashboard/admin`);
-          } else {
-            router.push(`/${locale}/ikp-booking`);
-          }
-          router.refresh();
-        }, 200);
+        // Simple redirect to a landing route, middleware will handle the rest
+        // Or we can just refresh to trigger the "already logged in" redirect at the top
+        window.location.reload();
       }
     } catch (err) {
       setError('An unexpected error occurred');
