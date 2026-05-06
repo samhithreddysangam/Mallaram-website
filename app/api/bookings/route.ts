@@ -35,7 +35,7 @@ export async function POST(request: Request) {
     }
 
     // 3. Create booking and increment slot count atomically
-    const booking = await prisma.$transaction(async (tx) => {
+    const booking = await prisma.$transaction(async (tx: any) => {
       const b = await tx.booking.create({
         data: {
           userId: user.id,
