@@ -119,14 +119,15 @@ export default function Navigation({ locale }: NavigationProps) {
                 {t('language.toggle')}
               </button>
               
+              {/* Desktop Login/Sign Out */}
               {session ? (
                 <div className="flex items-center gap-2">
-                  <span className="hidden md:block text-[10px] font-black text-primary-dark uppercase truncate max-w-[60px]">
+                  <span className="hidden md:block text-[10px] font-black text-primary-dark uppercase truncate max-w-[80px]">
                     {session.user?.name}
                   </span>
                   <button
                     onClick={() => signOut()}
-                    className="p-2 rounded-full bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
+                    className="p-2 rounded-full bg-red-50 text-red-600 hover:bg-red-100 transition-colors shadow-sm"
                     title="Sign Out"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -134,7 +135,15 @@ export default function Navigation({ locale }: NavigationProps) {
                     </svg>
                   </button>
                 </div>
-              ) : null}
+              ) : (
+                <Link
+                  href={`/${locale}/login`}
+                  className="px-4 py-2 lg:px-6 lg:py-2.5 text-[9px] lg:text-[10px] font-black rounded-full bg-primary-dark text-white hover:bg-earth transition-all shadow-md active:scale-95 uppercase tracking-widest whitespace-nowrap"
+                >
+                  {t('auth.login')}
+                </Link>
+              )}
+              
               {/* Mobile Menu Toggle */}
               <button
                 className="lg:hidden p-1.5 rounded-full bg-gray-50 text-primary hover:bg-gray-100 transition-colors"
