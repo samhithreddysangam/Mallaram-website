@@ -14,6 +14,10 @@ export const authConfig = {
         return false; // Redirect unauthenticated users to login page
       } else if (isLoggedIn && nextUrl.pathname.includes('/login')) {
         const locale = nextUrl.pathname.split('/')[1] || 'en';
+        const userRole = (auth?.user as any)?.role;
+        if (userRole === 'ADMIN') {
+          return Response.redirect(new URL(`/${locale}/dashboard/admin`, nextUrl));
+        }
         return Response.redirect(new URL(`/${locale}/ikp-booking`, nextUrl));
       }
       return true;
