@@ -13,7 +13,10 @@ export default function LoginPage() {
   const params = useParams();
   const searchParams = useSearchParams();
   const { data: session, status } = useSession();
-  const locale = (params?.locale as Locale) || 'en';
+  
+  const rawLocale = params?.locale;
+  const locale = (Array.isArray(rawLocale) ? rawLocale[0] : rawLocale) as Locale || 'en';
+  
   const dictionary = getDictionary(locale);
   const { auth } = dictionary;
 
@@ -30,7 +33,6 @@ export default function LoginPage() {
     const userRole = (session?.user as any)?.role;
     const targetPath = userRole === 'ADMIN' ? `/${locale}/dashboard/admin` : `/${locale}/ikp-booking`;
     
-    // Using window.location to ensure a full refresh and avoid hydration/middleware issues
     if (typeof window !== 'undefined') {
       window.location.href = targetPath;
     }
@@ -54,7 +56,6 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      // Use redirect: true (default) for better production reliability
       await signIn('credentials', {
         email,
         password,
@@ -104,12 +105,12 @@ export default function LoginPage() {
                   <HiOutlineEnvelope className="text-xl" />
                 </div>
                 <input
-                  type="email"
-                  required
-                  placeholder="arpitha@mallaram.in"
-                  className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all font-medium"
+                  type="text"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  placeholder="name@example.com or phone"
+                  className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-medium"
+                  required
                 />
               </div>
             </div>
@@ -123,12 +124,12 @@ export default function LoginPage() {
                   <HiOutlineLockClosed className="text-xl" />
                 </div>
                 <input
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  placeholder="••••••••"
-                  className="w-full pl-12 pr-12 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all font-medium"
+                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full pl-12 pr-12 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-medium"
+                  required
                 />
                 <button
                   type="button"
@@ -143,13 +144,13 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-4 bg-primary text-white rounded-2xl font-bold text-lg hover:bg-primary-dark transition-all shadow-xl shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+              className="w-full py-4 bg-primary text-white rounded-2xl font-black uppercase tracking-widest hover:bg-primary-dark transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed group"
             >
               {loading ? (
-                <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin" />
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
               ) : (
                 <>
-                  <HiOutlineArrowRight className="text-xl" />
+                  <HiOutlineArrowRight className="text-xl group-hover:translate-x-1 transition-transform" />
                   {auth.signIn}
                 </>
               )}
@@ -159,7 +160,7 @@ export default function LoginPage() {
               <button 
                 type="button"
                 onClick={() => setShowDebug(!showDebug)}
-                className="text-primary/40 hover:text-primary text-xs uppercase tracking-widest font-bold transition-colors"
+                className="text-primary/40 hover:text-primary text-xs uppercase tracking-widest font-bold transition-colors underline decoration-dotted"
               >
                 {showDebug ? 'Hide Diagnostics' : 'Login Issues? Click here'}
               </button>
@@ -167,11 +168,11 @@ export default function LoginPage() {
               {showDebug && (
                 <div className="mt-4 p-4 bg-gray-50 rounded-xl text-left text-[10px] font-mono space-y-2 border border-gray-200">
                   <p className="text-primary font-bold">Diagnostics:</p>
-                  <p>Status: {status}</p>
-                  <p>Role: {(session?.user as any)?.role || 'None'}</p>
-                  <p>Locale: {locale}</p>
+                  <p>Status: {String(status)}</p>
+                  <p>Role: {String((session as any)?.user?.role || 'None')}</p>
+                  <p>Locale: {String(locale)}</p>
                   <div className="pt-2 flex gap-2">
-                    <a href="/api/diagnostic" target="_blank" className="px-2 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100">Check DB User</a>
+                    <a href="/api/diagnostic" target="_blank" className="px-2 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100 no-underline">Check DB User</a>
                     <button type="button" onClick={() => window.location.reload()} className="px-2 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100">Reload Page</button>
                   </div>
                 </div>
