@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+import { HiOutlineMenuAlt4, HiOutlineX, HiOutlineUserCircle, HiOutlineLogout } from 'react-icons/hi';
 import { Locale, getDictionary, getTranslations } from '@/lib/i18n';
 import { useSession, signOut } from 'next-auth/react';
 
@@ -100,15 +101,21 @@ export default function Navigation({ locale }: NavigationProps) {
                   <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-earth transition-all group-hover:w-full"></span>
                 </Link>
               ))}
-              {isAdmin && (
-                <Link
-                  href={`/${locale}/dashboard/admin`}
-                  className="text-[9px] font-black text-red-600 hover:text-red-700 uppercase tracking-[0.2em] relative group px-2 py-1 transition-colors"
-                >
-                  Admin
-                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-red-600 transition-all group-hover:w-full"></span>
-                </Link>
-              )}
+              {isAdmin && <div className="flex items-center gap-2">
+                  <Link
+                    href={`/${locale}/dashboard/admin`}
+                    className="px-6 py-2 rounded-xl bg-earth text-white font-bold hover:bg-earth-dark transition-all shadow-lg flex items-center gap-2"
+                  >
+                    <span>Dashboard</span>
+                  </Link>
+                  <button
+                    onClick={() => signOut()}
+                    className="p-2 rounded-xl bg-gray-100 text-primary hover:bg-gray-200 transition-all"
+                    title="Sign Out"
+                  >
+                    <HiOutlineLogout className="text-xl" />
+                  </button>
+                </div>}
             </div>
             
             <div className="flex items-center gap-2 md:gap-3">
