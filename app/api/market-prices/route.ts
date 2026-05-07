@@ -46,3 +46,50 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Failed to add market price' }, { status: 500 });
   }
 }
+
+export async function PUT(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+    const { cropName, price, unit } = await request.json();
+
+    if (!id) {
+      return NextResponse.json({ error: 'ID is required' }, { status: 400 });
+    }
+
+    const updatedPrice = await prisma.cropPrice.update({
+      where: { id },
+      data: {
+        cropName,
+        price: parseFloat(price),
+        unit: unit || 'Quintal',
+        date: new Date(),
+      },
+    });
+
+    return NextResponse.json(updatedPrice);
+  } catch (error) {
+    console.error('Error updating market price:', error);
+    return NextResponse.json({ error: 'Failed to update market price' }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json({ error: 'ID is required' }, { status: 400 });
+    }
+
+    await prisma.cropPrice.delete({
+      where: { id },
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting market price:', error);
+    return NextResponse.json({ error: 'Failed to delete market price' }, { status: 500 });
+  }
+}

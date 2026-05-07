@@ -87,3 +87,80 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Failed to fetch bookings' }, { status: 500 });
   }
 }
+
+export async function PUT(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+    const { status, name, phone } = await request.json();
+
+    if (!id) {
+      return NextResponse.json({ error: 'ID is required' }, { status: 400 });
+    }
+
+    // Update booking status
+    if (status) {
+      const booking = await prisma.booking.update({
+        where: { id },
+        data: { status },
+      });
+      return NextResponse.json(booking);
+    }
+
+    // Update user details (if provided)
+    if (name || phone) {
+      const booking = await prisma.booking.findUnique({
+        where: { id },
+        include: { user: true },
+      });
+
+      if (booking) {
+        await prisma.user.update({
+          where: { id: booking.userId },
+          data: {
+            ...(name && { name }),
+            ...(phone && { phone }),
+          },
+        });
+      }
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Error updating booking:', error);
+    return NextResponse.json({ error: 'Failed to update booking' }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json({ error: 'ID is required' }, { status: 400 });
+    }
+
+    // Get booking to decrement slot count
+    const booking = await prisma.booking.findUnique({
+      where: { id },
+    });
+
+    if (booking) {
+      // Decrement slot count
+      await prisma.slot.update({
+        where: { id: booking.slotId },
+        data: { currentBookings: { decrement: 1 } },
+      });
+    }
+
+    await prisma.booking.delete({
+      where: { id },
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting booking:', error);
+    return NextResponse.json({ error: 'Failed to delete booking' }, { status: 500 });
+  }
+}

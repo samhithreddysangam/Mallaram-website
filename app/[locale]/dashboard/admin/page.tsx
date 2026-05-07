@@ -6,7 +6,7 @@ import { Locale, getDictionary } from '@/lib/i18n';
 import Navigation from '@/components/Navigation/Navigation';
 import Footer from '@/components/Footer/Footer';
 import { motion } from 'framer-motion';
-import { HiOutlineDocumentSearch, HiOutlineDatabase, HiOutlineCloudUpload, HiOutlineCheck, HiOutlineX, HiOutlineCurrencyRupee, HiOutlinePlus, HiOutlineBell, HiOutlineLocationMarker } from 'react-icons/hi';
+import { HiOutlineDocumentSearch, HiOutlineDatabase, HiOutlineCloudUpload, HiOutlineCheck, HiOutlineX, HiOutlineCurrencyRupee, HiOutlinePlus, HiOutlineBell, HiOutlineLocationMarker, HiOutlinePencil, HiOutlineTrash } from 'react-icons/hi';
 import { WeatherWidget } from '@/components/Agriculture/AgriWidgets';
 
 export default function AdminDashboard() {
@@ -16,6 +16,10 @@ export default function AdminDashboard() {
   const [marketPrices, setMarketPrices] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showPriceModal, setShowPriceModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingPrice, setEditingPrice] = useState<any>(null);
+  const [showBookingModal, setShowBookingModal] = useState(false);
+  const [editingBooking, setEditingBooking] = useState<any>(null);
   const [newPrice, setNewPrice] = useState({ cropName: '', price: '', unit: 'Quintal' });
 
   useEffect(() => {
@@ -46,9 +50,94 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleEditPrice = (price: any) => {
+    setEditingPrice({ ...price });
+    setShowEditModal(true);
+  };
+
+  const handleUpdatePrice = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const res = await fetch(`/api/market-prices?id=${editingPrice.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          cropName: editingPrice.cropName,
+          price: editingPrice.price,
+          unit: editingPrice.unit,
+        }),
+      });
+      if (res.ok) {
+        setShowEditModal(false);
+        setEditingPrice(null);
+        fetchMarketPrices();
+      }
+    } catch (error) {
+      console.error('Failed to update price:', error);
+    }
+  };
+
+  const handleDeletePrice = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this price?')) return;
+    try {
+      const res = await fetch(`/api/market-prices?id=${id}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        fetchMarketPrices();
+      }
+    } catch (error) {
+      console.error('Failed to delete price:', error);
+    }
+  };
+
   const updateBookingStatus = async (id: string, status: string) => {
-    alert(`Updating booking ${id} to ${status}`);
-    setBookings(bookings.map(b => b.id === id ? { ...b, status } : b));
+    try {
+      const res = await fetch(`/api/bookings?id=${id}&status=${status}`, { method: 'PUT' });
+      if (res.ok) {
+        setBookings(bookings.map(b => b.id === id ? { ...b, status } : b));
+      }
+    } catch (error) {
+      console.error('Failed to update booking status:', error);
+    }
+  };
+
+  const handleEditBooking = (booking: any) => {
+    setEditingBooking({ ...booking });
+    setShowBookingModal(true);
+  };
+
+  const handleUpdateBooking = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const res = await fetch(`/api/bookings?id=${editingBooking.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: editingBooking.user?.name,
+          phone: editingBooking.user?.phone,
+        }),
+      });
+      if (res.ok) {
+        setShowBookingModal(false);
+        setEditingBooking(null);
+        fetchBookings();
+      }
+    } catch (error) {
+      console.error('Failed to update booking:', error);
+    }
+  };
+
+  const handleDeleteBooking = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this booking?')) return;
+    try {
+      const res = await fetch(`/api/bookings?id=${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        fetchBookings();
+      }
+    } catch (error) {
+      console.error('Failed to delete booking:', error);
+    }
   };
 
   const handleAddPrice = async (e: React.FormEvent) => {
@@ -163,11 +252,12 @@ export default function AdminDashboard() {
                   <th className="px-6 py-4">Price (per Quintal)</th>
                   <th className="px-6 py-4">District</th>
                   <th className="px-6 py-4">Last Updated</th>
+                  <th className="px-6 py-4 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {marketPrices.length === 0 ? (
-                  <tr><td colSpan={4} className="px-6 py-12 text-center text-gray-400 italic">No market prices available.</td></tr>
+                  <tr><td colSpan={5} className="px-6 py-12 text-center text-gray-400 italic">No market prices available.</td></tr>
                 ) : marketPrices.map((price) => (
                   <tr key={price.id} className="hover:bg-gray-50/50 transition-colors">
                     <td className="px-6 py-4">
@@ -178,6 +268,24 @@ export default function AdminDashboard() {
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600">{price.district}</td>
                     <td className="px-6 py-4 text-sm text-gray-500">{new Date(price.date).toLocaleDateString()}</td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex justify-end gap-2">
+                        <button 
+                          onClick={() => handleEditPrice(price)}
+                          className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                          title="Edit"
+                        >
+                          <HiOutlinePencil className="w-4 h-4" />
+                        </button>
+                        <button 
+                          onClick={() => handleDeletePrice(price.id)}
+                          className="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                          title="Delete"
+                        >
+                          <HiOutlineTrash className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -240,24 +348,40 @@ export default function AdminDashboard() {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      {booking.status === 'PENDING' && (
-                        <div className="flex justify-end gap-2">
-                          <button 
-                            onClick={() => updateBookingStatus(booking.id, 'APPROVED')}
-                            className="p-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-                            title="Approve"
-                          >
-                            <HiOutlineCheck className="w-4 h-4" />
-                          </button>
-                          <button 
-                            onClick={() => updateBookingStatus(booking.id, 'REJECTED')}
-                            className="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
-                            title="Reject"
-                          >
-                            <HiOutlineX className="w-4 h-4" />
-                          </button>
-                        </div>
-                      )}
+                      <div className="flex justify-end gap-2">
+                        {booking.status === 'PENDING' && (
+                          <>
+                            <button 
+                              onClick={() => updateBookingStatus(booking.id, 'APPROVED')}
+                              className="p-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                              title="Approve"
+                            >
+                              <HiOutlineCheck className="w-4 h-4" />
+                            </button>
+                            <button 
+                              onClick={() => updateBookingStatus(booking.id, 'REJECTED')}
+                              className="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                              title="Reject"
+                            >
+                              <HiOutlineX className="w-4 h-4" />
+                            </button>
+                          </>
+                        )}
+                        <button 
+                          onClick={() => handleEditBooking(booking)}
+                          className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                          title="Edit"
+                        >
+                          <HiOutlinePencil className="w-4 h-4" />
+                        </button>
+                        <button 
+                          onClick={() => handleDeleteBooking(booking.id)}
+                          className="p-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                          title="Delete"
+                        >
+                          <HiOutlineTrash className="w-4 h-4" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -319,6 +443,122 @@ export default function AdminDashboard() {
                     className="flex-1 px-4 py-3 bg-primary text-white rounded-xl text-sm font-bold hover:bg-primary-dark transition-all"
                   >
                     Add Price
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Edit Price Modal */}
+        {showEditModal && editingPrice && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-md">
+              <h3 className="text-xl font-black text-primary-dark mb-4">Edit Market Price</h3>
+              <form onSubmit={handleUpdatePrice} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-bold text-gray-600 mb-1">Crop Name</label>
+                  <input
+                    type="text"
+                    value={editingPrice.cropName}
+                    onChange={(e) => setEditingPrice({ ...editingPrice, cropName: e.target.value })}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-600 mb-1">Price (per Quintal)</label>
+                  <input
+                    type="number"
+                    value={editingPrice.price}
+                    onChange={(e) => setEditingPrice({ ...editingPrice, price: e.target.value })}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-600 mb-1">Unit</label>
+                  <select
+                    value={editingPrice.unit}
+                    onChange={(e) => setEditingPrice({ ...editingPrice, unit: e.target.value })}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  >
+                    <option value="Quintal">Quintal</option>
+                    <option value="Kg">Kg</option>
+                    <option value="Ton">Ton</option>
+                  </select>
+                </div>
+                <div className="flex gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => { setShowEditModal(false); setEditingPrice(null); }}
+                    className="flex-1 px-4 py-3 border border-gray-200 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-50 transition-all"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 px-4 py-3 bg-blue-500 text-white rounded-xl text-sm font-bold hover:bg-blue-600 transition-all"
+                  >
+                    Update Price
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Edit Booking Modal */}
+        {showBookingModal && editingBooking && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-md">
+              <h3 className="text-xl font-black text-primary-dark mb-4">Edit Booking</h3>
+              <form onSubmit={handleUpdateBooking} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-bold text-gray-600 mb-1">Farmer Name</label>
+                  <input
+                    type="text"
+                    value={editingBooking.user?.name || ''}
+                    onChange={(e) => setEditingBooking({ ...editingBooking, user: { ...editingBooking.user, name: e.target.value } })}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-600 mb-1">Phone Number</label>
+                  <input
+                    type="text"
+                    value={editingBooking.user?.phone || ''}
+                    onChange={(e) => setEditingBooking({ ...editingBooking, user: { ...editingBooking.user, phone: e.target.value } })}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-600 mb-1">Status</label>
+                  <select
+                    value={editingBooking.status}
+                    onChange={(e) => setEditingBooking({ ...editingBooking, status: e.target.value })}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  >
+                    <option value="PENDING">Pending</option>
+                    <option value="APPROVED">Approved</option>
+                    <option value="REJECTED">Rejected</option>
+                  </select>
+                </div>
+                <div className="flex gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => { setShowBookingModal(false); setEditingBooking(null); }}
+                    className="flex-1 px-4 py-3 border border-gray-200 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-50 transition-all"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 px-4 py-3 bg-blue-500 text-white rounded-xl text-sm font-bold hover:bg-blue-600 transition-all"
+                  >
+                    Update Booking
                   </button>
                 </div>
               </form>
