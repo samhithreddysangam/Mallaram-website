@@ -23,27 +23,27 @@ export default auth((req) => {
     );
   }
 
-  // 2. Handle Authentication
+  // 2. Handle Authentication & Authorization
+  const locale = pathname.split('/')[1] || defaultLocale;
+  const isOnDashboard = pathname.includes('/dashboard');
   const isOnAdminDashboard = pathname.includes('/dashboard/admin');
   const isOnLogin = pathname.includes('/login');
   const userRole = (req.auth?.user as any)?.role;
 
-  // Only protect ADMIN dashboard
-  if (isOnAdminDashboard) {
+  // Protect all dashboard routes
+  if (isOnDashboard) {
     if (!isLoggedIn) {
-      const locale = pathname.split('/')[1] || defaultLocale;
       return NextResponse.redirect(new URL(`/${locale}/login`, nextUrl));
     }
     
-    if (userRole !== 'ADMIN') {
-      const locale = pathname.split('/')[1] || defaultLocale;
+    // Specifically protect ADMIN dashboard
+    if (isOnAdminDashboard && userRole !== 'ADMIN') {
       return NextResponse.redirect(new URL(`/${locale}/ikp-booking`, nextUrl));
     }
   }
 
-  // Redirect to appropriate dashboard if logged in and on login page
+  // Redirect to appropriate dashboard if logged in and trying to access login page
   if (isOnLogin && isLoggedIn) {
-    const locale = pathname.split('/')[1] || defaultLocale;
     if (userRole === 'ADMIN') {
       return NextResponse.redirect(new URL(`/${locale}/dashboard/admin`, nextUrl));
     }

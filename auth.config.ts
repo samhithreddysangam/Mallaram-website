@@ -5,23 +5,6 @@ export const authConfig = {
     signIn: '/login',
   },
   callbacks: {
-    authorized({ auth, request: { nextUrl } }) {
-      const isLoggedIn = !!auth?.user;
-      const isOnDashboard = nextUrl.pathname.includes('/dashboard');
-      
-      if (isOnDashboard) {
-        if (isLoggedIn) return true;
-        return false; // Redirect unauthenticated users to login page
-      } else if (isLoggedIn && nextUrl.pathname.includes('/login')) {
-        const locale = nextUrl.pathname.split('/')[1] || 'en';
-        const userRole = (auth?.user as any)?.role;
-        if (userRole === 'ADMIN') {
-          return Response.redirect(new URL(`/${locale}/dashboard/admin`, nextUrl));
-        }
-        return Response.redirect(new URL(`/${locale}/ikp-booking`, nextUrl));
-      }
-      return true;
-    },
     async jwt({ token, user }) {
       if (user) {
         token.role = (user as any).role;
