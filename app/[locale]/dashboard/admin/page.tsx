@@ -6,7 +6,8 @@ import { Locale, getDictionary } from '@/lib/i18n';
 import Navigation from '@/components/Navigation/Navigation';
 import Footer from '@/components/Footer/Footer';
 import { motion } from 'framer-motion';
-import { HiOutlineDocumentSearch, HiOutlineDatabase, HiOutlineCloudUpload, HiOutlineCheck, HiOutlineX, HiOutlineCurrencyRupee, HiOutlinePlus } from 'react-icons/hi';
+import { HiOutlineDocumentSearch, HiOutlineDatabase, HiOutlineCloudUpload, HiOutlineCheck, HiOutlineX, HiOutlineCurrencyRupee, HiOutlinePlus, HiOutlineBell, HiOutlineLocationMarker } from 'react-icons/hi';
+import { WeatherWidget } from '@/components/Agriculture/AgriWidgets';
 
 export default function AdminDashboard() {
   const params = useParams();
@@ -93,7 +94,7 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8 mb-12">
+        <div className="grid lg:grid-cols-4 gap-8 mb-12">
           {/* Stats Cards */}
           <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
             <div className="text-sm font-bold text-gray-400 uppercase mb-1">Total Bookings</div>
@@ -105,14 +106,41 @@ export default function AdminDashboard() {
             <div className="text-4xl font-black text-amber-500">{bookings.filter(b => b.status === 'PENDING').length}</div>
             <div className="text-xs text-amber-600 font-bold mt-2">Requires immediate action</div>
           </div>
+          <div className="bg-gradient-to-br from-red-500 to-red-600 p-6 rounded-3xl shadow-lg shadow-red-500/20 text-white">
+            <div className="text-sm font-bold uppercase mb-1 opacity-80">Send Alert</div>
+            <div className="text-lg font-black mb-3">Village Broadcast</div>
+            <a 
+              href="https://voice.sendgun.in/login.php" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-white text-red-600 rounded-xl text-sm font-bold hover:bg-red-50 transition-all shadow-lg"
+            >
+              <HiOutlineBell className="w-4 h-4" />
+              Send Alert
+            </a>
+          </div>
           <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-            <div className="text-sm font-bold text-gray-400 uppercase mb-1">Active Alerts</div>
-            <div className="text-4xl font-black text-red-500">1</div>
-            <div className="text-xs text-red-600 font-bold mt-2">High severity rain alert</div>
+            <div className="text-sm font-bold text-gray-400 uppercase mb-1">Location</div>
+            <div className="text-xl font-black text-primary-dark flex items-center gap-2">
+              <HiOutlineLocationMarker className="w-5 h-5 text-earth" />
+              Mallaram
+            </div>
+            <div className="text-xs text-gray-500 font-bold mt-2">IKP Centre, DCF Office</div>
           </div>
         </div>
 
-        {/* Market Prices Section */}
+        {/* Weather & Quick Actions */}
+        <div className="grid lg:grid-cols-4 gap-8 mb-12">
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-6">
+              <h3 className="text-lg font-black text-primary-dark mb-4 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+                Weather Report
+              </h3>
+              <WeatherWidget />
+            </div>
+          </div>
+          <div className="lg:col-span-3">
         <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden mb-12">
           <div className="p-6 border-b border-gray-100 flex items-center justify-between">
             <h2 className="text-xl font-bold text-primary-dark flex items-center gap-2">
@@ -156,6 +184,8 @@ export default function AdminDashboard() {
             </table>
           </div>
         </div>
+        </div>
+      </div>
 
         {/* Booking Management Table */}
         <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
