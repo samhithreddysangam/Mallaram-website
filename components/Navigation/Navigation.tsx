@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { HiOutlineMenuAlt4, HiOutlineX, HiOutlineUserCircle, HiOutlineLogout } from 'react-icons/hi';
+import { HiBars3BottomRight, HiXMark, HiUserCircle, HiArrowRightOnRectangle } from 'react-icons/hi2';
 import { Locale, getDictionary, getTranslations } from '@/lib/i18n';
 import { useSession, signOut } from 'next-auth/react';
 
@@ -113,7 +113,7 @@ export default function Navigation({ locale }: NavigationProps) {
                     className="p-2 rounded-xl bg-gray-100 text-primary hover:bg-gray-200 transition-all"
                     title="Sign Out"
                   >
-                    <HiOutlineLogout className="text-xl" />
+                    <HiArrowRightOnRectangle className="text-xl" />
                   </button>
                 </div>}
             </div>
@@ -137,9 +137,7 @@ export default function Navigation({ locale }: NavigationProps) {
                     className="p-2 rounded-full bg-red-50 text-red-600 hover:bg-red-100 transition-colors shadow-sm"
                     title="Sign Out"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                    </svg>
+                    <HiArrowRightOnRectangle className="w-4 h-4" />
                   </button>
                 </div>
               ) : (

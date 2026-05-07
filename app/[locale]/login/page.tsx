@@ -6,7 +6,7 @@ import { Locale, getDictionary } from '@/lib/i18n';
 import Navigation from '@/components/Navigation/Navigation';
 import Footer from '@/components/Footer/Footer';
 import { motion } from 'framer-motion';
-import { HiOutlineMail, HiOutlineLock, HiOutlineArrowRight, HiOutlineEye, HiOutlineEyeOff } from 'react-icons/hi';
+import { HiOutlineMail, HiOutlineLockClosed, HiOutlineArrowRight, HiOutlineEye, HiOutlineEyeOff } from 'react-icons/hi2';
 import { signIn, useSession } from 'next-auth/react';
 
 export default function LoginPage() {
@@ -120,7 +120,7 @@ export default function LoginPage() {
               </label>
               <div className="relative group">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/30 group-focus-within:text-primary transition-colors">
-                  <HiOutlineLock className="text-xl" />
+                  <HiOutlineLockClosed className="text-xl" />
                 </div>
                 <input
                   type={showPassword ? 'text' : 'password'}
