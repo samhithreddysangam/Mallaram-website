@@ -179,6 +179,14 @@ export default function AdminDashboard() {
             <div className="text-4xl font-black text-amber-500">{bookings.filter(b => b.status === 'PENDING').length}</div>
             <div className="text-[10px] text-amber-600 font-bold mt-2">Action Required</div>
           </motion.div>
+          <motion.div whileHover={{ y: -5 }} className="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100">
+            <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Location Status</div>
+            <div className="text-xl font-black text-[#0A0A0A] flex items-center gap-2">
+              <HiOutlineLocationMarker className="w-5 h-5 text-[#22FF88]" />
+              IKP Centre
+            </div>
+            <div className="text-[10px] text-gray-500 font-bold mt-2">Mallaram Village DCF</div>
+          </motion.div>
           <motion.div whileHover={{ y: -5 }} className="bg-[#0A0A0A] p-6 rounded-[2rem] shadow-xl text-white relative overflow-hidden group">
             <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-[#22FF88]/10 rounded-full blur-2xl group-hover:bg-[#22FF88]/20 transition-all"></div>
             <div className="text-[10px] font-black uppercase mb-1 opacity-50">Quick Alert</div>
@@ -187,14 +195,6 @@ export default function AdminDashboard() {
               <HiOutlineBell className="w-4 h-4" />
               Launch Voice Alert
             </a>
-          </motion.div>
-          <motion.div whileHover={{ y: -5 }} className="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100">
-            <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Location Status</div>
-            <div className="text-xl font-black text-[#0A0A0A] flex items-center gap-2">
-              <HiOutlineLocationMarker className="w-5 h-5 text-[#22FF88]" />
-              IKP Centre
-            </div>
-            <div className="text-[10px] text-gray-500 font-bold mt-2">Mallaram Village DCF</div>
           </motion.div>
         </div>
 
@@ -265,7 +265,19 @@ export default function AdminDashboard() {
               <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                 {slots.length === 0 ? (
                   <p className="text-sm text-gray-400 text-center py-4">No slots created.</p>
-                ) : slots.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map((slot) => {
+                ) : slots
+                  .sort((a, b) => {
+                    const dateA = new Date(a.date).getTime();
+                    const dateB = new Date(b.date).getTime();
+                    const isExpiredA = dateA < new Date(new Date().setHours(0,0,0,0)).getTime();
+                    const isExpiredB = dateB < new Date(new Date().setHours(0,0,0,0)).getTime();
+                    // Live slots first, sorted by date ascending (soonest first)
+                    // Then expired slots, sorted by date descending (most recent first)
+                    if (isExpiredA !== isExpiredB) {
+                      return isExpiredA ? 1 : -1;
+                    }
+                    return dateA - dateB;
+                  }).map((slot) => {
                   const isExpired = new Date(slot.date) < new Date(new Date().setHours(0,0,0,0));
                   return (
                     <div key={slot.id} className={`p-4 rounded-2xl border transition-all flex items-center justify-between group ${isExpired ? 'bg-gray-50 border-gray-100' : 'bg-white border-gray-100 hover:border-[#22FF88] shadow-sm'}`}>
