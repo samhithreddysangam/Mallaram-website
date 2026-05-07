@@ -140,7 +140,7 @@ export default function AdminDashboard() {
     <main className="min-h-screen bg-gray-50 font-sans">
       <Navigation locale={locale} />
       
-      <div className="pt-32 lg:pt-40 max-w-7xl mx-auto px-4 pb-20">
+      <div className="pt-48 lg:pt-60 max-w-7xl mx-auto px-4 pb-20">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
           <div>
             <h1 className="text-4xl font-black text-[#0A0A0A] tracking-tighter">Admin Control Center</h1>
@@ -201,7 +201,7 @@ export default function AdminDashboard() {
         <div className="grid lg:grid-cols-3 gap-8 mb-12">
           {/* Market Prices Section */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden">
+            <div className="bg-white h-full rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden">
               <div className="p-8 border-b border-gray-50 flex items-center justify-between">
                 <h2 className="text-2xl font-black text-[#0A0A0A] tracking-tighter flex items-center gap-3">
                   <div className="w-10 h-10 rounded-2xl bg-[#22FF88]/10 flex items-center justify-center text-[#22FF88]">
@@ -241,86 +241,104 @@ export default function AdminDashboard() {
           </div>
 
           {/* Weather Section */}
-          <div className="lg:col-span-1 space-y-8">
-            <div className="bg-white rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 p-8">
+          <div className="lg:col-span-1">
+            <div className="bg-white h-full rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 p-8">
               <h3 className="text-xl font-black text-[#0A0A0A] mb-6 flex items-center gap-3">
                 <div className="w-3 h-3 rounded-full bg-[#22FF88] animate-pulse"></div>
                 Live Weather
               </h3>
               <WeatherWidget />
-            </div>
-
-            {/* Quick Slot Management List */}
-            <div className="bg-white rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 p-8">
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <h3 className="text-xl font-black text-[#0A0A0A]">IKP Slots</h3>
-                  <p className="text-[10px] text-gray-400 font-bold uppercase">Dynamic Creation</p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-[#22FF88] animate-pulse"></div>
-                  <span className="text-[10px] font-black text-[#22FF88] uppercase">Active</span>
-                </div>
+              <div className="mt-8 p-6 bg-[#0A0A0A] rounded-3xl text-white">
+                <div className="text-[10px] font-black uppercase text-[#22FF88] mb-1">Advisory</div>
+                <p className="text-xs font-medium text-gray-300">Optimal moisture conditions for paddy collection today.</p>
               </div>
-              <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-                {slots.length === 0 ? (
-                  <p className="text-sm text-gray-400 text-center py-4">No slots created.</p>
-                ) : slots
-                  .sort((a, b) => {
-                    const dateA = new Date(a.date).getTime();
-                    const dateB = new Date(b.date).getTime();
-                    const isExpiredA = dateA < new Date(new Date().setHours(0,0,0,0)).getTime();
-                    const isExpiredB = dateB < new Date(new Date().setHours(0,0,0,0)).getTime();
-                    // Live slots first, sorted by date ascending (soonest first)
-                    // Then expired slots, sorted by date descending (most recent first)
-                    if (isExpiredA !== isExpiredB) {
-                      return isExpiredA ? 1 : -1;
-                    }
-                    return dateA - dateB;
-                  }).map((slot) => {
-                  const isExpired = new Date(slot.date) < new Date(new Date().setHours(0,0,0,0));
-                  return (
-                    <div key={slot.id} className={`p-4 rounded-2xl border transition-all flex items-center justify-between group ${isExpired ? 'bg-gray-50 border-gray-100' : 'bg-white border-gray-100 hover:border-[#22FF88] shadow-sm'}`}>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className={`text-sm font-black ${isExpired ? 'text-gray-400' : 'text-[#0A0A0A]'}`}>
-                            {new Date(slot.date).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}
-                          </span>
-                          {isExpired ? (
-                            <span className="text-[8px] font-black bg-gray-200 text-gray-500 px-1.5 py-0.5 rounded uppercase">Expired</span>
-                          ) : (
-                            <span className="text-[8px] font-black bg-[#22FF88]/10 text-[#22FF88] px-1.5 py-0.5 rounded uppercase">Live</span>
-                          )}
-                        </div>
-                        <div className="text-[10px] font-bold text-gray-400 uppercase">{slot.startTime} - {slot.endTime}</div>
-                        <div className="flex items-center gap-2 mt-1">
-                          <div className="w-16 h-1 bg-gray-100 rounded-full overflow-hidden">
-                            <div 
-                              className={`h-full transition-all ${isExpired ? 'bg-gray-300' : 'bg-[#22FF88]'}`} 
-                              style={{ width: `${Math.min(100, (slot.currentBookings / slot.capacity) * 100)}%` }}
-                            ></div>
-                          </div>
-                          <div className="text-[9px] font-black text-gray-500 uppercase">{slot.currentBookings}/{slot.capacity} Booked</div>
-                        </div>
-                      </div>
-                      <button 
-                        onClick={() => handleDeleteSlot(slot.id)}
-                        className="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all opacity-0 group-hover:opacity-100"
-                        title="Delete Slot"
-                      >
-                        <HiOutlineTrash className="w-4 h-4" />
-                      </button>
-                    </div>
-                  );
-                })}
+            </div>
+          </div>
+        </div>
+
+        {/* New Horizontal IKP Slots Section */}
+        <div className="mb-12">
+          <div className="bg-white rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 p-8 overflow-hidden">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+              <div>
+                <h3 className="text-2xl font-black text-[#0A0A0A] tracking-tighter">IKP Logistics Center</h3>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Active Collection Windows</p>
               </div>
               <button 
                 onClick={() => setShowSlotModal(true)}
-                className="w-full mt-6 py-4 bg-gray-50 hover:bg-[#0A0A0A] hover:text-white text-[#0A0A0A] rounded-2xl text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2"
+                className="px-6 py-3 bg-[#0A0A0A] text-[#22FF88] rounded-2xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all flex items-center gap-2"
               >
                 <HiOutlinePlus className="w-4 h-4" />
                 Add New Window
               </button>
+            </div>
+
+            <div className="flex gap-6 overflow-x-auto pb-6 custom-scrollbar snap-x">
+              {slots.length === 0 ? (
+                <div className="w-full text-center py-12 text-gray-300 font-bold italic">No collection windows scheduled.</div>
+              ) : slots.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map((slot) => {
+                const isExpired = new Date(slot.date) < new Date(new Date().setHours(0,0,0,0));
+                const fillPercent = Math.min(100, (slot.currentBookings / slot.capacity) * 100);
+                
+                return (
+                  <motion.div 
+                    key={slot.id} 
+                    whileHover={{ y: -5 }}
+                    className={`min-w-[280px] md:min-w-[320px] p-6 rounded-3xl border transition-all snap-start relative group ${
+                      isExpired ? 'bg-gray-50 border-gray-100 opacity-60' : 'bg-white border-gray-100 hover:border-[#22FF88] shadow-lg shadow-gray-200/20'
+                    }`}
+                  >
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center text-[#0A0A0A]">
+                        <HiOutlineCalendar className="w-6 h-6" />
+                      </div>
+                      <div className="flex flex-col items-end">
+                        {isExpired ? (
+                          <span className="px-2 py-1 bg-gray-200 text-gray-500 rounded-lg text-[8px] font-black uppercase">Expired</span>
+                        ) : (
+                          <span className="px-2 py-1 bg-[#22FF88]/10 text-[#22FF88] rounded-lg text-[8px] font-black uppercase animate-pulse">Live Window</span>
+                        )}
+                        <button 
+                          onClick={() => handleDeleteSlot(slot.id)}
+                          className="mt-2 p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all opacity-0 group-hover:opacity-100"
+                        >
+                          <HiOutlineTrash className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="mb-4">
+                      <div className="text-xl font-black text-[#0A0A0A]">
+                        {new Date(slot.date).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' })}
+                      </div>
+                      <div className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                        {slot.startTime} — {slot.endTime}
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest">
+                        <span className="text-gray-400">Capacity Status</span>
+                        <span className={fillPercent >= 100 ? 'text-red-500' : 'text-[#22FF88]'}>
+                          {slot.currentBookings} / {slot.capacity}
+                        </span>
+                      </div>
+                      <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                        <motion.div 
+                          initial={{ width: 0 }}
+                          animate={{ width: `${fillPercent}%` }}
+                          className={`h-full transition-all ${isExpired ? 'bg-gray-300' : fillPercent >= 90 ? 'bg-red-500' : 'bg-[#22FF88]'}`}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="mt-4 pt-4 border-t border-gray-50 flex items-center gap-2 text-gray-400">
+                      <HiOutlineLocationMarker className="w-4 h-4" />
+                      <span className="text-[10px] font-bold uppercase">{slot.location}</span>
+                    </div>
+                  </motion.div>
+                );
+              })}
             </div>
           </div>
         </div>
