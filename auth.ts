@@ -8,26 +8,38 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
   providers: [
     Credentials({
       async authorize(credentials) {
-        console.log('Authorize attempt for:', credentials?.email);
-        if (!credentials?.email || !credentials?.password) {
-          console.log('Missing credentials');
+        const identifier = credentials?.email as string;
+        const password = credentials?.password as string;
+
+        console.log('--- Auth Attempt ---');
+        console.log('Identifier:', identifier);
+        
+        if (!identifier || !password) {
+          console.log('Status: Missing credentials');
           return null;
         }
 
         try {
-          const user = await prisma.user.findUnique({
-            where: { email: credentials.email as string },
+          // Find user by email OR phone (allowing phone login in the email field)
+          const user = await prisma.user.findFirst({
+            where: {
+              OR: [
+                { email: identifier },
+                { phone: identifier },
+              ],
+            },
           });
 
           if (!user) {
-            console.log('User not found:', credentials.email);
+            console.log('Status: User not found in DB');
             return null;
           }
 
-          // In a real app, use bcrypt to compare hashed passwords
-          // For now, doing direct comparison as requested by the user's flow
-          const passwordsMatch = credentials.password === user.password;
-          console.log('Password match:', passwordsMatch);
+          console.log('User found:', user.email || user.phone, 'Role:', user.role);
+
+          // Direct comparison as currently implemented in the seed/user flow
+          const passwordsMatch = password === user.password;
+          console.log('Password Match:', passwordsMatch);
 
           if (passwordsMatch) {
             return {
@@ -36,9 +48,11 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
               email: user.email,
               role: user.role,
             };
+          } else {
+            console.log('Status: Password mismatch');
           }
-        } catch (error) {
-          console.error('Database error during authorize:', error);
+        } catch (error: any) {
+          console.error('Database/Supabase Error:', error.message);
           throw error;
         }
 
@@ -46,6 +60,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
       },
     }),
   ],
+  // Use session callbacks to persist the role to the client side
   callbacks: {
     async jwt({ token, user }) {
       if (user) {

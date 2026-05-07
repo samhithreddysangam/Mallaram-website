@@ -4,6 +4,10 @@ export const authConfig = {
   pages: {
     signIn: '/login',
   },
+  session: {
+    strategy: 'jwt', // Required for middleware session access
+  },
+  trustHost: true,
   callbacks: {
     async jwt({ token, user }) {
       if (user) {

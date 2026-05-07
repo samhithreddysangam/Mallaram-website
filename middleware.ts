@@ -1,7 +1,6 @@
 import NextAuth from 'next-auth';
 import { authConfig } from './auth.config';
 import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
 import { locales, defaultLocale } from '@/lib/i18n';
 
 const { auth } = NextAuth(authConfig);
@@ -18,6 +17,10 @@ export default auth((req) => {
 
   if (pathnameIsMissingLocale) {
     const locale = defaultLocale;
+    // Don't redirect if it's an API route or static asset (though matcher should handle this)
+    if (pathname.startsWith('/api') || pathname.startsWith('/_next')) {
+      return NextResponse.next();
+    }
     return NextResponse.redirect(
       new URL(`/${locale}${pathname}`, req.url)
     );
@@ -28,7 +31,12 @@ export default auth((req) => {
   const isOnDashboard = pathname.includes('/dashboard');
   const isOnAdminDashboard = pathname.includes('/dashboard/admin');
   const isOnLogin = pathname.includes('/login');
-  const userRole = (req.auth?.user as any)?.role;
+  
+  // Extract user info from the session
+  const user = req.auth?.user as any;
+  const userRole = user?.role;
+
+  console.log(`Middleware: ${pathname} | Auth: ${isLoggedIn} | Role: ${userRole}`);
 
   // Protect all dashboard routes
   if (isOnDashboard) {
@@ -38,6 +46,7 @@ export default auth((req) => {
     
     // Specifically protect ADMIN dashboard
     if (isOnAdminDashboard && userRole !== 'ADMIN') {
+      console.log('Middleware: Redirecting non-admin away from admin dashboard');
       return NextResponse.redirect(new URL(`/${locale}/ikp-booking`, nextUrl));
     }
   }
