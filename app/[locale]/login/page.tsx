@@ -6,7 +6,7 @@ import { Locale, getDictionary } from '@/lib/i18n';
 import Navigation from '@/components/Navigation/Navigation';
 import Footer from '@/components/Footer/Footer';
 import { motion } from 'framer-motion';
-import { HiOutlineMail, HiOutlineLockClosed, HiOutlineArrowRight, HiOutlineEye, HiOutlineEyeOff } from 'react-icons/hi2';
+import { HiOutlineEnvelope, HiOutlineLockClosed, HiOutlineArrowRight, HiOutlineEye, HiOutlineEyeSlash } from 'react-icons/hi2';
 import { signIn, useSession } from 'next-auth/react';
 
 export default function LoginPage() {
@@ -101,7 +101,7 @@ export default function LoginPage() {
               </label>
               <div className="relative group">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/30 group-focus-within:text-primary transition-colors">
-                  <HiOutlineMail className="text-xl" />
+                  <HiOutlineEnvelope className="text-xl" />
                 </div>
                 <input
                   type="email"
@@ -135,7 +135,7 @@ export default function LoginPage() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-primary/30 hover:text-primary transition-colors"
                 >
-                  {showPassword ? <HiOutlineEyeOff className="text-xl" /> : <HiOutlineEye className="text-xl" />}
+                  {showPassword ? <HiOutlineEyeSlash className="text-xl" /> : <HiOutlineEye className="text-xl" />}
                 </button>
               </div>
             </div>
