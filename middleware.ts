@@ -43,7 +43,7 @@ export default auth((req) => {
   }
 
   // Redirect to appropriate dashboard if logged in and trying to access login page
-  if (isOnLogin && isLoggedIn) {
+  if (isOnLogin && isLoggedIn && userRole) {
     if (userRole === 'ADMIN') {
       return NextResponse.redirect(new URL(`/${locale}/dashboard/admin`, nextUrl));
     }
