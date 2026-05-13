@@ -82,6 +82,16 @@ Create a modern digital identity for Mallaram village that showcases development
 
 ---
 
+### Phase 05: Feature Integration
+**Goal:** Integrate 9 demo features from temp_source_repo, adapting to existing UI and i18n system
+
+**Requirements:** `[FEAT-01, FEAT-02]`
+
+**Plans:**
+- [ ] 05-features/05-features-PLAN.md — Integrate: CommandCenter, Analytics, TransparencyPortal, WaterGovernance, GrievanceSystem, EmergencyAlerts, (adapted to match existing UI)
+
+---
+
 ## Requirement Index
 
 | ID | Requirement | Phase |
@@ -100,6 +110,8 @@ Create a modern digital identity for Mallaram village that showcases development
 | INT-01 | Complaint CTA with Google Forms link | 04 |
 | INT-02 | Contact section (Panchayat details, phone, address) | 04 |
 | INT-03 | Google Maps embed | 04 |
+| FEAT-01 | Integrate demo features from temp_source_repo | 05 |
+| FEAT-02 | Adapt features to match existing design system | 05 |
 
 ---
 
