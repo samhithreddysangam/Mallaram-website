@@ -2,6 +2,9 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { ArrowRight } from 'lucide-react';
+import { HiOutlineMail, HiOutlinePhone, HiOutlineLocationMarker } from 'react-icons/hi';
+import { FaInstagram, FaFacebook, FaTwitter, FaLinkedin } from 'react-icons/fa';
 import { Locale, getDictionary, getTranslations } from '@/lib/i18n';
 
 interface FooterProps {
@@ -18,6 +21,13 @@ export default function Footer({ locale }: FooterProps) {
     { key: 'gallery', href: `/${locale}#gallery` },
     { key: 'events', href: `/${locale}#events` },
     { key: 'contact', href: `/${locale}#contact` },
+  ];
+
+  const socialLinks = [
+    { icon: FaTwitter, label: 'Twitter', href: '#' },
+    { icon: FaFacebook, label: 'Facebook', href: '#' },
+    { icon: FaInstagram, label: 'Instagram', href: '#' },
+    { icon: FaLinkedin, label: 'Linkedin', href: '#' },
   ];
 
   return (
@@ -45,10 +55,14 @@ export default function Footer({ locale }: FooterProps) {
               A pioneering smart village initiative focused on transparency, digital inclusion, and community-driven progress.
             </p>
             <div className="flex gap-4">
-              {['Twitter', 'Facebook', 'Instagram'].map(social => (
-                <a key={social} href="#" className="w-12 h-12 rounded-2xl bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:bg-[#15803d] hover:text-white transition-all shadow-sm">
-                  <span className="sr-only">{social}</span>
-                  <div className="w-5 h-5 bg-current rounded-sm opacity-20" />
+              {socialLinks.map((social, i) => (
+                <a 
+                  key={i} 
+                  href={social.href} 
+                  className="w-12 h-12 rounded-2xl bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:bg-[#15803d] hover:text-white transition-all shadow-sm hover:-translate-y-1"
+                >
+                  <span className="sr-only">{social.label}</span>
+                  <social.icon className="w-5 h-5" />
                 </a>
               ))}
             </div>
@@ -84,7 +98,7 @@ export default function Footer({ locale }: FooterProps) {
                 className="inline-flex items-center gap-3 text-[10px] font-black text-[#15803d] uppercase tracking-[0.2em] group"
               >
                 Access Admin Panel
-                <span className="w-10 h-[2px] bg-[#15803d]/20 group-hover:bg-[#15803d] transition-all group-hover:w-16"></span>
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-2" />
               </Link>
             </div>
           </div>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { HiOutlineCalendar, HiOutlineClock, HiOutlineUser, HiOutlinePhone, HiOutlineIdentification, HiCheckCircle, HiSearch, HiArrowLeft } from 'react-icons/hi';
+import { Calendar, Clock, User, Phone, Fingerprint, CheckCircle, Search, ArrowLeft } from 'lucide-react';
 import { Locale, getDictionary } from '@/lib/i18n';
 
 interface Slot {
@@ -128,7 +128,7 @@ export default function BookingSystem({ locale }: BookingSystemProps) {
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <label className="flex items-center gap-2 text-xs font-black text-primary uppercase tracking-widest mb-3 px-1">
-                    <HiOutlineUser className="w-4 h-4" />
+                    <User className="w-4 h-4" />
                     {ikp.name}
                   </label>
                   <input
@@ -142,7 +142,7 @@ export default function BookingSystem({ locale }: BookingSystemProps) {
                 </div>
                 <div>
                   <label className="flex items-center gap-2 text-xs font-black text-primary uppercase tracking-widest mb-3 px-1">
-                    <HiOutlinePhone className="w-4 h-4" />
+                    <Phone className="w-4 h-4" />
                     {ikp.phone}
                   </label>
                   <input
@@ -159,7 +159,7 @@ export default function BookingSystem({ locale }: BookingSystemProps) {
               {/* Slot Selection */}
               <div>
                 <label className="flex items-center gap-2 text-xs font-black text-primary uppercase tracking-widest mb-4 px-1">
-                  <HiOutlineCalendar className="w-4 h-4" />
+                  <Calendar className="w-4 h-4" />
                   Select Submission Slot
                 </label>
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -188,7 +188,7 @@ export default function BookingSystem({ locale }: BookingSystemProps) {
                       >
                         <div className="font-bold text-primary-dark mb-1">{date}</div>
                         <div className="flex items-center gap-2 text-[10px] font-bold text-earth mb-2 uppercase tracking-tighter">
-                          <HiOutlineClock className="w-3 h-3" />
+                          <Clock className="w-3 h-3" />
                           {slot.startTime} - {slot.endTime}
                         </div>
                         <div className={`text-[10px] font-black uppercase ${isFull ? 'text-red-500' : 'text-green-600'}`}>
@@ -235,7 +235,7 @@ export default function BookingSystem({ locale }: BookingSystemProps) {
                   disabled={searching}
                   className="px-8 py-4 bg-primary text-white rounded-2xl font-black uppercase tracking-widest shadow-lg hover:bg-earth transition-all"
                 >
-                  <HiSearch className="w-6 h-6" />
+                  <Search className="w-6 h-6" />
                 </button>
               </div>
 
@@ -289,7 +289,7 @@ export default function BookingSystem({ locale }: BookingSystemProps) {
               className="text-center py-10"
             >
               <div className="w-24 h-24 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                <HiCheckCircle className="w-16 h-16" />
+                <CheckCircle className="w-16 h-16" />
               </div>
               <h3 className="text-3xl font-black text-primary-dark mb-4">{ikp.success}</h3>
               <p className="text-earth max-w-sm mx-auto mb-10 font-medium">
@@ -299,7 +299,7 @@ export default function BookingSystem({ locale }: BookingSystemProps) {
                 onClick={() => setView('book')}
                 className="inline-flex items-center gap-2 px-10 py-4 bg-primary text-white rounded-full font-black uppercase tracking-widest shadow-xl hover:bg-earth transition-all"
               >
-                <HiArrowLeft className="w-5 h-5" />
+                <ArrowLeft className="w-5 h-5" />
                 {ikp.bookNew}
               </button>
             </motion.div>

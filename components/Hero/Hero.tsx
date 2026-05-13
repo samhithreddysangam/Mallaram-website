@@ -34,7 +34,7 @@ export default function Hero({ locale }: HeroProps) {
         <motion.div
           key={currentSlide}
           initial={{ opacity: 0, scale: 1.1 }}
-          animate={{ opacity: 0.3, scale: 1 }}
+          animate={{ opacity: 0.7, scale: 1 }}
           exit={{ opacity: 0, scale: 1.05 }}
           transition={{ duration: 2, ease: "easeOut" }}
           className="absolute inset-0 z-0"
@@ -42,7 +42,7 @@ export default function Hero({ locale }: HeroProps) {
           <img
             src={heroImages[currentSlide].src}
             alt={heroImages[currentSlide].alt}
-            className="w-full h-full object-cover opacity-60"
+            className="w-full h-full object-cover"
           />
           {/* Overlay Vignetts */}
           <div className="absolute inset-0 bg-gradient-to-t from-[#FAF9F6] via-transparent to-[#FAF9F6]/80" />
@@ -130,15 +130,7 @@ export default function Hero({ locale }: HeroProps) {
         ))}
       </div>
 
-      {/* Scroll indicator */}
-      <motion.div
-        animate={{ y: [0, 10, 0] }}
-        transition={{ repeat: Infinity, duration: 2 }}
-        className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4 opacity-40 hover:opacity-100 transition-opacity cursor-pointer"
-      >
-        <span className="text-[9px] font-black text-[#0A0A0A] uppercase tracking-[0.4em] [writing-mode:vertical-lr]">Scroll</span>
-        <div className="w-px h-16 bg-gradient-to-b from-[#0A0A0A]/0 via-[#0A0A0A] to-[#0A0A0A]/0"></div>
-      </motion.div>
+      
     </section>
   );
 }

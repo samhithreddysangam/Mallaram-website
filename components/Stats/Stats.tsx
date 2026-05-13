@@ -3,6 +3,8 @@
 import { motion } from 'framer-motion';
 import { Locale, getDictionary } from '@/lib/i18n';
 
+import { Users, Home, GraduationCap, BookOpen } from 'lucide-react';
+
 interface StatsProps {
   locale: Locale;
 }
@@ -11,10 +13,10 @@ export default function Stats({ locale }: StatsProps) {
   const dictionary = getDictionary(locale);
 
   const stats = [
-    { label: 'Population', value: '2000+', icon: '👥' },
-    { label: 'Households', value: '400+', icon: '🏠' },
-    { label: 'Schools', value: '2', icon: '🏫' },
-    { label: 'Literacy', value: '85%', icon: '📚' },
+    { label: 'Population', value: '2000+', icon: Users },
+    { label: 'Households', value: '400+', icon: Home },
+    { label: 'Schools', value: '2', icon: GraduationCap },
+    { label: 'Literacy', value: '85%', icon: BookOpen },
   ];
 
   return (
@@ -33,9 +35,9 @@ export default function Stats({ locale }: StatsProps) {
             >
               <div className="absolute inset-0 bg-white shadow-[0_8px_32px_rgba(0,0,0,0.03)] rounded-3xl border border-gray-100 group-hover:border-[#15803d]/50 transition-colors duration-500" />
               <div className="relative p-6 md:p-8 flex flex-col items-center text-center">
-                <span className="text-3xl md:text-4xl mb-4 transform group-hover:scale-125 transition-transform duration-500">
-                  {stat.icon}
-                </span>
+                <div className="w-16 h-16 rounded-2xl bg-[#15803d]/5 text-[#15803d] flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-[#15803d]/10 transition-all duration-500">
+                  <stat.icon className="w-8 h-8" />
+                </div>
                 <h3 className="text-2xl md:text-4xl font-black text-[#0A0A0A] mb-1 tracking-tighter">
                   {stat.value}
                 </h3>

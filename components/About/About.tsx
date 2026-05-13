@@ -2,12 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { Locale, getDictionary } from '@/lib/i18n';
-import { 
-  HiOutlineShieldCheck, 
-  HiOutlineUserGroup, 
-  HiOutlineCollection, 
-  HiOutlineChartBar,
-} from 'react-icons/hi';
+import { ShieldCheck, Users, Layers, BarChart } from 'lucide-react';
 
 interface AboutProps {
   locale: Locale;
@@ -18,10 +13,10 @@ export default function About({ locale }: AboutProps) {
   const { about } = dictionary;
 
   const featureIcons = [
-    <HiOutlineShieldCheck className="w-6 h-6" />,
-    <HiOutlineUserGroup className="w-6 h-6" />,
-    <HiOutlineCollection className="w-6 h-6" />,
-    <HiOutlineChartBar className="w-6 h-6" />
+    <ShieldCheck className="w-6 h-6" />,
+    <Users className="w-6 h-6" />,
+    <Layers className="w-6 h-6" />,
+    <BarChart className="w-6 h-6" />
   ];
 
   const features = [
@@ -105,7 +100,7 @@ export default function About({ locale }: AboutProps) {
           className="mt-20 p-12 bg-gradient-to-br from-[#15803d]/5 to-transparent rounded-[4rem] border border-[#15803d]/10 relative overflow-hidden"
         >
           <div className="absolute top-0 right-0 p-8 opacity-10">
-            <HiOutlineShieldCheck className="w-32 h-32 text-[#15803d]" />
+            <ShieldCheck className="w-32 h-32 text-[#15803d]" />
           </div>
           <p className="text-2xl md:text-4xl font-black text-[#0A0A0A] text-center leading-tight tracking-tighter uppercase">
             <span className="text-[#15803d]">“</span> {about.vision} <span className="text-[#15803d]">”</span>

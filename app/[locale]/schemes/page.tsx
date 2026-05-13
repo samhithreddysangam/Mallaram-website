@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { Locale, getDictionary } from '@/lib/i18n';
 import Navigation from '@/components/Navigation/Navigation';
 import Footer from '@/components/Footer/Footer';
-import { HiOutlineClock, HiOutlineArrowLeft } from 'react-icons/hi';
+import { Clock, ArrowLeft } from 'lucide-react';
 
 export default function SchemesPage() {
   const params = useParams();
@@ -31,7 +31,7 @@ export default function SchemesPage() {
           >
             {/* Icon */}
             <div className="inline-flex items-center justify-center w-24 h-24 bg-white rounded-[2rem] shadow-xl border border-primary/10 text-primary mb-4">
-              <HiOutlineClock className="w-12 h-12" />
+              <Clock className="w-12 h-12" />
             </div>
 
             {/* Content */}
@@ -55,7 +55,7 @@ export default function SchemesPage() {
                 href={`/${locale}`}
                 className="inline-flex items-center gap-2 px-8 py-4 bg-primary text-white font-bold rounded-full shadow-lg hover:bg-earth transition-all active:scale-95"
               >
-                <HiOutlineArrowLeft className="w-5 h-5" />
+                <ArrowLeft className="w-5 h-5" />
                 {comingSoon.backHome}
               </Link>
             </motion.div>

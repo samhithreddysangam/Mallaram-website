@@ -7,7 +7,7 @@ import Footer from '@/components/Footer/Footer';
 import BookingSystem from '@/components/Agriculture/BookingSystem';
 import { WeatherWidget, MarketPrices } from '@/components/Agriculture/AgriWidgets';
 import { motion } from 'framer-motion';
-import { HiOutlineBell, HiOutlineUserCircle, HiOutlineLogout } from 'react-icons/hi';
+import { Bell, UserCircle, LogOut } from 'lucide-react';
 
 import { useSession } from 'next-auth/react';
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { Lightbulb, Video, Recycle, Zap, Activity } from 'lucide-react';
 import { Locale, getDictionary } from '@/lib/i18n';
 
 interface SmartCommandCenterProps {
@@ -11,10 +12,10 @@ export default function SmartCommandCenter({ locale }: SmartCommandCenterProps) 
   const dictionary = getDictionary(locale);
 
   const metrics = [
-    { label: 'Street Lights', value: '142/145', status: 'Optimal', icon: '💡', color: '#15803d' },
-    { label: 'CCTV Network', value: '12 Active', status: 'Secure', icon: '📹', color: '#15803d' },
-    { label: 'Waste Collection', value: '98%', status: 'Regular', icon: '♻️', color: '#15803d' },
-    { label: 'Power Grid', value: 'Stable', status: 'Online', icon: '⚡', color: '#15803d' },
+    { label: 'Street Lights', value: '142/145', status: 'Optimal', icon: Lightbulb, color: 'text-amber-500', bg: 'bg-amber-500/10' },
+    { label: 'CCTV Network', value: '12 Active', status: 'Secure', icon: Video, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+    { label: 'Waste Collection', value: '98%', status: 'Regular', icon: Recycle, color: 'text-green-500', bg: 'bg-green-500/10' },
+    { label: 'Power Grid', value: 'Stable', status: 'Online', icon: Zap, color: 'text-amber-500', bg: 'bg-amber-500/10' },
   ];
 
   return (
@@ -47,7 +48,9 @@ export default function SmartCommandCenter({ locale }: SmartCommandCenterProps) 
               transition={{ delay: i * 0.1 }}
               className="relative group p-10 bg-white shadow-[0_8px_32px_rgba(0,0,0,0.03)] rounded-[3rem] border border-gray-100 hover:border-[#15803d]/40 transition-all duration-500"
             >
-              <div className="text-4xl mb-8 group-hover:scale-110 transition-transform duration-500">{metric.icon}</div>
+              <div className={`w-16 h-16 rounded-2xl ${metric.bg} ${metric.color} flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-500`}>
+                <metric.icon className="w-8 h-8" />
+              </div>
               <div className="space-y-1">
                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{metric.label}</p>
                 <h4 className="text-3xl font-black text-[#0A0A0A] tracking-tighter">{metric.value}</h4>

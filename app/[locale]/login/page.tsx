@@ -6,7 +6,7 @@ import { Locale, getDictionary } from '@/lib/i18n';
 import Navigation from '@/components/Navigation/Navigation';
 import Footer from '@/components/Footer/Footer';
 import { motion } from 'framer-motion';
-import { HiOutlineEnvelope, HiOutlineLockClosed, HiOutlineArrowRight, HiOutlineEye, HiOutlineEyeSlash } from 'react-icons/hi2';
+import { Mail, Lock, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { signIn, useSession } from 'next-auth/react';
 
 export default function LoginPage() {
@@ -102,7 +102,7 @@ export default function LoginPage() {
               </label>
               <div className="relative group">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/30 group-focus-within:text-primary transition-colors">
-                  <HiOutlineEnvelope className="text-xl" />
+                  <Mail className="text-xl" />
                 </div>
                 <input
                   type="text"
@@ -121,7 +121,7 @@ export default function LoginPage() {
               </label>
               <div className="relative group">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/30 group-focus-within:text-primary transition-colors">
-                  <HiOutlineLockClosed className="text-xl" />
+                  <Lock className="text-xl" />
                 </div>
                 <input
                   type={showPassword ? "text" : "password"}
@@ -136,7 +136,7 @@ export default function LoginPage() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-primary/30 hover:text-primary transition-colors"
                 >
-                  {showPassword ? <HiOutlineEyeSlash className="text-xl" /> : <HiOutlineEye className="text-xl" />}
+                  {showPassword ? <EyeOff className="text-xl" /> : <Eye className="text-xl" />}
                 </button>
               </div>
             </div>
@@ -150,7 +150,7 @@ export default function LoginPage() {
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
               ) : (
                 <>
-                  <HiOutlineArrowRight className="text-xl group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="text-xl group-hover:translate-x-1 transition-transform" />
                   {auth.signIn}
                 </>
               )}

@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { GraduationCap, HeartPulse, Map, Droplets, Zap } from 'lucide-react';
 import { Locale, getDictionary, getTranslations } from '@/lib/i18n';
 
 interface FacilitiesProps {
@@ -10,44 +11,23 @@ interface FacilitiesProps {
 const facilities = [
   {
     key: 'schools',
-    icon: (
-      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 14l9-5-9-5-9 5 9 5z" />
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
-      </svg>
-    ),
+    icon: GraduationCap,
   },
   {
     key: 'healthcare',
-    icon: (
-      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-      </svg>
-    ),
+    icon: HeartPulse,
   },
   {
     key: 'roads',
-    icon: (
-      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-      </svg>
-    ),
+    icon: Map,
   },
   {
     key: 'water',
-    icon: (
-      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547" />
-      </svg>
-    ),
+    icon: Droplets,
   },
   {
     key: 'electricity',
-    icon: (
-      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
-      </svg>
-    ),
+    icon: Zap,
   },
 ];
 
@@ -90,7 +70,7 @@ export default function Facilities({ locale }: FacilitiesProps) {
               <div className="h-full flex flex-col items-center text-center p-10 bg-white shadow-[0_8px_32px_rgba(0,0,0,0.03)] rounded-[3rem] border border-gray-100 hover:border-[#15803d]/40 transition-all duration-500">
                 {/* Icon */}
                 <div className="w-20 h-20 rounded-2xl bg-[#FAF9F6] flex items-center justify-center text-gray-400 mb-8 group-hover:bg-[#15803d] group-hover:text-white transition-all duration-500 group-hover:scale-110">
-                  {facility.icon}
+                  <facility.icon className="w-8 h-8" />
                 </div>
                 
                 {/* Label */}

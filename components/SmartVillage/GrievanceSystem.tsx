@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { BarChart3, MessageSquare } from 'lucide-react';
 import { Locale, getDictionary } from '@/lib/i18n';
 
 interface GrievanceSystemProps {
@@ -31,11 +32,13 @@ export default function GrievanceSystem({ locale }: GrievanceSystemProps) {
 
             <div className="flex flex-col gap-6">
               {[
-                { label: 'Total Resolved', value: '428', color: '#15803d' },
-                { label: 'Avg Resolution Time', value: '3.2 Days', color: '#15803d' },
+                { label: 'Total Resolved', value: '428', icon: BarChart3 },
+                { label: 'Avg Resolution Time', value: '3.2 Days', icon: MessageSquare },
               ].map((stat, i) => (
-                <div key={i} className="flex items-center gap-6 p-6 rounded-3xl bg-[#FAF9F6] border border-gray-100">
-                  <div className="w-16 h-16 rounded-2xl bg-white flex items-center justify-center text-2xl shadow-sm">📊</div>
+                <div key={i} className="flex items-center gap-6 p-6 rounded-3xl bg-[#FAF9F6] border border-gray-100 group transition-all">
+                  <div className="w-16 h-16 rounded-2xl bg-white flex items-center justify-center text-[#15803d] shadow-sm group-hover:scale-110 transition-transform">
+                    <stat.icon className="w-8 h-8" />
+                  </div>
                   <div>
                     <h4 className="text-2xl font-black text-[#0A0A0A] tracking-tighter">{stat.value}</h4>
                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{stat.label}</p>

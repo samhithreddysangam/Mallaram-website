@@ -6,7 +6,7 @@ import { Locale, getDictionary } from '@/lib/i18n';
 import Navigation from '@/components/Navigation/Navigation';
 import Footer from '@/components/Footer/Footer';
 import { motion } from 'framer-motion';
-import { HiOutlineDocumentSearch, HiOutlineDatabase, HiOutlineCloudUpload, HiOutlineCheck, HiOutlineX, HiOutlineCurrencyRupee, HiOutlinePlus, HiOutlineBell, HiOutlineLocationMarker, HiOutlineCalendar, HiOutlineClock, HiOutlineTrash } from 'react-icons/hi';
+import { Search, Database, Upload, Check, X, IndianRupee, Plus, Bell, MapPin, Calendar, Clock, Trash2 } from 'lucide-react';
 import { WeatherWidget } from '@/components/Agriculture/AgriWidgets';
 
 export default function AdminDashboard() {
@@ -151,14 +151,14 @@ export default function AdminDashboard() {
               onClick={() => setShowSlotModal(true)}
               className="px-6 py-3 bg-[#0A0A0A] text-white rounded-2xl text-sm font-bold hover:bg-black transition-all flex items-center gap-2 shadow-xl shadow-black/10"
             >
-              <HiOutlineCalendar className="w-4 h-4" />
+              <Calendar className="w-4 h-4" />
               Create Slot
             </button>
             <button 
               onClick={() => setShowPriceModal(true)}
               className="px-6 py-3 bg-[#22FF88] text-[#0A0A0A] rounded-2xl text-sm font-bold hover:bg-[#1DE97B] transition-all flex items-center gap-2 shadow-xl shadow-[#22FF88]/20"
             >
-              <HiOutlineCurrencyRupee className="w-4 h-4" />
+              <IndianRupee className="w-4 h-4" />
               Update Prices
             </button>
           </div>
@@ -182,7 +182,7 @@ export default function AdminDashboard() {
           <motion.div whileHover={{ y: -5 }} className="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100">
             <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Location Status</div>
             <div className="text-xl font-black text-[#0A0A0A] flex items-center gap-2">
-              <HiOutlineLocationMarker className="w-5 h-5 text-[#22FF88]" />
+              <MapPin className="w-5 h-5 text-[#22FF88]" />
               IKP Centre
             </div>
             <div className="text-[10px] text-gray-500 font-bold mt-2">Mallaram Village DCF</div>
@@ -192,7 +192,7 @@ export default function AdminDashboard() {
             <div className="text-[10px] font-black uppercase mb-1 opacity-50">Quick Alert</div>
             <div className="text-xl font-black mb-4">Emergency Broadcast</div>
             <a href="https://voice.sendgun.in/login.php" target="_blank" className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#22FF88] text-[#0A0A0A] rounded-xl text-xs font-black uppercase tracking-tighter hover:scale-105 transition-all">
-              <HiOutlineBell className="w-4 h-4" />
+              <Bell className="w-4 h-4" />
               Launch Voice Alert
             </a>
           </motion.div>
@@ -205,7 +205,7 @@ export default function AdminDashboard() {
               <div className="p-8 border-b border-gray-50 flex items-center justify-between">
                 <h2 className="text-2xl font-black text-[#0A0A0A] tracking-tighter flex items-center gap-3">
                   <div className="w-10 h-10 rounded-2xl bg-[#22FF88]/10 flex items-center justify-center text-[#22FF88]">
-                    <HiOutlineCurrencyRupee className="w-6 h-6" />
+                    <IndianRupee className="w-6 h-6" />
                   </div>
                   Market Prices
                 </h2>
@@ -268,7 +268,7 @@ export default function AdminDashboard() {
                 onClick={() => setShowSlotModal(true)}
                 className="px-6 py-3 bg-[#0A0A0A] text-[#22FF88] rounded-2xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all flex items-center gap-2"
               >
-                <HiOutlinePlus className="w-4 h-4" />
+                <Plus className="w-4 h-4" />
                 Add New Window
               </button>
             </div>
@@ -290,7 +290,7 @@ export default function AdminDashboard() {
                   >
                     <div className="flex justify-between items-start mb-4">
                       <div className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center text-[#0A0A0A]">
-                        <HiOutlineCalendar className="w-6 h-6" />
+                        <Calendar className="w-6 h-6" />
                       </div>
                       <div className="flex flex-col items-end">
                         {isExpired ? (
@@ -302,7 +302,7 @@ export default function AdminDashboard() {
                           onClick={() => handleDeleteSlot(slot.id)}
                           className="mt-2 p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all opacity-0 group-hover:opacity-100"
                         >
-                          <HiOutlineTrash className="w-4 h-4" />
+                          <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
                     </div>
@@ -333,7 +333,7 @@ export default function AdminDashboard() {
                     </div>
 
                     <div className="mt-4 pt-4 border-t border-gray-50 flex items-center gap-2 text-gray-400">
-                      <HiOutlineLocationMarker className="w-4 h-4" />
+                      <MapPin className="w-4 h-4" />
                       <span className="text-[10px] font-bold uppercase">{slot.location}</span>
                     </div>
                   </motion.div>
@@ -349,7 +349,7 @@ export default function AdminDashboard() {
             <div>
               <h2 className="text-3xl font-black text-[#0A0A0A] tracking-tighter flex items-center gap-4">
                 <div className="w-12 h-12 rounded-2xl bg-[#0A0A0A] flex items-center justify-center text-white">
-                  <HiOutlineDocumentSearch className="w-6 h-6" />
+                  <Search className="w-6 h-6" />
                 </div>
                 Booking Requests
               </h2>
@@ -361,7 +361,7 @@ export default function AdminDashboard() {
                 placeholder="Search by farmer name or phone..." 
                 className="w-full md:w-80 pl-12 pr-6 py-4 bg-gray-50 border border-gray-100 rounded-[1.5rem] text-sm focus:outline-none focus:ring-4 focus:ring-[#22FF88]/10 focus:border-[#22FF88] transition-all font-bold"
               />
-              <HiOutlineDocumentSearch className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#22FF88] transition-colors" />
+              <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#22FF88] transition-colors" />
             </div>
           </div>
           
@@ -397,7 +397,7 @@ export default function AdminDashboard() {
                     <td className="px-10 py-7">
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500">
-                          <HiOutlineClock className="w-5 h-5" />
+                          <Clock className="w-5 h-5" />
                         </div>
                         <div>
                           <div className="text-sm font-black text-[#0A0A0A]">{new Date(booking.slot.date).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' })}</div>
@@ -430,14 +430,14 @@ export default function AdminDashboard() {
                             className="w-10 h-10 bg-[#22FF88] text-[#0A0A0A] rounded-xl flex items-center justify-center hover:scale-110 transition-all shadow-lg shadow-[#22FF88]/20"
                             title="Approve Booking"
                           >
-                            <HiOutlineCheck className="w-5 h-5" />
+                            <Check className="w-5 h-5" />
                           </button>
                           <button 
                             onClick={() => updateBookingStatus(booking.id, 'REJECTED')}
                             className="w-10 h-10 bg-white border border-gray-100 text-red-500 rounded-xl flex items-center justify-center hover:bg-red-50 hover:border-red-100 transition-all"
                             title="Reject Booking"
                           >
-                            <HiOutlineX className="w-5 h-5" />
+                            <X className="w-5 h-5" />
                           </button>
                         </div>
                       ) : (
@@ -455,7 +455,7 @@ export default function AdminDashboard() {
         {showSlotModal && (
           <div className="fixed inset-0 bg-[#0A0A0A]/90 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
             <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-[2.5rem] shadow-2xl p-10 w-full max-w-xl relative">
-              <button onClick={() => setShowSlotModal(false)} className="absolute top-8 right-8 text-gray-300 hover:text-[#0A0A0A] transition-colors"><HiOutlineX className="w-6 h-6"/></button>
+              <button onClick={() => setShowSlotModal(false)} className="absolute top-8 right-8 text-gray-300 hover:text-[#0A0A0A] transition-colors"><X className="w-6 h-6"/></button>
               <h3 className="text-3xl font-black text-[#0A0A0A] mb-2 tracking-tighter">Create IKP Slot</h3>
               <p className="text-gray-400 mb-8 font-medium">Add a new paddy collection window for farmers</p>
               
@@ -525,7 +525,7 @@ export default function AdminDashboard() {
         {showPriceModal && (
           <div className="fixed inset-0 bg-[#0A0A0A]/90 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
             <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-[2.5rem] shadow-2xl p-10 w-full max-w-md relative">
-              <button onClick={() => setShowPriceModal(false)} className="absolute top-8 right-8 text-gray-300 hover:text-[#0A0A0A] transition-colors"><HiOutlineX className="w-6 h-6"/></button>
+              <button onClick={() => setShowPriceModal(false)} className="absolute top-8 right-8 text-gray-300 hover:text-[#0A0A0A] transition-colors"><X className="w-6 h-6"/></button>
               <h3 className="text-3xl font-black text-[#0A0A0A] mb-8 tracking-tighter">Update Market Pricing</h3>
               <form onSubmit={handleAddPrice} className="space-y-6">
                 <div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { Waves, Droplets, Droplet, Target } from 'lucide-react';
 import { Locale, getDictionary } from '@/lib/i18n';
 
 interface WaterGovernanceProps {
@@ -11,10 +12,10 @@ export default function WaterGovernance({ locale }: WaterGovernanceProps) {
   const dictionary = getDictionary(locale);
 
   const waterSources = [
-    { label: 'Main Reservoir', level: 85, status: 'Stable', icon: '🌊' },
-    { label: 'Village Tank 1', level: 72, status: 'Normal', icon: '🚰' },
-    { label: 'Village Tank 2', level: 90, status: 'High', icon: '🚰' },
-    { label: 'Canal Flow', level: 45, status: 'Low', icon: '🌊' },
+    { label: 'Main Reservoir', level: 85, status: 'Stable', icon: Waves },
+    { label: 'Village Tank 1', level: 72, status: 'Normal', icon: Droplets },
+    { label: 'Village Tank 2', level: 90, status: 'High', icon: Droplets },
+    { label: 'Canal Flow', level: 45, status: 'Low', icon: Waves },
   ];
 
   return (
@@ -47,7 +48,9 @@ export default function WaterGovernance({ locale }: WaterGovernanceProps) {
               transition={{ delay: i * 0.1 }}
               className="group p-10 bg-white shadow-[0_8px_32px_rgba(0,0,0,0.03)] rounded-[3rem] border border-gray-100 hover:border-[#0ea5e9]/40 transition-all duration-500 text-center"
             >
-              <div className="text-5xl mb-8 group-hover:scale-110 transition-transform duration-500">{source.icon}</div>
+              <div className="w-20 h-20 rounded-3xl bg-[#0ea5e9]/10 text-[#0ea5e9] flex items-center justify-center mb-8 mx-auto group-hover:scale-110 transition-transform duration-500">
+                <source.icon className="w-10 h-10" />
+              </div>
               <h4 className="text-xl font-black text-[#0A0A0A] mb-8 uppercase tracking-tighter">{source.label}</h4>
               
               <div className="relative h-48 w-24 mx-auto bg-gray-50 rounded-3xl border border-gray-100 overflow-hidden">
@@ -84,7 +87,9 @@ export default function WaterGovernance({ locale }: WaterGovernanceProps) {
           className="mt-12 p-12 bg-white shadow-[0_8px_32px_rgba(0,0,0,0.03)] rounded-[4rem] border border-gray-100 flex flex-col md:flex-row items-center justify-between gap-8"
         >
           <div className="flex items-center gap-8">
-            <div className="w-20 h-20 rounded-3xl bg-[#0ea5e9]/10 text-[#0ea5e9] flex items-center justify-center text-3xl">⛲</div>
+            <div className="w-20 h-20 rounded-3xl bg-[#0ea5e9]/10 text-[#0ea5e9] flex items-center justify-center group-hover:scale-110 transition-transform">
+              <Target className="w-10 h-10" />
+            </div>
             <div>
               <h4 className="text-2xl font-black text-[#0A0A0A] uppercase tracking-tighter leading-none mb-2">Conservation Target</h4>
               <p className="text-gray-500 font-medium">Reduce waste by 15% this quarter</p>

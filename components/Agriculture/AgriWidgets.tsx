@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { HiOutlineSun, HiOutlineCloud, HiOutlineTrendingUp, HiOutlineTrendingDown, HiOutlineInformationCircle } from 'react-icons/hi';
+import { Sun, Cloud, TrendingUp, TrendingDown, Info } from 'lucide-react';
 
 export function WeatherWidget() {
   const [weather, setWeather] = useState<any>(null);
@@ -24,7 +24,7 @@ export function WeatherWidget() {
   return (
     <div className="bg-gradient-to-br from-blue-500 to-blue-700 rounded-3xl p-6 text-white shadow-lg relative overflow-hidden">
       {/* Decorative sun/cloud icon in background */}
-      <HiOutlineSun className="absolute -top-4 -right-4 w-32 h-32 opacity-20" />
+      <Sun className="absolute -top-4 -right-4 w-32 h-32 opacity-20" />
       
       <div className="relative z-10">
         <div className="flex justify-between items-start mb-4">
@@ -51,7 +51,7 @@ export function WeatherWidget() {
 
         {weather?.alerts && weather.alerts.length > 0 && (
           <div className="mt-4 p-3 bg-red-500/30 backdrop-blur-md rounded-xl border border-red-400/30 flex items-center gap-2">
-            <HiOutlineInformationCircle className="w-5 h-5 text-red-100" />
+            <Info className="w-5 h-5 text-red-100" />
             <span className="text-xs font-bold text-red-50 uppercase tracking-tighter">Rain Alert Active</span>
           </div>
         )}
@@ -79,7 +79,7 @@ export function MarketPrices() {
     <div className="bg-white rounded-3xl shadow-xl p-6 border border-primary/5">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-xl font-bold text-primary flex items-center gap-2">
-          <HiOutlineTrendingUp className="text-earth" />
+          <TrendingUp className="text-earth" />
           Market Prices
         </h3>
         <span className="text-[10px] text-earth uppercase tracking-widest font-bold">Today</span>
@@ -100,7 +100,7 @@ export function MarketPrices() {
             <div className="text-right">
               <div className="font-black text-primary text-base">₹{crop.price}</div>
               <div className="text-[10px] text-green-600 font-bold flex items-center justify-end gap-1">
-                <HiOutlineTrendingUp className="w-3 h-3" />
+                <TrendingUp className="w-3 h-3" />
                 +2.4%
               </div>
             </div>
