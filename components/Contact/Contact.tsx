@@ -7,7 +7,7 @@ interface ContactProps {
   locale: Locale;
 }
 
-const MAP_IFRAME_URL = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15197.696144885!2d78.8000000!3d18.5000000!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bcd02c00b02f7dd%3A0xc56220fad96b9943!2sMallaram%2C%20Telangana%20505403!5e0!3m2!1sen!2sin!4v1713870000000!5m2!1sen!2sin';
+
 
 export default function Contact({ locale }: ContactProps) {
   const dictionary = getDictionary(locale);
@@ -33,12 +33,12 @@ export default function Contact({ locale }: ContactProps) {
           </p>
         </motion.div>
 
-        <div className="grid lg:grid-cols-2 gap-12 items-stretch">
+        <div className="max-w-5xl mx-auto">
           {/* Contact Details */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className="p-10 bg-[#FAF9F6] rounded-[3rem] border border-gray-100 flex flex-col justify-between group hover:border-[#15803d]/30 transition-all duration-500"
             >
@@ -50,8 +50,8 @@ export default function Contact({ locale }: ContactProps) {
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
               className="p-10 bg-[#FAF9F6] rounded-[3rem] border border-gray-100 flex flex-col justify-between group hover:border-[#15803d]/30 transition-all duration-500"
@@ -64,43 +64,22 @@ export default function Contact({ locale }: ContactProps) {
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
-              className="p-10 bg-[#FAF9F6] rounded-[3rem] border border-gray-100 flex flex-col justify-between group hover:border-[#15803d]/30 transition-all duration-500 sm:col-span-2"
+              className="p-10 bg-[#FAF9F6] rounded-[3rem] border border-gray-100 flex flex-col justify-between group hover:border-[#15803d]/30 transition-all duration-500 sm:col-span-2 lg:col-span-1"
             >
               <div className="text-[10px] font-black text-[#15803d] uppercase tracking-widest mb-8">Digital Governance</div>
-              <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                <div>
-                  <h3 className="text-2xl font-black text-[#0A0A0A] mb-4 uppercase tracking-tighter">Support Email</h3>
-                  <p className="text-gray-600 font-medium leading-relaxed">admin@mallaram.in</p>
-                </div>
-                <a href="mailto:admin@mallaram.in" className="px-8 py-4 bg-[#15803d] text-white text-[10px] font-black uppercase tracking-widest rounded-2xl hover:scale-105 transition-all self-start md:self-auto">
+              <div>
+                <h3 className="text-2xl font-black text-[#0A0A0A] mb-4 uppercase tracking-tighter">Support Email</h3>
+                <p className="text-gray-600 font-medium leading-relaxed mb-6">admin@mallaram.in</p>
+                <a href="mailto:admin@mallaram.in" className="inline-block px-8 py-4 bg-[#15803d] text-white text-[10px] font-black uppercase tracking-widest rounded-2xl hover:scale-105 transition-all">
                   Message Us
                 </a>
               </div>
             </motion.div>
           </div>
-
-          {/* Map Visualization */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.98 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            className="rounded-[3rem] overflow-hidden border border-gray-100 min-h-[400px] grayscale hover:grayscale-0 transition-all duration-1000 shadow-sm"
-          >
-            <iframe
-              src={MAP_IFRAME_URL}
-              width="100%"
-              height="100%"
-              style={{ border: 0 }}
-              allowFullScreen
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              title="Mallaram Village Location"
-            />
-          </motion.div>
         </div>
       </div>
     </section>
