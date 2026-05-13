@@ -7,8 +7,6 @@ import {
   HiOutlineUserGroup, 
   HiOutlineCollection, 
   HiOutlineChartBar,
-  HiOutlineGlobeAlt,
-  HiOutlineScale
 } from 'react-icons/hi';
 
 interface AboutProps {
@@ -20,10 +18,10 @@ export default function About({ locale }: AboutProps) {
   const { about } = dictionary;
 
   const featureIcons = [
-    <HiOutlineShieldCheck className="w-8 h-8" />,
-    <HiOutlineUserGroup className="w-8 h-8" />,
-    <HiOutlineCollection className="w-8 h-8" />,
-    <HiOutlineChartBar className="w-8 h-8" />
+    <HiOutlineShieldCheck className="w-6 h-6" />,
+    <HiOutlineUserGroup className="w-6 h-6" />,
+    <HiOutlineCollection className="w-6 h-6" />,
+    <HiOutlineChartBar className="w-6 h-6" />
   ];
 
   const features = [
@@ -34,108 +32,64 @@ export default function About({ locale }: AboutProps) {
   ];
 
   return (
-    <section id="about" className="py-24 md:py-36 px-4 bg-[#FAF9F6] relative overflow-hidden">
-      {/* Background Subtle Patterns */}
-      <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-primary/5 blur-[120px] rounded-full -translate-y-1/2 translate-x-1/4" />
-      <div className="absolute bottom-0 left-0 w-1/4 h-1/4 bg-earth/5 blur-[100px] rounded-full translate-y-1/2 -translate-x-1/4" />
+    <section id="about" className="py-32 relative bg-[#FAF9F6] overflow-hidden">
+      {/* Ambient background */}
+      <div className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-40">
+        <div className="absolute top-[10%] right-[5%] w-[400px] h-[400px] bg-[#15803d]/5 blur-[100px] rounded-full" />
+        <div className="absolute bottom-[20%] left-[5%] w-[300px] h-[300px] bg-[#15803d]/5 blur-[80px] rounded-full" />
+      </div>
 
-      <div className="max-w-7xl mx-auto relative z-10">
-        {/* Section Header */}
-        <div className="flex flex-col md:flex-row items-end justify-between mb-20 gap-8">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 relative z-10">
+        <div className="grid lg:grid-cols-2 gap-20 items-center">
+          {/* Text Content */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="max-w-2xl"
+            transition={{ duration: 1 }}
           >
-            <div className="flex items-center gap-2 mb-4">
-              <span className="w-12 h-[1px] bg-primary"></span>
-              <span className="text-primary font-bold tracking-widest uppercase text-xs">
-                {about.tagline}
-              </span>
-            </div>
-            <h2 className="text-4xl md:text-6xl font-bold text-primary leading-tight">
+            <span className="inline-block px-4 py-1.5 rounded-full bg-[#15803d]/10 text-[#15803d] text-[10px] font-black uppercase tracking-[0.3em] mb-8 border border-[#15803d]/20">
+              Legacy & Vision
+            </span>
+            <h2 className="text-5xl md:text-7xl font-black text-[#0A0A0A] mb-10 tracking-tighter uppercase leading-[0.9]">
               {about.title}
             </h2>
-          </motion.div>
+            <p className="text-xl text-gray-600 mb-12 leading-relaxed font-medium">
+              {about.description}
+            </p>
 
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="hidden lg:block"
-          >
-            <div className="p-6 bg-white/50 backdrop-blur-md rounded-3xl border border-primary/10 flex items-center gap-4 shadow-sm">
-              <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white">
-                <HiOutlineGlobeAlt className="w-6 h-6" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-12">
+              <div className="p-8 rounded-[2.5rem] bg-white border border-gray-100 shadow-sm group hover:border-[#15803d]/30 transition-all duration-500">
+                <div className="text-[10px] font-black text-[#15803d] uppercase tracking-widest mb-4">Leadership</div>
+                <h4 className="text-xl font-bold text-[#0A0A0A] mb-2">{about.leadership}</h4>
+                <p className="text-gray-500 text-xs font-bold uppercase tracking-widest">Hon'ble Chief Minister</p>
               </div>
-              <div>
-                <p className="text-xs text-earth-dark/60 font-medium uppercase tracking-wider">Vision</p>
-                <p className="text-primary font-bold">Digital Telangana</p>
+              <div className="p-8 rounded-[2.5rem] bg-white border border-gray-100 shadow-sm group hover:border-[#15803d]/30 transition-all duration-500">
+                <div className="text-[10px] font-black text-[#15803d] uppercase tracking-widest mb-4">Governance</div>
+                <h4 className="text-xl font-bold text-[#0A0A0A] mb-2">{about.sarpanch}</h4>
+                <p className="text-gray-500 text-xs font-bold uppercase tracking-widest">Village President</p>
               </div>
-            </div>
-          </motion.div>
-        </div>
-
-        {/* Content Grid */}
-        <div className="grid lg:grid-cols-12 gap-12 items-start">
-          {/* Main Description & Leadership */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="lg:col-span-5 space-y-8"
-          >
-            <div className="space-y-6">
-              <p className="text-xl md:text-2xl text-earth-dark/80 leading-relaxed font-light italic">
-                "{about.description}"
-              </p>
-              
-              <div className="pt-8 border-t border-earth/10 flex flex-col gap-4">
-                <div className="flex items-center gap-4 group">
-                  <div className="w-1.5 h-12 bg-primary group-hover:h-16 transition-all duration-300 rounded-full" />
-                  <div>
-                    <h4 className="text-primary font-bold text-lg">{about.leadership}</h4>
-                    <p className="text-earth text-sm">Hon'ble Chief Minister</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4 group">
-                  <div className="w-1.5 h-12 bg-earth group-hover:h-16 transition-all duration-300 rounded-full" />
-                  <div>
-                    <h4 className="text-earth-dark font-bold text-lg">{about.sarpanch}</h4>
-                    <p className="text-earth text-sm">Village President</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="p-8 bg-primary rounded-[2.5rem] text-white shadow-2xl relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full translate-x-10 -translate-y-10 group-hover:scale-125 transition-transform duration-500" />
-              <HiOutlineScale className="w-12 h-12 mb-6 text-white/50" />
-              <p className="text-lg font-medium leading-relaxed">
-                {about.vision}
-              </p>
             </div>
           </motion.div>
 
-          {/* Features Grid */}
-          <div className="lg:col-span-7 grid md:grid-cols-2 gap-6">
-            {features.map((feature, index) => (
+          {/* Features Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {features.map((feature, i) => (
               <motion.div
-                key={index}
+                key={i}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className="group p-8 bg-white rounded-3xl border border-primary/5 hover:border-primary/20 hover:shadow-xl transition-all duration-300 flex flex-col items-start"
+                transition={{ delay: i * 0.1, duration: 0.8 }}
+                className="group p-10 bg-white shadow-[0_4px_20px_rgba(0,0,0,0.03)] rounded-[3rem] border border-gray-100 hover:bg-[#15803d] transition-all duration-500 cursor-default"
               >
-                <div className="w-14 h-14 bg-primary/5 rounded-2xl flex items-center justify-center text-primary mb-6 group-hover:bg-primary group-hover:text-white transition-colors duration-300">
+                <div className="w-16 h-16 rounded-2xl bg-[#15803d]/10 text-[#15803d] flex items-center justify-center mb-8 group-hover:bg-white group-hover:text-[#15803d] transition-colors duration-500">
                   {feature.icon}
                 </div>
-                <h3 className="text-xl font-bold text-primary mb-3">
+                <h3 className="text-2xl font-black text-[#0A0A0A] mb-4 group-hover:text-white transition-colors duration-500 uppercase tracking-tighter">
                   {feature.title}
                 </h3>
-                <p className="text-earth-dark/70 leading-relaxed">
+                <p className="text-gray-600 group-hover:text-white/80 transition-colors duration-500 font-medium leading-relaxed">
                   {feature.desc}
                 </p>
               </motion.div>
@@ -143,15 +97,18 @@ export default function About({ locale }: AboutProps) {
           </div>
         </div>
 
-        {/* Footer Statement */}
+        {/* Vision Statement */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-20 p-8 md:p-12 bg-white/40 backdrop-blur-sm border border-primary/10 rounded-[3rem] text-center"
+          className="mt-20 p-12 bg-gradient-to-br from-[#15803d]/5 to-transparent rounded-[4rem] border border-[#15803d]/10 relative overflow-hidden"
         >
-          <p className="text-lg md:text-2xl font-bold text-primary/80 max-w-4xl mx-auto leading-relaxed">
-            {about.footer}
+          <div className="absolute top-0 right-0 p-8 opacity-10">
+            <HiOutlineShieldCheck className="w-32 h-32 text-[#15803d]" />
+          </div>
+          <p className="text-2xl md:text-4xl font-black text-[#0A0A0A] text-center leading-tight tracking-tighter uppercase">
+            <span className="text-[#15803d]">“</span> {about.vision} <span className="text-[#15803d]">”</span>
           </p>
         </motion.div>
       </div>

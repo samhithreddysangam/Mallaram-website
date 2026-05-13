@@ -10,6 +10,13 @@ import Events from '@/components/Events/Events';
 import CTA from '@/components/CTA/CTA';
 import Contact from '@/components/Contact/Contact';
 import Footer from '@/components/Footer/Footer';
+import SmartAgriculture from '@/components/SmartVillage/SmartAgriculture';
+import SmartCommandCenter from '@/components/SmartVillage/SmartCommandCenter';
+import WaterGovernance from '@/components/SmartVillage/WaterGovernance';
+import TransparencyPortal from '@/components/SmartVillage/TransparencyPortal';
+import EmergencyAlerts from '@/components/SmartVillage/EmergencyAlerts';
+import GrievanceSystem from '@/components/SmartVillage/GrievanceSystem';
+import VillageMap from '@/components/SmartVillage/VillageMap';
 import { locales, getDictionary, Locale } from '@/lib/i18n';
 import { notFound } from 'next/navigation';
 
@@ -42,13 +49,20 @@ export default async function LocalePage({ params }: { params: Promise<{ locale:
   const currentLocale = locale as Locale;
   
   return (
-    <main className="min-h-screen bg-cream pt-[80px] lg:pt-[200px]">
+    <main className="min-h-screen bg-[#FAF9F6] pt-[80px] lg:pt-[200px]">
       <Suspense fallback={<div className="h-16 bg-cream" />}>
         <Navigation locale={currentLocale} />
       </Suspense>
       <OfficialsSection locale={currentLocale} />
       <Hero locale={currentLocale} />
       <Stats locale={currentLocale} />
+      <SmartCommandCenter locale={currentLocale} />
+      <SmartAgriculture locale={currentLocale} />
+      <WaterGovernance locale={currentLocale} />
+      <TransparencyPortal locale={currentLocale} />
+      <EmergencyAlerts locale={currentLocale} />
+      <GrievanceSystem locale={currentLocale} />
+      <VillageMap locale={currentLocale} />
       <About locale={currentLocale} />
       <Facilities locale={currentLocale} />
       <Gallery locale={currentLocale} />

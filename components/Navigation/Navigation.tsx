@@ -2,15 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { HiBars3BottomRight, HiXMark, HiUserCircle, HiArrowRightOnRectangle } from 'react-icons/hi2';
+import { HiBars3BottomRight, HiXMark, HiArrowRightOnRectangle } from 'react-icons/hi2';
 import { Locale, getDictionary, getTranslations } from '@/lib/i18n';
 import { useSession, signOut } from 'next-auth/react';
 
 interface NavigationProps {
   locale: Locale;
 }
-
 
 export default function Navigation({ locale }: NavigationProps) {
   const { data: session } = useSession();
@@ -27,6 +27,7 @@ export default function Navigation({ locale }: NavigationProps) {
 
   const navItems = [
     { key: 'home', href: `/${locale}#home` },
+    { key: 'governance', href: `/${locale}#command-center` },
     { key: 'about', href: `/${locale}#about` },
     { key: 'dashboard', href: `/${locale}/ikp-booking` },
     { key: 'schemes', href: `/${locale}/schemes` },
@@ -37,219 +38,137 @@ export default function Navigation({ locale }: NavigationProps) {
     { key: 'contact', href: `/${locale}#contact` },
   ];
 
-  const isAdmin = (session?.user as any)?.role === 'ADMIN';
-
   const toggleLanguage = () => {
     const newLocale = locale === 'en' ? 'te' : 'en';
     window.location.href = `/${newLocale}${window.location.hash || ''}`;
   };
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-in-out ${scrolled ? 'bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-100' : 'bg-white shadow-sm border-b border-transparent'}`}>
-      {/* Decorative top strip */}
-      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-600 z-[60]"></div>
-      
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-in-out ${scrolled ? 'py-2' : 'py-6'}`}>
       <div className="max-w-7xl mx-auto px-4 md:px-6">
-        <div className={`flex items-center justify-between transition-all duration-500 ease-in-out ${scrolled ? 'h-16 lg:h-20' : 'h-20 lg:h-44'}`}>
+        <div className={`relative transition-all duration-500 bg-white/70 backdrop-blur-2xl border border-white/40 rounded-[2rem] px-6 md:px-10 flex items-center justify-between shadow-[0_8px_32px_rgba(0,0,0,0.05)] ${scrolled ? 'h-16' : 'h-20'}`}>
           
-          {/* LEFT: Village Identity */}
-          <div className={`flex-1 flex justify-start transition-transform duration-500 ${scrolled ? 'scale-90' : 'scale-100'}`}>
-            <Link href={`/${locale}`} className="flex flex-col items-start group">
-              <span className="text-xl md:text-3xl font-black text-primary tracking-tighter transition-colors duration-300 group-hover:text-earth whitespace-nowrap">
-                {dictionary.hero.title}
-              </span>
-              <div className="flex items-center gap-2">
-                <span className="h-px w-3 md:w-4 bg-earth/40"></span>
-                <span className="text-[7px] md:text-[10px] font-bold text-earth uppercase tracking-[0.2em] md:tracking-[0.4em] whitespace-nowrap">
-                  {dictionary.hero.tagline}
+          {/* LEFT: Identity */}
+          <div className="flex-1 flex justify-start items-center gap-4">
+            <Link href={`/${locale}`} className="flex items-center gap-3 group">
+              <div className="relative w-10 h-10 md:w-12 md:h-12">
+                <Image
+                  src="/images/telangana-logo.png"
+                  alt="Telangana Logo"
+                  fill
+                  className="object-contain"
+                />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-sm md:text-xl font-black text-[#0A0A0A] tracking-tighter leading-none uppercase">
+                  {dictionary.hero.title}
+                </span>
+                <span className="text-[7px] md:text-[9px] font-bold text-[#15803d] uppercase tracking-[0.2em] mt-1">
+                  Government of Telangana
                 </span>
               </div>
             </Link>
           </div>
  
-          {/* CENTER: MAIN LOGO */}
-          <div className="flex-none flex justify-center relative px-2">
-            <Link href={`/${locale}`} className="relative group flex items-center justify-center">
-              {/* Outer glow ring */}
-              <div 
-                className={`absolute inset-0 rounded-full bg-gradient-to-tr from-earth/20 via-primary/10 to-earth/20 blur-2xl md:blur-3xl -m-6 md:-m-12 pointer-events-none transition-opacity duration-700 ${scrolled ? 'opacity-30' : 'opacity-60'}`}
-              ></div>
-              
-              <div 
-                className={`relative transition-all duration-500 ease-out will-change-transform rounded-full bg-white p-1.5 md:p-2 shadow-xl md:shadow-2xl border-[3px] md:border-[4px] border-earth/20 flex items-center justify-center overflow-hidden ${scrolled ? 'w-14 h-14 md:w-24 md:h-24' : 'w-16 h-16 md:w-44 md:h-44'}`}
+          {/* CENTER: Desktop Links */}
+          <div className="hidden xl:flex items-center gap-1">
+            {navItems.slice(0, 7).map((item) => (
+              <Link
+                key={item.key}
+                href={item.href}
+                className="text-[9px] font-black text-[#0A0A0A]/60 hover:text-[#15803d] uppercase tracking-[0.2em] px-4 py-2 transition-all relative group"
               >
-                <img
-                  src="/images/telangana-state-logo.png"
-                  alt="Telangana State Logo"
-                  className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-110 z-10"
-                />
-                <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none"></div>
-              </div>
-            </Link>
+                {t(`nav.${item.key}`)}
+                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-[#15803d] transition-all group-hover:w-1/2"></span>
+              </Link>
+            ))}
           </div>
  
-          {/* RIGHT: Nav Links & Controls */}
-          <div className={`flex-1 flex justify-end items-center gap-2 lg:gap-6 transition-transform duration-500 ${scrolled ? 'scale-95' : 'scale-100'}`}>
-            <div className="hidden xl:flex items-center gap-4">
-              {navItems.slice(0, 4).map((item) => (
-                <Link
-                  key={item.key}
-                  href={item.href}
-                  className="text-[9px] font-black text-gray-600 hover:text-primary uppercase tracking-[0.2em] relative group px-2 py-1 transition-colors"
-                >
-                  {t(`nav.${item.key}`)}
-                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-earth transition-all group-hover:w-full"></span>
-                </Link>
-              ))}
-              {isAdmin && <div className="flex items-center gap-2">
-                  <Link
-                    href={`/${locale}/dashboard/admin`}
-                    className="px-6 py-2 rounded-xl bg-earth text-white font-bold hover:bg-earth-dark transition-all shadow-lg flex items-center gap-2"
-                  >
-                    <span>Dashboard</span>
-                  </Link>
-                  <button
-                    onClick={() => signOut()}
-                    className="p-2 rounded-xl bg-gray-100 text-primary hover:bg-gray-200 transition-all"
-                    title="Sign Out"
-                  >
-                    <HiArrowRightOnRectangle className="text-xl" />
-                  </button>
-                </div>}
-            </div>
-            
-            <div className="flex items-center gap-2 md:gap-3">
+          {/* RIGHT: Controls */}
+          <div className="flex-1 flex justify-end items-center gap-4">
+            <div className="hidden md:flex items-center gap-3">
               <button
                 onClick={toggleLanguage}
-                className="px-3 py-1.5 lg:px-6 lg:py-2.5 text-[8px] lg:text-[10px] font-black rounded-full bg-primary text-white hover:bg-earth transition-all shadow-md active:scale-95 uppercase tracking-widest whitespace-nowrap"
+                className="px-5 py-2 text-[9px] font-black rounded-xl bg-[#15803d]/10 text-[#15803d] hover:bg-[#15803d] hover:text-white transition-all border border-[#15803d]/20 uppercase tracking-widest"
               >
                 {t('language.toggle')}
               </button>
               
-              {/* Desktop Login/Sign Out */}
               {session ? (
                 <div className="flex items-center gap-2">
-                  <span className="hidden md:block text-[10px] font-black text-primary-dark uppercase truncate max-w-[80px]">
-                    {session.user?.name}
-                  </span>
                   <button
                     onClick={() => signOut()}
-                    className="p-2 rounded-full bg-red-50 text-red-600 hover:bg-red-100 transition-colors shadow-sm"
+                    className="p-2.5 rounded-xl bg-gray-100 text-gray-500 hover:text-red-500 hover:bg-red-500/10 transition-all border border-gray-200"
                     title="Sign Out"
                   >
-                    <HiArrowRightOnRectangle className="w-4 h-4" />
+                    <HiArrowRightOnRectangle className="w-5 h-5" />
                   </button>
                 </div>
               ) : (
                 <Link
                   href={`/${locale}/login`}
-                  className="px-4 py-2 lg:px-6 lg:py-2.5 text-[9px] lg:text-[10px] font-black rounded-full bg-primary-dark text-white hover:bg-earth transition-all shadow-md active:scale-95 uppercase tracking-widest whitespace-nowrap"
+                  className="px-6 py-2 text-[9px] font-black rounded-xl bg-[#15803d] text-white hover:bg-black transition-all uppercase tracking-widest shadow-lg shadow-[#15803d]/10"
                 >
                   {t('auth.login')}
                 </Link>
               )}
-              
-              {/* Mobile Menu Toggle */}
-              <button
-                className="lg:hidden p-1.5 rounded-full bg-gray-50 text-primary hover:bg-gray-100 transition-colors"
-                onClick={() => setIsOpen(!isOpen)}
-                aria-label="Toggle menu"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  {isOpen ? (
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
-                  ) : (
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 8h16M4 16h16" />
-                  )}
-                </svg>
-              </button>
-
-              {/* Desktop Complaint Button */}
-              <Link
-                href={`/${locale}#complaint`}
-                className="hidden sm:flex items-center gap-2 px-4 py-2 lg:px-5 lg:py-2.5 text-[9px] lg:text-[10px] font-black rounded-full border-2 border-primary text-primary hover:bg-primary hover:text-white transition-all active:scale-95 uppercase tracking-widest"
-              >
-                <svg className="w-3 h-3 lg:w-4 lg:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                </svg>
-                {t('nav.complaint')}
-              </Link>
             </div>
+            
+            {/* Mobile Toggle */}
+            <button
+              className="xl:hidden p-2.5 rounded-xl bg-gray-100 text-[#0A0A0A] border border-gray-200"
+              onClick={() => setIsOpen(!isOpen)}
+            >
+              <HiBars3BottomRight className="w-6 h-6" />
+            </button>
           </div>
         </div>
 
-        {/* Mobile Navigation Menu */}
+        {/* Mobile Menu */}
         <AnimatePresence>
           {isOpen && (
             <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="lg:hidden overflow-hidden bg-white/95 backdrop-blur-md"
+              initial={{ opacity: 0, y: -20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 0.95 }}
+              className="xl:hidden absolute top-full left-4 right-4 mt-4 p-8 bg-white/95 backdrop-blur-2xl border border-gray-200 rounded-[2.5rem] shadow-2xl z-[60]"
             >
-              <div className="flex flex-col gap-1 py-6">
+              <div className="grid grid-cols-1 gap-2">
                 {navItems.map((item) => (
                   <Link
                     key={item.key}
                     href={item.href}
                     onClick={() => setIsOpen(false)}
-                    className="text-base font-black text-gray-700 hover:text-primary py-3 px-2 border-b border-gray-50 transition-colors uppercase tracking-wider flex items-center justify-between"
+                    className="text-lg font-black text-[#0A0A0A]/60 hover:text-[#15803d] py-4 px-4 rounded-2xl hover:bg-gray-50 transition-all uppercase tracking-widest flex items-center justify-between"
                   >
                     {t(`nav.${item.key}`)}
-                    <svg className="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
+                    <span className="text-[#15803d]/20 group-hover:text-[#15803d]">→</span>
                   </Link>
                 ))}
-                {isAdmin && (
-                  <Link
-                    href={`/${locale}/dashboard/admin`}
-                    onClick={() => setIsOpen(false)}
-                    className="text-base font-black text-red-600 hover:text-red-700 py-3 px-2 border-b border-gray-50 transition-colors uppercase tracking-wider flex items-center justify-between"
-                  >
-                    Admin Control
-                    <svg className="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </Link>
-                )}
                 
-                {session ? (
+                <div className="mt-6 pt-6 border-t border-gray-100 flex flex-col gap-4">
                   <button
-                    onClick={() => {
-                      setIsOpen(false);
-                      signOut();
-                    }}
-                    className="text-base font-black text-red-600 hover:text-red-700 py-3 px-2 border-b border-gray-50 transition-colors uppercase tracking-wider flex items-center justify-between w-full text-left"
+                    onClick={toggleLanguage}
+                    className="w-full py-4 text-xs font-black rounded-2xl bg-[#15803d] text-white uppercase tracking-widest"
                   >
-                    {session.user?.name} (Sign Out)
-                    <svg className="w-4 h-4 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                    </svg>
+                    {t('language.toggle')}
                   </button>
-                ) : (
-                  <Link
-                    href={`/${locale}/login`}
-                    onClick={() => setIsOpen(false)}
-                    className="text-base font-black text-primary hover:text-earth py-3 px-2 border-b border-gray-50 transition-colors uppercase tracking-wider flex items-center justify-between"
-                  >
-                    {t('auth.login')}
-                    <svg className="w-4 h-4 text-primary/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                    </svg>
-                  </Link>
-                )}
-                {/* Mobile Complaint Button inside menu */}
-                <Link
-                  href={`/${locale}#complaint`}
-                  onClick={() => setIsOpen(false)}
-                  className="mt-4 flex items-center justify-center gap-3 px-6 py-4 text-sm font-black rounded-xl bg-primary text-white hover:bg-earth transition-all shadow-lg uppercase tracking-widest"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
-                  {t('nav.complaint')}
-                </Link>
+                  {session ? (
+                    <button
+                      onClick={() => signOut()}
+                      className="w-full py-4 text-xs font-black rounded-2xl bg-red-500/10 text-red-500 uppercase tracking-widest"
+                    >
+                      Sign Out
+                    </button>
+                  ) : (
+                    <Link
+                      href={`/${locale}/login`}
+                      className="w-full py-4 text-center text-xs font-black rounded-2xl bg-black text-white uppercase tracking-widest"
+                    >
+                      {t('auth.login')}
+                    </Link>
+                  )}
+                </div>
               </div>
             </motion.div>
           )}

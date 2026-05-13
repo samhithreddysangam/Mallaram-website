@@ -11,30 +11,34 @@ const events = [
   {
     id: 1,
     title: 'Bonalu Festival',
-    description: 'Annual thanksgiving festival dedicated to Goddess Mahakali, featuring traditional rituals, folk dances, and cultural performances.',
+    description: 'Annual thanksgiving festival dedicated to Goddess Mahakali, featuring traditional rituals.',
     image: 'https://images.unsplash.com/photo-1513175242576-9f5af6fcd91c?w=600&q=80',
     category: 'festivals',
+    date: 'July 15',
   },
   {
     id: 2,
     title: 'Sankranti Celebration',
-    description: 'Harvest festival celebrated with kite flying, traditional foods, and community gatherings.',
+    description: 'Harvest festival celebrated with kite flying and community gatherings.',
     image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&q=80',
     category: 'festivals',
+    date: 'Jan 14',
   },
   {
     id: 3,
     title: 'Village Sports Day',
-    description: 'Annual sports event featuring cricket matches, athletics, and traditional games for all age groups.',
+    description: 'Annual sports event featuring cricket matches and traditional games.',
     image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&q=80',
     category: 'local',
+    date: 'Aug 20',
   },
   {
     id: 4,
     title: 'Cultural Meet',
-    description: 'Monthly cultural gathering showcasing local talent in music, dance, and theater performances.',
+    description: 'Monthly cultural gathering showcasing local talent in music and dance.',
     image: 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=600&q=80',
     category: 'local',
+    date: 'Every 2nd Sun',
   },
 ];
 
@@ -43,84 +47,92 @@ export default function Events({ locale }: EventsProps) {
   const t = getTranslations(dictionary);
 
   return (
-    <section id="events" className="py-16 md:py-24 px-4 bg-cream-light">
-      <div className="max-w-6xl mx-auto">
-        <motion.h2
+    <section id="events" className="py-32 relative bg-[#FAF9F6] overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 relative">
+        {/* Section Header */}
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-3xl md:text-4xl font-bold text-primary text-center mb-12"
+          className="text-center mb-24"
         >
-          {dictionary.events.title}
-        </motion.h2>
+          <span className="inline-block px-4 py-1.5 rounded-full bg-[#15803d]/10 text-[#15803d] text-[10px] font-black uppercase tracking-[0.3em] mb-6 border border-[#15803d]/20">
+            Happenings
+          </span>
+          <h2 className="text-4xl md:text-6xl font-black text-[#0A0A0A] mb-6 uppercase tracking-tighter">
+            Community <span className="text-[#15803d]">Calendar</span>
+          </h2>
+          <p className="text-gray-600 max-w-xl mx-auto font-medium">
+            Stay updated with the cultural heartbeat and local gatherings of Mallaram.
+          </p>
+        </motion.div>
 
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className="grid lg:grid-cols-2 gap-12">
           {/* Festivals */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <h3 className="text-xl font-semibold text-earth-dark mb-4">
-              {t('events.festivals')}
-            </h3>
-            <div className="space-y-4">
+          <div className="space-y-8">
+            <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+              <h3 className="text-lg font-black text-[#0A0A0A] uppercase tracking-widest">
+                {t('events.festivals')}
+              </h3>
+              <span className="text-[#15803d] text-[10px] font-black uppercase tracking-widest">Tradition</span>
+            </div>
+            <div className="space-y-6">
               {events
                 .filter((e) => e.category === 'festivals')
-                .map((event) => (
-                  <div
+                .map((event, i) => (
+                  <motion.div
                     key={event.id}
-                    className="bg-cream rounded-xl p-4 shadow-md hover:shadow-lg transition-shadow"
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.1 }}
+                    className="group flex gap-6 p-6 bg-white rounded-[2.5rem] border border-gray-100 hover:border-[#15803d]/40 transition-all duration-500 shadow-sm"
                   >
-                    <div className="flex flex-col xs:flex-row gap-4">
-                      <img
-                        src={event.image}
-                        alt={event.title}
-                        className="w-full xs:w-24 h-48 xs:h-24 rounded-lg object-cover flex-shrink-0"
-                      />
-                      <div>
-                        <h4 className="font-semibold text-earth-dark mb-1 text-base xs:text-lg">{event.title}</h4>
-                        <p className="text-sm text-earth leading-relaxed">{event.description}</p>
-                      </div>
+                    <div className="w-24 h-24 rounded-2xl overflow-hidden shrink-0">
+                      <img src={event.image} alt={event.title} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" />
                     </div>
-                  </div>
+                    <div className="flex flex-col justify-center">
+                      <div className="text-[#15803d] text-[9px] font-black uppercase tracking-widest mb-2">{event.date}</div>
+                      <h4 className="text-xl font-black text-[#0A0A0A] mb-2 uppercase tracking-tighter group-hover:text-[#15803d] transition-colors">{event.title}</h4>
+                      <p className="text-gray-600 text-sm font-medium leading-relaxed">{event.description}</p>
+                    </div>
+                  </motion.div>
                 ))}
             </div>
-          </motion.div>
+          </div>
 
           {/* Local Events */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-          >
-            <h3 className="text-xl font-semibold text-earth-dark mb-4">
-              {t('events.localEvents')}
-            </h3>
-            <div className="space-y-4">
+          <div className="space-y-8">
+            <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+              <h3 className="text-lg font-black text-[#0A0A0A] uppercase tracking-widest">
+                {t('events.localEvents')}
+              </h3>
+              <span className="text-[#15803d] text-[10px] font-black uppercase tracking-widest">Community</span>
+            </div>
+            <div className="space-y-6">
               {events
                 .filter((e) => e.category === 'local')
-                .map((event) => (
-                  <div
+                .map((event, i) => (
+                  <motion.div
                     key={event.id}
-                    className="bg-cream rounded-xl p-4 shadow-md hover:shadow-lg transition-shadow"
+                    initial={{ opacity: 0, x: 20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.1 }}
+                    className="group flex gap-6 p-6 bg-white rounded-[2.5rem] border border-gray-100 hover:border-[#15803d]/40 transition-all duration-500 shadow-sm"
                   >
-                    <div className="flex flex-col xs:flex-row gap-4">
-                      <img
-                        src={event.image}
-                        alt={event.title}
-                        className="w-full xs:w-24 h-48 xs:h-24 rounded-lg object-cover flex-shrink-0"
-                      />
-                      <div>
-                        <h4 className="font-semibold text-earth-dark mb-1 text-base xs:text-lg">{event.title}</h4>
-                        <p className="text-sm text-earth leading-relaxed">{event.description}</p>
-                      </div>
+                    <div className="w-24 h-24 rounded-2xl overflow-hidden shrink-0">
+                      <img src={event.image} alt={event.title} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" />
                     </div>
-                  </div>
+                    <div className="flex flex-col justify-center">
+                      <div className="text-[#15803d] text-[9px] font-black uppercase tracking-widest mb-2">{event.date}</div>
+                      <h4 className="text-xl font-black text-[#0A0A0A] mb-2 uppercase tracking-tighter group-hover:text-[#15803d] transition-colors">{event.title}</h4>
+                      <p className="text-gray-600 text-sm font-medium leading-relaxed">{event.description}</p>
+                    </div>
+                  </motion.div>
                 ))}
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>

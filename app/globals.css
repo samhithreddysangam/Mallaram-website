@@ -1,27 +1,13 @@
 @import "tailwindcss";
 
-/* Design Tokens from PRD */
+/* Slick Light Design System */
 :root {
-  /* Primary: Deep Green */
-  --color-primary: #1B5E20;
-  --color-primary-light: #2E7D32;
-  --color-primary-dark: #0D3A12;
+  --color-background: #FAF9F6;
+  --color-foreground: #0A0A0A;
+  --color-primary: #15803d; /* Deep Green */
+  --color-primary-light: #22c55e;
+  --color-primary-dark: #14532d;
   
-  /* Background: Pure White */
-  --color-cream: #FFFFFF;
-  --color-cream-light: #F9FAFB;
-  
-  /* Accent: Earth tones */
-  --color-earth: #8D6E63;
-  --color-earth-light: #A1887F;
-  --color-earth-dark: #5D4037;
-  
-  /* Semantic */
-  --color-background: #FFFFFF;
-  --color-foreground: #1a1a1a;
-  --color-accent: var(--color-earth);
-  
-  /* Typography */
   --font-sans: 'Inter', system-ui, sans-serif;
 }
 
@@ -29,29 +15,21 @@
   --color-primary: var(--color-primary);
   --color-primary-light: var(--color-primary-light);
   --color-primary-dark: var(--color-primary-dark);
-  --color-cream: var(--color-cream);
-  --color-cream-light: var(--color-cream-light);
-  --color-earth: var(--color-earth);
-  --color-earth-light: var(--color-earth-light);
-  --color-earth-dark: var(--color-earth-dark);
   --color-background: var(--color-background);
   --color-foreground: var(--color-foreground);
-  --color-accent: var(--color-accent);
-  --color-slick-green: #22FF88;
-  --color-slick-black: #0A0A0A;
   
   --font-sans: var(--font-sans);
 }
 
 @layer utilities {
   .glass-card {
-    @apply bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl;
+    @apply bg-white/70 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.03)];
   }
 }
 
 /* Base styles */
 body {
-  background: var(--color-cream);
+  background: var(--color-background);
   color: var(--color-foreground);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
@@ -65,20 +43,21 @@ html {
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-cream-light);
+  background: var(--color-background);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-earth-light);
-  border-radius: 4px;
+  background: #e2e8f0;
+  border-radius: 10px;
+  border: 2px solid var(--color-background);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-earth);
+  background: #cbd5e1;
 }
 
 /* Hide scrollbar utility */
@@ -90,4 +69,10 @@ html {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+}
+
+/* Slick Typography */
+h1, h2, h3, h4, h5, h6 {
+  letter-spacing: -0.05em;
+  font-weight: 900;
 }
