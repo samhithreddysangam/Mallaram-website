@@ -38,6 +38,25 @@ about: {
     backHome: string;
   };
   facilities: { title: string; schools: string; healthcare: string; roads: string; water: string; electricity: string };
+  alerts: {
+    livePulse: string;
+    description: string;
+    realTimeWeather: string;
+    forecast: string;
+    humidity: string;
+    wind: string;
+    villageSafe: string;
+    emergencyNotifications: string;
+    stayNotified: string;
+    subscribeDesc: string;
+    whatsappCta: string;
+  };
+  emergency: {
+    title: string;
+    available: string;
+    services: string;
+    callNow: string;
+  };
   gallery: { title: string };
   events: { title: string; festivals: string; localEvents: string };
   complaint: { title: string; description: string; cta: string };
@@ -121,6 +140,25 @@ const enDict: Dictionary = {
     backHome: "Back to Home"
   },
   facilities: { title: "Facilities", schools: "Schools", healthcare: "Healthcare", roads: "Roads", water: "Water", electricity: "Electricity" },
+  alerts: {
+    livePulse: "Weather & Alerts",
+    description: "Today's weather, weekly forecast, and important safety alerts for our farming community.",
+    realTimeWeather: "Real-time Weather",
+    forecast: "Live 7-Day Forecast",
+    humidity: "Humidity",
+    wind: "Wind",
+    villageSafe: "Village Safe",
+    emergencyNotifications: "Emergency Notifications",
+    stayNotified: "Stay Notified",
+    subscribeDesc: "Get real-time alerts via WhatsApp & SMS",
+    whatsappCta: "Get Alerts on WhatsApp"
+  },
+  emergency: {
+    title: "Emergency Help",
+    available: "Help Available 24 Hours",
+    services: "Police / Fire / Medical",
+    callNow: "Call Now"
+  },
   gallery: { title: "Gallery" },
   events: { title: "Events", festivals: "Festivals", localEvents: "Local Events" },
   complaint: { title: "Have a Complaint?", description: "We value your feedback. Help us improve by submitting your complaints or suggestions.", cta: "Submit Complaint / suggestion" },
@@ -229,6 +267,25 @@ about: {
     backHome: "తిరిగి హోమ్ పేజీకి"
   },
   facilities: { title: "సౌకర్యాలు", schools: "పాఠశాలలు", healthcare: "వైద్యం", roads: "రోడ్లు", water: "మంచినీరు", electricity: "విద్యుత్" },
+  alerts: {
+    livePulse: "వాతావరణం & హెచ్చరికలు",
+    description: "ఈ రోజు వాతావరణం, వారపు అంచనా మరియు మన రైతు సోదరులకు ముఖ్యమైన సూచనలు.",
+    realTimeWeather: "ప్రస్తుత వాతావరణం",
+    forecast: "లైవ్ 7 రోజుల వాతావరణం",
+    humidity: "గాలిలో తేమ",
+    wind: "గాలి వేగం",
+    villageSafe: "గ్రామం సురక్షితం",
+    emergencyNotifications: "అత్యవసర హెచ్చరికలు",
+    stayNotified: "ఎప్పటికప్పుడు సమాచారం",
+    subscribeDesc: "వాట్సాప్ మరియు SMS ద్వారా తాజా సమాచారం పొందండి",
+    whatsappCta: "వాట్సాప్‌లో అలర్ట్స్ పొందండి"
+  },
+  emergency: {
+    title: "అత్యవసర సహాయం",
+    available: "24 గంటల సేవ",
+    services: "పోలీస్ / ఫైర్ / మెడికల్",
+    callNow: "ఇప్పుడే కాల్ చేయండి"
+  },
   gallery: { title: "ఫోటోలు" },
   events: { title: "కార్యక్రమాలు", festivals: "పండుగలు", localEvents: "స్థానిక ఈవెంట్స్" },
   complaint: { title: "ఫిర్యాదు ఉందా?", description: "మీ ఫీడ్‌బ్యాక్ మాకు ముఖ్యం. మీ ఫిర్యాదులు లేదా సూచనలను సమర్పించడం ద్వారా మాకు సహాయపడండి.", cta: "ఫిర్యాదును సమర్పించండి" },
