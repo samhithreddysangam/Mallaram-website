@@ -27,25 +27,25 @@ export default function TransparencyPortal({ locale }: TransparencyPortalProps) 
             viewport={{ once: true }}
           >
             <span className="inline-block px-4 py-1.5 rounded-full bg-[#15803d]/10 text-[#15803d] text-[10px] font-black uppercase tracking-[0.2em] mb-8 border border-[#15803d]/20">
-              Open Governance
+              Public Information
             </span>
             <h2 className="text-5xl md:text-7xl font-black text-[#0A0A0A] mb-10 tracking-tighter uppercase leading-[0.9]">
-              Transparency <br /><span className="text-[#15803d]">Portal</span>
+              Village <br /><span className="text-[#15803d]">Funds & Projects</span>
             </h2>
             <p className="text-xl text-gray-600 mb-12 leading-relaxed font-medium">
-              A public window into village finances, project timelines, and administrative decisions. We believe in 100% accountability.
+              See how village funds are being used, which projects are running, and how decisions are made. Everything is open to the public.
             </p>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="p-8 rounded-[2.5rem] bg-[#FAF9F6] border border-gray-100 group hover:border-[#15803d]/30 transition-all duration-500">
-                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 block">Total Fund Flow</span>
-                <span className="text-3xl font-black text-[#0A0A0A] tracking-tighter">₹42.8 Lakh</span>
+                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 block">Total Funds Received</span>
+                <span className="text-3xl font-black text-[#0A0A0A] tracking-tighter">₹10 Lakh</span>
                 <p className="text-[10px] font-black text-[#15803d] uppercase tracking-widest mt-4">FY 2024-25</p>
               </div>
               <div className="p-8 rounded-[2.5rem] bg-[#FAF9F6] border border-gray-100 group hover:border-[#15803d]/30 transition-all duration-500">
-                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 block">Utilization</span>
+                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 block">Funds Used</span>
                 <span className="text-3xl font-black text-[#0A0A0A] tracking-tighter">92%</span>
-                <p className="text-[10px] font-black text-[#15803d] uppercase tracking-widest mt-4">Highly Efficient</p>
+                <p className="text-[10px] font-black text-[#15803d] uppercase tracking-widest mt-4">Well Spent</p>
               </div>
             </div>
           </motion.div>
@@ -56,7 +56,7 @@ export default function TransparencyPortal({ locale }: TransparencyPortalProps) 
             viewport={{ once: true }}
             className="space-y-6"
           >
-            <h3 className="text-2xl font-black text-[#0A0A0A] mb-8 uppercase tracking-tighter">Live <span className="text-[#15803d]">Projects</span></h3>
+            <h3 className="text-2xl font-black text-[#0A0A0A] mb-8 uppercase tracking-tighter">Ongoing <span className="text-[#15803d]">Works</span></h3>
             {projects.map((project, i) => (
               <div key={i} className="p-8 bg-[#FAF9F6] shadow-sm rounded-[3rem] border border-gray-100 group hover:bg-white transition-all duration-500">
                 <div className="flex justify-between items-center mb-6">
@@ -86,7 +86,7 @@ export default function TransparencyPortal({ locale }: TransparencyPortalProps) 
               </div>
             ))}
             <button className="w-full py-5 border border-gray-200 text-[#0A0A0A] text-[11px] font-black uppercase tracking-[0.2em] rounded-2xl hover:bg-[#15803d] hover:text-white hover:border-[#15803d] transition-all">
-              Download Audit Reports
+              Download Reports
             </button>
           </motion.div>
         </div>

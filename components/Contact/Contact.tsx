@@ -58,7 +58,7 @@ export default function Contact({ locale }: ContactProps) {
             >
               <div className="text-[10px] font-black text-[#15803d] uppercase tracking-widest mb-8">Contact Info</div>
               <div>
-                <h3 className="text-2xl font-black text-[#0A0A0A] mb-4 uppercase tracking-tighter">Voice Support</h3>
+                <h3 className="text-2xl font-black text-[#0A0A0A] mb-4 uppercase tracking-tighter">Phone Numbers</h3>
                 <p className="text-gray-600 font-medium leading-relaxed">+91 9989120933<br />+91 8008253003</p>
               </div>
             </motion.div>
@@ -70,9 +70,9 @@ export default function Contact({ locale }: ContactProps) {
               transition={{ delay: 0.2 }}
               className="p-10 bg-[#FAF9F6] rounded-[3rem] border border-gray-100 flex flex-col justify-between group hover:border-[#15803d]/30 transition-all duration-500 sm:col-span-2 lg:col-span-1"
             >
-              <div className="text-[10px] font-black text-[#15803d] uppercase tracking-widest mb-8">Digital Governance</div>
+              <div className="text-[10px] font-black text-[#15803d] uppercase tracking-widest mb-8">Email</div>
               <div>
-                <h3 className="text-2xl font-black text-[#0A0A0A] mb-4 uppercase tracking-tighter">Support Email</h3>
+                <h3 className="text-2xl font-black text-[#0A0A0A] mb-4 uppercase tracking-tighter">Email Address</h3>
                 <p className="text-gray-600 font-medium leading-relaxed mb-6">admin@mallaram.in</p>
                 <a href="mailto:admin@mallaram.in" className="inline-block px-8 py-4 bg-[#15803d] text-white text-[10px] font-black uppercase tracking-widest rounded-2xl hover:scale-105 transition-all">
                   Message Us

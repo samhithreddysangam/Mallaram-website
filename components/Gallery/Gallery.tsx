@@ -32,13 +32,13 @@ export default function Gallery({ locale }: GalleryProps) {
           className="text-center mb-24"
         >
           <span className="inline-block px-4 py-1.5 rounded-full bg-[#15803d]/10 text-[#15803d] text-[10px] font-black uppercase tracking-[0.3em] mb-6 border border-[#15803d]/20">
-            Visual Journey
+            Photos
           </span>
           <h2 className="text-4xl md:text-6xl font-black text-[#0A0A0A] mb-6 uppercase tracking-tighter">
-            Village <span className="text-[#15803d]">Archive</span>
+            Village <span className="text-[#15803d]">Photos</span>
           </h2>
           <p className="text-gray-600 max-w-xl mx-auto font-medium">
-            Capturing the essence of Mallaram through the lens of community and progress.
+            Photos of our beautiful Mallaram village — our people, places, and celebrations.
           </p>
         </motion.div>
 
@@ -61,7 +61,7 @@ export default function Gallery({ locale }: GalleryProps) {
               
               <div className="absolute inset-x-6 bottom-6 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
                 <span className="text-[10px] font-black text-[#15803d] uppercase tracking-[0.2em] mb-1 block">Mallaram</span>
-                <span className="text-white font-bold text-sm">Village Perspective</span>
+                <span className="text-white font-bold text-sm">Our Village</span>
               </div>
             </motion.div>
           ))}
@@ -70,7 +70,7 @@ export default function Gallery({ locale }: GalleryProps) {
         {/* View More Button */}
         <div className="mt-20 text-center">
           <button className="px-12 py-5 bg-[#FAF9F6] text-[#0A0A0A] border border-gray-200 text-[11px] font-black uppercase tracking-[0.2em] rounded-2xl hover:bg-[#15803d] hover:text-white hover:border-[#15803d] transition-all shadow-2xl">
-            Explore Full Gallery
+            See All Photos
           </button>
         </div>
       </div>

@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Mallaram Village | Mana Ooru",
-  description: "Smart village rooted in nature - Mallaram Village Digital Identity",
+  description: "Official Website of Mallaram Village - Smart village rooted in nature",
   icons: {
     icon: [
       { url: '/favicon.ico' },

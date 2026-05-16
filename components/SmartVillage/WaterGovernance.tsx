@@ -28,13 +28,13 @@ export default function WaterGovernance({ locale }: WaterGovernanceProps) {
           className="text-center mb-24"
         >
           <span className="inline-block px-4 py-1.5 rounded-full bg-[#0ea5e9]/10 text-[#0ea5e9] text-[10px] font-black uppercase tracking-[0.2em] mb-6 border border-[#0ea5e9]/20">
-            Resource Management
+            Water Supply
           </span>
           <h2 className="text-4xl md:text-6xl font-black text-[#0A0A0A] mb-6 uppercase tracking-tighter">
-            Water <span className="text-[#0ea5e9]">Governance</span>
+            Water <span className="text-[#0ea5e9]">Supply</span>
           </h2>
           <p className="text-gray-600 max-w-xl mx-auto font-medium">
-            Real-time tracking of water resources and consumption patterns to ensure sustainable supply for every household.
+            Check how much water is available in our village tanks and reservoirs. We make sure every home gets clean water.
           </p>
         </motion.div>
 
@@ -91,8 +91,8 @@ export default function WaterGovernance({ locale }: WaterGovernanceProps) {
               <Target className="w-10 h-10" />
             </div>
             <div>
-              <h4 className="text-2xl font-black text-[#0A0A0A] uppercase tracking-tighter leading-none mb-2">Conservation Target</h4>
-              <p className="text-gray-500 font-medium">Reduce waste by 15% this quarter</p>
+              <h4 className="text-2xl font-black text-[#0A0A0A] uppercase tracking-tighter leading-none mb-2">Water Saving Goal</h4>
+              <p className="text-gray-500 font-medium">Save 15% more water this season</p>
             </div>
           </div>
           <div className="flex gap-4">
@@ -101,7 +101,7 @@ export default function WaterGovernance({ locale }: WaterGovernanceProps) {
               <span className="text-xl font-black text-[#0A0A0A] tracking-tighter">180K Liters</span>
             </div>
             <div className="px-8 py-4 bg-gray-50 border border-gray-100 rounded-2xl">
-              <span className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Quality Score</span>
+              <span className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Water Quality</span>
               <span className="text-xl font-black text-[#15803d] tracking-tighter">98/100</span>
             </div>
           </div>

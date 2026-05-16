@@ -57,10 +57,10 @@ export default function Events({ locale }: EventsProps) {
           className="text-center mb-24"
         >
           <span className="inline-block px-4 py-1.5 rounded-full bg-[#15803d]/10 text-[#15803d] text-[10px] font-black uppercase tracking-[0.3em] mb-6 border border-[#15803d]/20">
-            Happenings
+            Latest News
           </span>
           <h2 className="text-4xl md:text-6xl font-black text-[#0A0A0A] mb-6 uppercase tracking-tighter">
-            Community <span className="text-[#15803d]">Calendar</span>
+            Village <span className="text-[#15803d]">Events</span>
           </h2>
           <p className="text-gray-600 max-w-xl mx-auto font-medium">
             Stay updated with the cultural heartbeat and local gatherings of Mallaram.

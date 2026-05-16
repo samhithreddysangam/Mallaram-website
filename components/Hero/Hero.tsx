@@ -78,7 +78,7 @@ export default function Hero({ locale }: HeroProps) {
             transition={{ duration: 1, ease: "easeOut" }}
           >
             <span className="inline-block px-4 py-1.5 rounded-full bg-[#15803d]/10 text-[#15803d] text-[10px] font-black uppercase tracking-[0.3em] mb-8 border border-[#15803d]/20">
-              Transforming Governance
+              Our Village
             </span>
             <h1 className="text-6xl md:text-9xl font-black text-[#0A0A0A] mb-8 tracking-tighter leading-[0.85] uppercase">
               {dictionary.hero.title.split(' ')[0]} <br />
@@ -92,8 +92,8 @@ export default function Hero({ locale }: HeroProps) {
               </p>
               <div className="h-px w-24 bg-[#0A0A0A]/10 hidden md:block"></div>
               <div className="flex flex-col">
-                <span className="text-[10px] font-black text-[#15803d] uppercase tracking-[0.2em] mb-1">Impact Goal</span>
-                <span className="text-[#0A0A0A] font-bold text-lg">100% Digital Inclusion</span>
+                <span className="text-[10px] font-black text-[#15803d] uppercase tracking-[0.2em] mb-1">Our Goal</span>
+                <span className="text-[#0A0A0A] font-bold text-lg">Digital Services for All</span>
               </div>
             </div>
           </motion.div>
@@ -108,13 +108,13 @@ export default function Hero({ locale }: HeroProps) {
               href="#command-center" 
               className="px-10 py-5 bg-[#15803d] text-white text-[11px] font-black uppercase tracking-[0.2em] rounded-2xl hover:scale-105 transition-all shadow-xl shadow-[#15803d]/20"
             >
-              Explore Dashboard
+              See Village Info
             </a>
             <a 
               href="#complaint" 
               className="px-10 py-5 bg-white text-[#0A0A0A] border border-gray-200 text-[11px] font-black uppercase tracking-[0.2em] rounded-2xl hover:bg-gray-50 transition-all shadow-sm"
             >
-              Submit Grievance
+              Submit Complaint
             </a>
           </motion.div>
         </div>

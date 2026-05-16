@@ -21,19 +21,19 @@ export default function GrievanceSystem({ locale }: GrievanceSystemProps) {
             viewport={{ once: true }}
           >
             <span className="inline-block px-4 py-1.5 rounded-full bg-[#15803d]/10 text-[#15803d] text-[10px] font-black uppercase tracking-[0.2em] mb-8 border border-[#15803d]/20">
-              Citizen Voice
+              Your Voice
             </span>
             <h2 className="text-5xl md:text-7xl font-black text-[#0A0A0A] mb-10 tracking-tighter uppercase leading-[0.9]">
-              Public <br /><span className="text-[#15803d]">Grievance</span>
+              Public <br /><span className="text-[#15803d]">Complaint</span>
             </h2>
             <p className="text-xl text-gray-600 mb-12 leading-relaxed font-medium">
-              Submit your concerns directly to the village administration. Every grievance is tracked, audited, and resolved with priority.
+              Tell us about any problem in the village. We will look into it and fix it as soon as possible.
             </p>
 
             <div className="flex flex-col gap-6">
               {[
-                { label: 'Total Resolved', value: '428', icon: BarChart3 },
-                { label: 'Avg Resolution Time', value: '3.2 Days', icon: MessageSquare },
+                { label: 'Problems Fixed', value: '428', icon: BarChart3 },
+                { label: 'Average Fix Time', value: '3.2 Days', icon: MessageSquare },
               ].map((stat, i) => (
                 <div key={i} className="flex items-center gap-6 p-6 rounded-3xl bg-[#FAF9F6] border border-gray-100 group transition-all">
                   <div className="w-16 h-16 rounded-2xl bg-white flex items-center justify-center text-[#15803d] shadow-sm group-hover:scale-110 transition-transform">
@@ -80,11 +80,11 @@ export default function GrievanceSystem({ locale }: GrievanceSystemProps) {
                 <textarea rows={4} className="w-full px-6 py-4 rounded-2xl bg-white border border-gray-100 focus:border-[#15803d] outline-none transition-all font-medium resize-none" placeholder="Describe your issue in detail..." />
               </div>
               <button className="w-full py-6 bg-[#15803d] text-white text-[12px] font-black uppercase tracking-[0.2em] rounded-3xl hover:scale-[1.02] transition-all shadow-xl shadow-[#15803d]/20 mt-4">
-                Submit Formal Grievance
+                Submit Complaint
               </button>
             </form>
             <p className="mt-8 text-center text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
-              Your submission will be assigned a unique tracking ID.
+              You will get a number to check your complaint status.
             </p>
           </motion.div>
         </div>

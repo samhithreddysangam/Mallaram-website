@@ -28,13 +28,13 @@ export default function SmartAgriculture({ locale }: SmartAgricultureProps) {
             viewport={{ once: true }}
           >
             <span className="inline-block px-4 py-1.5 rounded-full bg-[#15803d]/10 text-[#15803d] text-[10px] font-black uppercase tracking-[0.2em] mb-8 border border-[#15803d]/20">
-              Agritech Hub
+              Farming Help
             </span>
             <h2 className="text-5xl md:text-7xl font-black text-[#0A0A0A] mb-10 tracking-tighter uppercase leading-[0.9]">
-              Precision <br /><span className="text-[#15803d]">Agriculture</span>
+              Smart <br /><span className="text-[#15803d]">Farming</span>
             </h2>
             <p className="text-xl text-gray-600 mb-12 leading-relaxed font-medium">
-              Empowering Mallaram farmers with real-time market data, soil analytics, and AI-driven weather advisory.
+              Helping Mallaram farmers with daily market prices, soil health tips, and weather updates.
             </p>
 
             <div className="space-y-6">
@@ -57,7 +57,7 @@ export default function SmartAgriculture({ locale }: SmartAgricultureProps) {
                     <BrainCircuit className="w-7 h-7" />
                   </div>
                   <div>
-                    <h4 className="text-xl font-black text-[#0A0A0A] uppercase tracking-tighter leading-none mb-2">AI Soil Insights</h4>
+                    <h4 className="text-xl font-black text-[#0A0A0A] uppercase tracking-tighter leading-none mb-2">Soil Health Report</h4>
                     <p className="text-gray-500 text-sm font-bold uppercase tracking-widest">Nitrogen Levels: High | Moisture: Balanced</p>
                   </div>
                 </div>

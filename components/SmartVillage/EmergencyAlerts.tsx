@@ -71,7 +71,7 @@ export default function EmergencyAlerts({ locale }: EmergencyAlertsProps) {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
                 </span>
-                Real-time Updates
+                Latest Updates
               </span>
               <h2 className="text-5xl md:text-6xl font-black text-[#0A0A0A] mb-8 uppercase tracking-tighter leading-[0.9]">
                 Village <span className="text-red-500">Alert</span> System
@@ -83,7 +83,7 @@ export default function EmergencyAlerts({ locale }: EmergencyAlertsProps) {
 
             {/* Utility Status Grid */}
             <div className="grid grid-cols-1 gap-4">
-              <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Current Infrastructure Status</h3>
+              <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Current Village Services</h3>
               {statuses.map((item, i) => (
                 <motion.div
                   key={i}
@@ -159,7 +159,7 @@ export default function EmergencyAlerts({ locale }: EmergencyAlertsProps) {
                       : 'bg-[#15803d] text-white hover:bg-[#0A0A0A] shadow-xl shadow-[#15803d]/10'
                   } active:scale-95`}>
                     <CheckCircle2 className="w-4 h-4" />
-                    Acknowledged
+                    Got It
                   </button>
                   <button className="flex items-center gap-2 px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-gray-200 text-gray-600 hover:bg-gray-50 transition-all active:scale-95">
                     <Share2 className="w-4 h-4" />
@@ -186,7 +186,7 @@ export default function EmergencyAlerts({ locale }: EmergencyAlertsProps) {
                 </div>
               </div>
               <button className="w-full md:w-auto px-10 py-5 bg-white text-black text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-[#15803d] hover:text-white transition-all">
-                Join Alert Network
+                Get Alerts on WhatsApp
               </button>
             </motion.div>
           </div>
@@ -207,7 +207,7 @@ export default function EmergencyAlerts({ locale }: EmergencyAlertsProps) {
             </div>
             <div>
               <h3 className="text-3xl md:text-5xl font-black uppercase tracking-tighter leading-[0.8] mb-3">Emergency Help</h3>
-              <p className="text-red-100 font-bold uppercase tracking-widest text-[10px] md:text-xs opacity-80">24/7 Rapid Response Unit Available</p>
+              <p className="text-red-100 font-bold uppercase tracking-widest text-[10px] md:text-xs opacity-80">Help Available 24 Hours</p>
             </div>
           </div>
 

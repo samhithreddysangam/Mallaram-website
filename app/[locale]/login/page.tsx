@@ -167,12 +167,12 @@ export default function LoginPage() {
               
               {showDebug && (
                 <div className="mt-4 p-4 bg-gray-50 rounded-xl text-left text-[10px] font-mono space-y-2 border border-gray-200">
-                  <p className="text-primary font-bold">Diagnostics:</p>
+                  <p className="text-primary font-bold">Technical Help:</p>
                   <p>Status: {String(status)}</p>
                   <p>Role: {String((session as any)?.user?.role || 'None')}</p>
                   <p>Locale: {String(locale)}</p>
                   <div className="pt-2 flex gap-2">
-                    <a href="/api/diagnostic" target="_blank" className="px-2 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100 no-underline">Check DB User</a>
+                    <a href="/api/diagnostic" target="_blank" className="px-2 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100 no-underline">Check My Account</a>
                     <button type="button" onClick={() => window.location.reload()} className="px-2 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100">Reload Page</button>
                   </div>
                 </div>

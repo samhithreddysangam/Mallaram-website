@@ -34,13 +34,13 @@ export default function VillageMap({ locale }: VillageMapProps) {
           >
             <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#15803d]/10 text-[#15803d] text-[10px] font-black uppercase tracking-[0.3em] mb-6 border border-[#15803d]/20">
               <Layers className="w-3 h-3" />
-              GIS Visualization
+              Village Map
             </span>
             <h2 className="text-5xl md:text-7xl font-black text-[#0A0A0A] mb-8 tracking-tighter uppercase leading-[0.85]">
-              Village <span className="text-[#15803d]">Spatial</span> Map
+              Village <span className="text-[#15803d]">Map & Locations</span>
             </h2>
             <p className="text-gray-600 text-lg font-medium leading-relaxed">
-              Interactive GIS layout of Mallaram village. Explore key landmarks, infrastructure nodes, and developmental projects in real-time satellite view.
+              Find important places in Mallaram village. See schools, offices, health centers, and more on the map.
             </p>
           </motion.div>
 
@@ -57,7 +57,7 @@ export default function VillageMap({ locale }: VillageMapProps) {
               <Navigation2 className="w-6 h-6 rotate-45" />
             </div>
             <div className="text-left">
-              <div className="text-[10px] font-black uppercase tracking-widest opacity-60 mb-1">Open 3D Experience</div>
+              <div className="text-[10px] font-black uppercase tracking-widest opacity-60 mb-1">View in 3D</div>
               <div className="text-sm font-black uppercase tracking-tight flex items-center gap-2">
                 Launch Google Earth
                 <ExternalLink className="w-4 h-4 opacity-40" />
@@ -101,7 +101,7 @@ export default function VillageMap({ locale }: VillageMapProps) {
               <div className="mt-4 px-6 py-3 bg-[#0A0A0A] text-white rounded-2xl border border-white/10 shadow-2xl opacity-0 group-hover/mark:opacity-100 transition-all duration-500 whitespace-nowrap -translate-y-2 group-hover/mark:translate-y-0">
                 <p className="text-[10px] font-black uppercase tracking-widest leading-none mb-1">{mark.name}</p>
                 <div className="h-[1px] w-full bg-white/20 mb-1" />
-                <p className="text-[8px] font-bold text-[#15803d] uppercase tracking-widest">Active Station</p>
+                <p className="text-[8px] font-bold text-[#15803d] uppercase tracking-widest">Open</p>
               </div>
             </motion.div>
           ))}
@@ -123,9 +123,9 @@ export default function VillageMap({ locale }: VillageMapProps) {
             </h4>
             <div className="space-y-4">
               {[
-                { label: 'Government Hubs', color: 'bg-[#15803d]', icon: MapPin },
+                { label: 'Government Offices', color: 'bg-[#15803d]', icon: MapPin },
                 { label: 'Water Resources', color: 'bg-blue-500', icon: Droplets },
-                { label: 'Infrastructure', color: 'bg-amber-500', icon: Trash2 }
+                { label: 'Roads & Facilities', color: 'bg-amber-500', icon: Trash2 }
               ].map((item, i) => (
                 <div key={i} className="flex items-center gap-4 group/item">
                   <div className={`p-2 rounded-lg ${item.color} group-hover/item:scale-110 transition-transform`}>

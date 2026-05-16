@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { Locale, getDictionary } from '@/lib/i18n';
+import { Shield, Zap, Fingerprint } from 'lucide-react';
 
 interface CTAProps {
   locale: Locale;
@@ -59,16 +60,24 @@ export default function CTA({ locale }: CTAProps) {
             </a>
           </motion.div>
 
-          <div className="flex flex-wrap justify-center gap-8 pt-10">
+          <div className="flex flex-wrap justify-center gap-4 md:gap-8 pt-12">
             {[
-              { label: 'Secure & Private', icon: '🔒' },
-              { label: '24/7 Response', icon: '⚡' },
-              { label: 'Tracking ID', icon: '🆔' }
+              { label: 'Secure & Private', icon: <Shield className="w-4 h-4" /> },
+              { label: 'Quick Response', icon: <Zap className="w-4 h-4" /> },
+              { label: 'Complaint Number', icon: <Fingerprint className="w-4 h-4" /> }
             ].map((item, i) => (
-              <div key={i} className="flex items-center gap-2 text-white/60">
-                <span className="text-lg">{item.icon}</span>
-                <span className="text-[10px] font-black uppercase tracking-widest">{item.label}</span>
-              </div>
+              <motion.div 
+                key={i} 
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 }}
+                className="flex items-center gap-3 px-6 py-3 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl text-white/70 hover:bg-white/10 hover:text-white hover:border-white/20 transition-all duration-300 group"
+              >
+                <div className="text-[#22FF88] group-hover:scale-110 transition-transform">
+                  {item.icon}
+                </div>
+                <span className="text-[10px] font-black uppercase tracking-[0.2em]">{item.label}</span>
+              </motion.div>
             ))}
           </div>
         </motion.div>

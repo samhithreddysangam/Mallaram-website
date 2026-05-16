@@ -55,12 +55,12 @@ export default function About({ locale }: AboutProps) {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-12">
               <div className="p-8 rounded-[2.5rem] bg-white border border-gray-100 shadow-sm group hover:border-[#15803d]/30 transition-all duration-500">
-                <div className="text-[10px] font-black text-[#15803d] uppercase tracking-widest mb-4">Leadership</div>
+                <div className="text-[10px] font-black text-[#15803d] uppercase tracking-widest mb-4">Our Leader</div>
                 <h4 className="text-xl font-bold text-[#0A0A0A] mb-2">{about.leadership}</h4>
                 <p className="text-gray-500 text-xs font-bold uppercase tracking-widest">Hon'ble Chief Minister</p>
               </div>
               <div className="p-8 rounded-[2.5rem] bg-white border border-gray-100 shadow-sm group hover:border-[#15803d]/30 transition-all duration-500">
-                <div className="text-[10px] font-black text-[#15803d] uppercase tracking-widest mb-4">Governance</div>
+                <div className="text-[10px] font-black text-[#15803d] uppercase tracking-widest mb-4">Village Head</div>
                 <h4 className="text-xl font-bold text-[#0A0A0A] mb-2">{about.sarpanch}</h4>
                 <p className="text-gray-500 text-xs font-bold uppercase tracking-widest">Village President</p>
               </div>

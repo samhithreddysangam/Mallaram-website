@@ -46,13 +46,13 @@ export default function Facilities({ locale }: FacilitiesProps) {
           className="text-center mb-24"
         >
           <span className="inline-block px-4 py-1.5 rounded-full bg-[#15803d]/10 text-[#15803d] text-[10px] font-black uppercase tracking-[0.3em] mb-6 border border-[#15803d]/20">
-            Infrastructure
+            Village Facilities
           </span>
           <h2 className="text-4xl md:text-6xl font-black text-[#0A0A0A] mb-6 uppercase tracking-tighter">
             Village <span className="text-[#15803d]">Facilities</span>
           </h2>
           <p className="text-gray-600 max-w-xl mx-auto font-medium">
-            Modern utilities and public services optimized for the future of Mallaram.
+            Important services and facilities available in our village.
           </p>
         </motion.div>
 
@@ -81,7 +81,7 @@ export default function Facilities({ locale }: FacilitiesProps) {
                 {/* Status indicator */}
                 <div className="mt-auto pt-6 flex items-center gap-3">
                   <span className="w-2 h-2 rounded-full bg-[#15803d] shadow-[0_0_10px_#15803d]"></span>
-                  <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest group-hover:text-[#0A0A0A] transition-colors">Operational</span>
+                  <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest group-hover:text-[#0A0A0A] transition-colors">Available</span>
                 </div>
               </div>
             </motion.div>

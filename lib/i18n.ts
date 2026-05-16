@@ -54,6 +54,16 @@ about: {
   };
   footer: { copyright: string };
   language: { toggle: string };
+  privacy: {
+    title: string;
+    introduction: string;
+    sections: { title: string; content: string }[];
+  };
+  terms: {
+    title: string;
+    introduction: string;
+    sections: { title: string; content: string }[];
+  };
 };
 
 // Supported locales
@@ -79,7 +89,7 @@ const enDict: Dictionary = {
     success: "Slot Booked Successfully!",
   },
   about: {
-    title: "Village Digital Governance",
+    title: "About Our Village",
     tagline: "One Vision, Digital Telangana",
     description: "Under the leadership of Revanth Reddy, our village has taken a crucial step towards transparent and accountable governance through Digital Telangana's 'One Vision'.",
     leadership: "Leadership of Revanth Reddy",
@@ -95,15 +105,15 @@ const enDict: Dictionary = {
         desc: "People can directly learn about, apply for, and track government schemes without any middlemen."
       },
       ikb: {
-        title: "IKB Slot System",
-        desc: "Integrated Knowledge & Booking system for organized and timely access to village services, reducing wait times."
+        title: "Service Booking System",
+        desc: "Book your time for village services easily — no long waits, no confusion."
       },
       updates: {
         title: "Real-time Updates",
         desc: "Stay informed about village development works, decisions, and progress in real-time."
       }
     },
-    footer: "This is not just a website. It is a governance control system—designed to run fast, transparently, and accountably."
+    footer: "This website helps our village run smoothly, openly, and with responsibility."
   },
   comingSoon: {
     title: "Coming Soon",
@@ -125,8 +135,48 @@ const enDict: Dictionary = {
     alreadyAccount: "Already have an account?",
     error: "Invalid email or password",
   },
-  footer: { copyright: "© 2026 Mallaram Village. All rights reserved. \n Developed by Samhithreddy Sangam" },
-  language: { toggle: "తెలుగు" }
+  footer: { copyright: "© 2026 Mallaram Village. All rights reserved." },
+  language: { toggle: "తెలుగు" },
+  privacy: {
+    title: "Privacy Policy",
+    introduction: "This Privacy Policy explains how the Mallaram Gram Panchayat collects, uses, and protects your personal information when you use our village portal.",
+    sections: [
+      {
+        title: "Information We Collect",
+        content: "We collect basic information such as your name, phone number, and the last 4 digits of your Aadhaar card when you use services like the IKP Slot Booking system. This is required for verification and service delivery."
+      },
+      {
+        title: "How We Use Your Data",
+        content: "Your data is used solely for providing village services, verifying identities for government schemes, and maintaining the Transparency Portal. We do not sell or share your data with private third parties."
+      },
+      {
+        title: "Data Security",
+        content: "In line with Digital Telangana policies and the Digital Personal Data Protection (DPDP) Act of India, we use secure servers and encryption to protect your personal information."
+      },
+      {
+        title: "Governing Authority",
+        content: "This portal is managed by the Gram Panchayat Mallaram under the IT guidelines of the Government of Telangana."
+      }
+    ]
+  },
+  terms: {
+    title: "Terms of Service",
+    introduction: "By using the Mallaram Village Portal, you agree to the following terms and conditions designed to ensure fair and transparent service for all residents.",
+    sections: [
+      {
+        title: "User Responsibility",
+        content: "Users must provide accurate and truthful information when applying for schemes or booking IKP slots. Providing false information may lead to cancellation of services."
+      },
+      {
+        title: "Service Availability",
+        content: "While we strive for 100% uptime, some digital services may be temporarily unavailable during maintenance. The physical records at the Panchayat Office remain the final authority."
+      },
+      {
+        title: "Governing Law",
+        content: "These terms are governed by the laws of the State of Telangana and the Republic of India. Any disputes will be subject to the jurisdiction of the courts in Telangana."
+      }
+    ]
+  }
 };
 // Telugu dictionary
 const teDict: Dictionary = {
@@ -147,7 +197,7 @@ const teDict: Dictionary = {
     success: "స్లాట్ విజయవంతంగా బుక్ చేయబడింది!",
   },
 about: { 
-    title: "గ్రామ డిజిటల్ గవర్నెన్స్ ప్రారంభం",
+    title: "మా గ్రామం గురించి",
     tagline: "డిజిటల్ తెలంగాణ “వన్ విజన్”",
     description: "Revanth Reddy నాయకత్వంలో, డిజిటల్ తెలంగాణ “వన్ విజన్” దిశగా మా గ్రామం పారదర్శకమైన మరియు బాధ్యతాయుతమైన పాలన వైపు ఒక కీలక అడుగు వేసింది.",
     leadership: "రేవంత్ రెడ్డి నాయకత్వంలో",
@@ -163,15 +213,15 @@ about: {
         desc: "ప్రజలు స్వయంగా పథకాలను తెలుసుకొని, దరఖాస్తు చేసుకొని, వాటి స్థితిని ట్రాక్ చేసుకోవచ్చు — మధ్యవర్తులు అవసరం లేదు."
       },
       ikb: {
-        title: "IKB స్లాట్ సిస్టమ్",
-        desc: "గ్రామ సేవలను క్రమబద్ధంగా, సమయపాలనతో పొందే విధానం — గందరగోళం, వేచి ఉండే సమయం తగ్గింపు."
+        title: "సేవల బుకింగ్ విధానం",
+        desc: "గ్రామ సేవలను సులభంగా, ఎటువంటి గందరగోళం లేకుండా పొందడానికి మీ సమయాన్ని ఇక్కడే బుక్ చేసుకోండి."
       },
       updates: {
         title: "రియల్-టైమ్ అప్డేట్స్",
         desc: "గ్రామ అభివృద్ధి పనులు, నిర్ణయాలు, పురోగతి — అన్నీ ప్రజలకు అందుబాటులో ఉంటాయి."
       }
     },
-    footer: "ఇది కేవలం ఒక వెబ్సైట్ కాదు. ఇది పాలనను నియంత్రించే వ్యవస్థ — వేగంగా, పారదర్శకంగా, బాధ్యతాయుతంగా నడిచేలా రూపొందించబడింది."
+    footer: "ఈ వెబ్సైట్ మా గ్రామం సులభంగా, పారదర్శకంగా మరియు బాధ్యతాయుతంగా నడవడానికి సహాయపడుతుంది."
   },
   comingSoon: {
     title: "త్వరలో వస్తుంది",
@@ -193,8 +243,48 @@ about: {
     alreadyAccount: "ఇప్పటికే ఖాతా ఉందా?",
     error: "చెల్లని ఈమెయిల్ లేదా పాస్‌వర్డ్",
   },
-  footer: { copyright: "© 2026 మల్లారం గ్రామం. అన్ని హక్కులు ప్రత్యేకించబడ్డాయి. \n Made with ❤️ by Samhithreddy Sangam" },
-  language: { toggle: "EN" }
+  footer: { copyright: "© 2026 మల్లారం గ్రామం. అన్ని హక్కులు ప్రత్యేకించబడ్డాయి." },
+  language: { toggle: "EN" },
+  privacy: {
+    title: "గోప్యతా విధానం (Privacy Policy)",
+    introduction: "మీరు మా గ్రామ పోర్టల్‌ను ఉపయోగించినప్పుడు మల్లారం గ్రామ పంచాయితీ మీ వ్యక్తిగత సమాచారాన్ని ఎలా సేకరిస్తుంది, ఉపయోగిస్తుంది మరియు రక్షిస్తుంది అనేది ఈ విధానం వివరిస్తుంది.",
+    sections: [
+      {
+        title: "మేము సేకరించే సమాచారం",
+        content: "మీరు IKP స్లాట్ బుకింగ్ వంటి సేవలను ఉపయోగించినప్పుడు మీ పేరు, ఫోన్ నంబర్ మరియు మీ ఆధార్ కార్డ్ చివరి 4 అంకెలు వంటి ప్రాథమిక సమాచారాన్ని మేము సేకరిస్తాము. ఇది ధృవీకరణ కోసం అవసరం."
+      },
+      {
+        title: "మేము డేటాను ఎలా ఉపయోగిస్తాము",
+        content: "మీ డేటా కేవలం గ్రామ సేవలను అందించడానికి, ప్రభుత్వ పథకాల కోసం గుర్తింపును ధృవీకరించడానికి మరియు పారదర్శకత పోర్టల్‌ను నిర్వహించడానికి మాత్రమే ఉపయోగించబడుతుంది."
+      },
+      {
+        title: "డేటా భద్రత",
+        content: "డిజిటల్ తెలంగాణ విధానాలు మరియు భారత ప్రభుత్వ డిజిటల్ వ్యక్తిగత డేటా రక్షణ (DPDP) చట్టం ప్రకారం, మీ సమాచారాన్ని రక్షించడానికి మేము సురక్షితమైన సర్వర్లను ఉపయోగిస్తాము."
+      },
+      {
+        title: "నిర్వహణ సంస్థ",
+        content: "ఈ పోర్టల్ తెలంగాణ ప్రభుత్వ ఐటి మార్గదర్శకాల ప్రకారం మల్లారం గ్రామ పంచాయతీ ద్వారా నిర్వహించబడుతుంది."
+      }
+    ]
+  },
+  terms: {
+    title: "నిబంధనలు మరియు షరతులు (Terms of Service)",
+    introduction: "మల్లారం గ్రామ పోర్టల్‌ను ఉపయోగించడం ద్వారా, నివాసితులందరికీ పారదర్శకమైన సేవలను అందించడానికి రూపొందించబడిన ఈ క్రింది నిబంధనలకు మీరు అంగీకరిస్తున్నారు.",
+    sections: [
+      {
+        title: "వినియోగదారు బాధ్యత",
+        content: "పథకాల కోసం దరఖాస్తు చేసినప్పుడు లేదా IKP స్లాట్‌లను బుక్ చేసినప్పుడు వినియోగదారులు ఖచ్చితమైన మరియు నిజమైన సమాచారాన్ని అందించాలి."
+      },
+      {
+        title: "సేవల అందుబాటు",
+        content: "డిజిటల్ సేవలు కొన్నిసార్లు నిర్వహణ సమయంలో అందుబాటులో ఉండకపోవచ్చు. అటువంటి సమయంలో పంచాయితీ కార్యాలయంలోని భౌతిక రికార్డులే తుది నిర్ణయంగా పరిగణించబడతాయి."
+      },
+      {
+        title: "పాలక చట్టం",
+        content: "ఈ నిబంధనలు తెలంగాణ రాష్ట్ర మరియు భారత ప్రభుత్వ చట్టాల ద్వారా నిర్వహించబడతాయి. ఏవైనా వివాదాలు తెలంగాణలోని కోర్టుల పరిధికి లోబడి ఉంటాయి."
+      }
+    ]
+  }
 };
 
 // Dictionary map

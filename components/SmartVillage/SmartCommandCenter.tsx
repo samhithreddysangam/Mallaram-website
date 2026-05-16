@@ -12,10 +12,10 @@ export default function SmartCommandCenter({ locale }: SmartCommandCenterProps) 
   const dictionary = getDictionary(locale);
 
   const metrics = [
-    { label: 'Street Lights', value: '142/145', status: 'Optimal', icon: Lightbulb, color: 'text-amber-500', bg: 'bg-amber-500/10' },
-    { label: 'CCTV Network', value: '12 Active', status: 'Secure', icon: Video, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+    { label: 'Street Lights', value: '142/145', status: 'Working Well', icon: Lightbulb, color: 'text-amber-500', bg: 'bg-amber-500/10' },
+    { label: 'CCTV Network', value: '12 Active', status: 'All Safe', icon: Video, color: 'text-blue-500', bg: 'bg-blue-500/10' },
     { label: 'Waste Collection', value: '98%', status: 'Regular', icon: Recycle, color: 'text-green-500', bg: 'bg-green-500/10' },
-    { label: 'Power Grid', value: 'Stable', status: 'Online', icon: Zap, color: 'text-amber-500', bg: 'bg-amber-500/10' },
+    { label: 'Electricity Supply', value: 'Stable', status: 'Available', icon: Zap, color: 'text-amber-500', bg: 'bg-amber-500/10' },
   ];
 
   return (
@@ -28,13 +28,13 @@ export default function SmartCommandCenter({ locale }: SmartCommandCenterProps) 
           className="mb-16"
         >
           <span className="inline-block px-4 py-1.5 rounded-full bg-[#15803d]/10 text-[#15803d] text-[10px] font-black uppercase tracking-[0.2em] mb-4 border border-[#15803d]/20">
-            Smart Infrastructure
+            Village Services
           </span>
           <h2 className="text-4xl md:text-6xl font-black text-[#0A0A0A] mb-6 tracking-tighter uppercase">
-            Village <span className="text-[#15803d]">Command</span> Center
+            Village <span className="text-[#15803d]">Overview</span>
           </h2>
           <p className="text-gray-600 max-w-xl text-lg font-medium">
-            Real-time monitoring of village infrastructure and essential services for proactive governance.
+            See how our village services like lights, roads, and water are working right now.
           </p>
         </motion.div>
 
@@ -76,13 +76,13 @@ export default function SmartCommandCenter({ locale }: SmartCommandCenterProps) 
           <div className="grid lg:grid-cols-3 gap-12 items-center">
             <div className="lg:col-span-2 space-y-8">
               <h3 className="text-3xl font-black text-[#0A0A0A] uppercase tracking-tighter leading-none">
-                Network <span className="text-[#15803d]">Efficiency</span> Report
+                Village <span className="text-[#15803d]">Performance</span> Summary
               </h3>
               <div className="space-y-6">
                 {[
                   { label: 'Energy Usage', val: '12% Reduction' },
-                  { label: 'System Response', val: '0.4s Latency' },
-                  { label: 'Uptime', val: '99.9%' }
+                  { label: 'Response Speed', val: 'Very Fast' },
+                  { label: 'Service Availability', val: '99.9%' }
                 ].map((item, i) => (
                   <div key={i} className="space-y-2">
                     <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
@@ -103,9 +103,9 @@ export default function SmartCommandCenter({ locale }: SmartCommandCenterProps) 
               </div>
             </div>
             <div className="bg-[#15803d]/5 p-8 rounded-[2.5rem] border border-[#15803d]/10">
-              <p className="text-[10px] font-black text-[#15803d] uppercase tracking-[0.2em] mb-4">Operational Status</p>
+              <p className="text-[10px] font-black text-[#15803d] uppercase tracking-[0.2em] mb-4">Current Status</p>
               <p className="text-sm text-gray-600 font-medium leading-relaxed">
-                Mallaram infrastructure systems are fully synchronized with the Telangana State Smart Village Grid.
+                Mallaram infrastructure systems are connected with the Telangana State Village Network.
               </p>
             </div>
           </div>
