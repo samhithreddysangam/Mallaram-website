@@ -11,7 +11,7 @@ async function main() {
       email: 'arpitha@mallaram.in',
       name: 'Admin Arpitha',
       phone: '9989120933',
-      password: 'manamallaram@admin015', // In real app, use hashed password
+      password: 'mallaram123', // In real app, use hashed password
       role: 'ADMIN',
     },
   });

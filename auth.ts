@@ -19,13 +19,19 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
           return null;
         }
 
+        const trimmedIdentifier = identifier.trim().toLowerCase();
+        const trimmedPassword = password.trim();
+
         try {
           // Find user by email OR phone (allowing phone login in the email field)
           const user = await prisma.user.findFirst({
             where: {
               OR: [
-                { email: identifier },
-                { phone: identifier },
+                { email: trimmedIdentifier },
+                { phone: trimmedIdentifier },
+                // Also check original just in case
+                { email: identifier.trim() },
+                { phone: identifier.trim() },
               ],
             },
           });
@@ -35,13 +41,15 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
             return null;
           }
 
-          console.log('User found:', user.email || user.phone, 'Role:', user.role);
+          console.log('User found:', user.email || user.phone);
+          console.log('User Role in DB:', user.role);
 
           // Direct comparison as currently implemented in the seed/user flow
-          const passwordsMatch = password === user.password;
+          const passwordsMatch = trimmedPassword === user.password;
           console.log('Password Match:', passwordsMatch);
 
           if (passwordsMatch) {
+            console.log('Status: Success, Role:', user.role);
             return {
               id: user.id,
               name: user.name,
@@ -52,7 +60,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
             console.log('Status: Password mismatch');
           }
         } catch (error: any) {
-          console.error('Database/Supabase Error:', error.message);
+          console.error('Database/Prisma Error:', error.message);
           throw error;
         }
 
@@ -60,21 +68,5 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
       },
     }),
   ],
-  // Use session callbacks to persist the role to the client side
-  callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.role = (user as any).role;
-        token.id = user.id;
-      }
-      return token;
-    },
-    async session({ session, token }) {
-      if (token && session.user) {
-        (session.user as any).role = token.role;
-        (session.user as any).id = token.id;
-      }
-      return session;
-    },
-  },
+  // Use callbacks from authConfig
 });
