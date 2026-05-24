@@ -6,7 +6,7 @@ import { Locale, getDictionary } from '@/lib/i18n';
 import Navigation from '@/components/Navigation/Navigation';
 import Footer from '@/components/Footer/Footer';
 import { motion } from 'framer-motion';
-import { Search, Database, Upload, Check, X, IndianRupee, Plus, Bell, MapPin, Calendar, Clock, Trash2 } from 'lucide-react';
+import { Search, Database, Upload, Check, X, IndianRupee, Plus, Bell, MapPin, Calendar, Clock, Trash2, ExternalLink, Edit } from 'lucide-react';
 import { WeatherWidget } from '@/components/Agriculture/AgriWidgets';
 
 export default function AdminDashboard() {
@@ -15,11 +15,13 @@ export default function AdminDashboard() {
   const [bookings, setBookings] = useState<any[]>([]);
   const [marketPrices, setMarketPrices] = useState<any[]>([]);
   const [slots, setSlots] = useState<any[]>([]);
+  const [schemes, setSchemes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
   // Modals
   const [showPriceModal, setShowPriceModal] = useState(false);
   const [showSlotModal, setShowSlotModal] = useState(false);
+  const [showSchemeModal, setShowSchemeModal] = useState(false);
   
   // Form States
   const [newPrice, setNewPrice] = useState({ cropName: '', price: '', unit: 'Quintal' });
@@ -30,6 +32,8 @@ export default function AdminDashboard() {
     capacity: '10',
     location: 'IKP Centre Mallaram'
   });
+  const [newScheme, setNewScheme] = useState({ title: '', link: '', description: '' });
+  const [editingScheme, setEditingScheme] = useState<string | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -49,7 +53,8 @@ export default function AdminDashboard() {
     await Promise.all([
       fetchBookings(),
       fetchMarketPrices(),
-      fetchSlots()
+      fetchSlots(),
+      fetchSchemes()
     ]);
     setLoading(false);
   };
@@ -82,6 +87,16 @@ export default function AdminDashboard() {
       setSlots(data);
     } catch (error) {
       console.error('Failed to fetch slots:', error);
+    }
+  };
+
+  const fetchSchemes = async () => {
+    try {
+      const res = await fetch('/api/schemes');
+      const data = await res.json();
+      setSchemes(data);
+    } catch (error) {
+      console.error('Failed to fetch schemes:', error);
     }
   };
 
@@ -126,6 +141,44 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleAddScheme = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const method = editingScheme ? 'PUT' : 'POST';
+      const body = editingScheme ? { id: editingScheme, ...newScheme } : newScheme;
+      
+      const res = await fetch('/api/schemes', {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (res.ok) {
+        setShowSchemeModal(false);
+        setNewScheme({ title: '', link: '', description: '' });
+        setEditingScheme(null);
+        fetchSchemes();
+      }
+    } catch (error) {
+      console.error('Failed to save scheme:', error);
+    }
+  };
+
+  const handleDeleteScheme = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this scheme?')) return;
+    try {
+      const res = await fetch(`/api/schemes?id=${id}`, { method: 'DELETE' });
+      if (res.ok) fetchSchemes();
+    } catch (error) {
+      console.error('Failed to delete scheme:', error);
+    }
+  };
+
+  const startEditScheme = (scheme: any) => {
+    setNewScheme({ title: scheme.title, link: scheme.link, description: scheme.description || '' });
+    setEditingScheme(scheme.id);
+    setShowSchemeModal(true);
+  };
+
   const handleDeleteSlot = async (id: string) => {
     if (!confirm('Are you sure you want to delete this slot? Existing bookings may be affected.')) return;
     try {
@@ -153,6 +206,17 @@ export default function AdminDashboard() {
             >
               <Calendar className="w-4 h-4" />
               Create Slot
+            </button>
+            <button 
+              onClick={() => {
+                setEditingScheme(null);
+                setNewScheme({ title: '', link: '', description: '' });
+                setShowSchemeModal(true);
+              }}
+              className="px-6 py-3 bg-[#0A0A0A] text-[#22FF88] rounded-2xl text-sm font-bold hover:scale-105 transition-all flex items-center gap-2 shadow-xl shadow-black/10 border border-[#22FF88]/20"
+            >
+              <ExternalLink className="w-4 h-4" />
+              Add Scheme
             </button>
             <button 
               onClick={() => setShowPriceModal(true)}
@@ -339,6 +403,51 @@ export default function AdminDashboard() {
                   </motion.div>
                 );
               })}
+            </div>
+          </div>
+        </div>
+
+        {/* Schemes Management Section */}
+        <div className="mb-12">
+          <div className="bg-white rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 p-8">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+              <div>
+                <h3 className="text-2xl font-black text-[#0A0A0A] tracking-tighter">Government Schemes</h3>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Manage links shown on schemes page</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {schemes.length === 0 ? (
+                <div className="col-span-full text-center py-12 text-gray-300 font-bold italic">No schemes configured.</div>
+              ) : schemes.map((scheme) => (
+                <div key={scheme.id} className="p-6 rounded-3xl bg-gray-50 border border-gray-100 hover:border-blue-200 transition-all group">
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-blue-600 shadow-sm">
+                      <ExternalLink className="w-5 h-5" />
+                    </div>
+                    <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button 
+                        onClick={() => startEditScheme(scheme)}
+                        className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button 
+                        onClick={() => handleDeleteScheme(scheme.id)}
+                        className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                  <h4 className="font-black text-[#0A0A0A] mb-1 line-clamp-1">{scheme.title}</h4>
+                  <p className="text-[10px] text-gray-400 font-medium mb-4 line-clamp-2">{scheme.description || 'No description provided.'}</p>
+                  <a href={scheme.link} target="_blank" className="text-[10px] font-black text-blue-600 uppercase tracking-widest flex items-center gap-1 hover:underline">
+                    View Link <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -552,6 +661,55 @@ export default function AdminDashboard() {
                 </div>
                 <button type="submit" className="w-full py-5 bg-[#22FF88] text-[#0A0A0A] rounded-[1.5rem] font-black uppercase tracking-widest hover:scale-[1.02] transition-all shadow-xl shadow-[#22FF88]/20 mt-4">
                   Broadcast New Price
+                </button>
+              </form>
+            </motion.div>
+          </div>
+        )}
+        {/* Scheme Modal */}
+        {showSchemeModal && (
+          <div className="fixed inset-0 bg-[#0A0A0A]/90 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-[2.5rem] shadow-2xl p-10 w-full max-w-md relative">
+              <button onClick={() => setShowSchemeModal(false)} className="absolute top-8 right-8 text-gray-300 hover:text-[#0A0A0A] transition-colors"><X className="w-6 h-6"/></button>
+              <h3 className="text-3xl font-black text-[#0A0A0A] mb-2 tracking-tighter">
+                {editingScheme ? 'Update Scheme' : 'Add New Scheme'}
+              </h3>
+              <p className="text-gray-400 mb-8 font-medium">Configure government scheme link and details</p>
+              
+              <form onSubmit={handleAddScheme} className="space-y-6">
+                <div>
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Scheme Title</label>
+                  <input
+                    type="text"
+                    value={newScheme.title}
+                    onChange={(e) => setNewScheme({ ...newScheme, title: e.target.value })}
+                    className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 font-bold"
+                    placeholder="e.g., MGNREGA Portal"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Portal Link (URL)</label>
+                  <input
+                    type="url"
+                    value={newScheme.link}
+                    onChange={(e) => setNewScheme({ ...newScheme, link: e.target.value })}
+                    className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 font-bold"
+                    placeholder="https://..."
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Short Description</label>
+                  <textarea
+                    value={newScheme.description}
+                    onChange={(e) => setNewScheme({ ...newScheme, description: e.target.value })}
+                    className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 font-bold min-h-[100px]"
+                    placeholder="What is this scheme about?"
+                  />
+                </div>
+                <button type="submit" className="w-full py-5 bg-[#0A0A0A] text-[#22FF88] rounded-[1.5rem] font-black uppercase tracking-widest hover:scale-[1.02] transition-all shadow-xl shadow-black/20 mt-4">
+                  {editingScheme ? 'Save Changes' : 'Publish Scheme'}
                 </button>
               </form>
             </motion.div>

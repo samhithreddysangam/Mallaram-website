@@ -85,3 +85,12 @@ model Complaint {
   status        String    @default("OPEN") // OPEN, IN_PROGRESS, RESOLVED
   createdAt     DateTime  @default(now())
 }
+
+model Scheme {
+  id            String    @id @default(cuid())
+  title         String
+  link          String
+  description   String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
