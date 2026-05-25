@@ -36,13 +36,13 @@ const DEFAULT_SCHEMES: Scheme[] = [
   },
   {
     id: 'epanchayat',
-    title: 'Telangana e-Panchayat',
+    title: 'e-Panchayat Telangana',
     link: 'https://epanchayat.telangana.gov.in/cs',
     description: 'Digital services and information for Gram Panchayats in Telangana.'
   },
   {
     id: 'indirammaindlu',
-    title: 'Indiramma Indlu',
+    title: 'Indiramma Indlu Telangana',
     link: 'https://indirammaindlu.telangana.gov.in/',
     description: 'Housing scheme for the poor in Telangana state.'
   },
@@ -54,13 +54,13 @@ const DEFAULT_SCHEMES: Scheme[] = [
   },
   {
     id: 'agri',
-    title: 'Telangana Agriculture',
+    title: 'Agriculture Telangana',
     link: 'https://agri.telangana.gov.in/',
     description: 'Portal for agricultural schemes and farmer support in Telangana.'
   },
   {
     id: 'registration',
-    title: 'Society Registration',
+    title: 'Society Registration Telangana',
     link: 'https://registration.telangana.gov.in/societyRegistration.htm',
     description: 'Online registration portal for societies in Telangana.'
   },
@@ -72,13 +72,13 @@ const DEFAULT_SCHEMES: Scheme[] = [
   },
   {
     id: 'food-security',
-    title: 'Food Security Card',
-    link: 'https://epds.telangana.gov.in/FoodSecurityAct/',
+    title: 'EPDS Food Security',
+    link: 'https://epds.telangana.gov.in/FoodSecurityAct/?wicket:bookmarkablePage=:nic.fsc.foodsecurity.FscSearch',
     description: 'Check status and manage Food Security (Ration) Cards in Telangana.'
   },
   {
     id: 'tgcess',
-    title: 'TG Cess',
+    title: 'TGCESS',
     link: 'https://tgcessltd.com/',
     description: 'Telangana Cooperative Electric Supply Society Limited.'
   }
@@ -87,7 +87,6 @@ const DEFAULT_SCHEMES: Scheme[] = [
 export default function SchemesPage() {
   const params = useParams();
   const locale = (params?.locale as Locale) || 'en';
-  const dictionary = getDictionary(locale);
   const [schemes, setSchemes] = useState<Scheme[]>([]);
   const [loading, setLoading] = useState(true);
 

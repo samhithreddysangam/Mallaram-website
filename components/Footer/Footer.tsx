@@ -17,6 +17,7 @@ export default function Footer({ locale }: FooterProps) {
 
   const quickLinks = [
     { key: 'about', href: `/${locale}#about` },
+    { key: 'schemes', href: `/${locale}/schemes` },
     { key: 'facilities', href: `/${locale}#facilities` },
     { key: 'gallery', href: `/${locale}#gallery` },
     { key: 'events', href: `/${locale}#events` },

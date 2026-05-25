@@ -88,12 +88,12 @@ async function main() {
       description: 'Simplified work based accounting application for Panchayati Raj Institutions.'
     },
     {
-      title: 'Telangana e-Panchayat',
+      title: 'e-Panchayat Telangana',
       link: 'https://epanchayat.telangana.gov.in/cs',
       description: 'Digital services and information for Gram Panchayats in Telangana.'
     },
     {
-      title: 'Indiramma Indlu',
+      title: 'Indiramma Indlu Telangana',
       link: 'https://indirammaindlu.telangana.gov.in/',
       description: 'Housing scheme for the poor in Telangana state.'
     },
@@ -103,12 +103,12 @@ async function main() {
       description: 'Society for Elimination of Rural Poverty - Empowering rural poor through SHGs.'
     },
     {
-      title: 'Telangana Agriculture',
+      title: 'Agriculture Telangana',
       link: 'https://agri.telangana.gov.in/',
       description: 'Portal for agricultural schemes and farmer support in Telangana.'
     },
     {
-      title: 'Society Registration',
+      title: 'Society Registration Telangana',
       link: 'https://registration.telangana.gov.in/societyRegistration.htm',
       description: 'Online registration portal for societies in Telangana.'
     },
@@ -118,25 +118,23 @@ async function main() {
       description: 'Telangana Social Welfare Residential Educational Institutions Society.'
     },
     {
-      title: 'Food Security Card',
-      link: 'https://epds.telangana.gov.in/FoodSecurityAct/',
+      title: 'EPDS Food Security',
+      link: 'https://epds.telangana.gov.in/FoodSecurityAct/?wicket:bookmarkablePage=:nic.fsc.foodsecurity.FscSearch',
       description: 'Check status and manage Food Security (Ration) Cards in Telangana.'
     },
     {
-      title: 'TG Cess',
+      title: 'TGCESS',
       link: 'https://tgcessltd.com/',
       description: 'Telangana Cooperative Electric Supply Society Limited.'
     }
   ];
 
+  // Clear existing schemes to avoid duplicates with old labels
+  await prisma.scheme.deleteMany({});
+
   for (const scheme of initialSchemes) {
-    await prisma.scheme.upsert({
-      where: { id: scheme.title.toLowerCase().replace(/\s+/g, '-') }, // Using a slug-like ID for seed upsert
-      update: {},
-      create: {
-        id: scheme.title.toLowerCase().replace(/\s+/g, '-'),
-        ...scheme
-      },
+    await prisma.scheme.create({
+      data: scheme,
     });
   }
 

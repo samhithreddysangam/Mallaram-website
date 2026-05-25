@@ -11,7 +11,7 @@ const initialSchemes = [
   {
     title: 'Swachh Bharat Mission',
     link: 'https://swachhbharatmission.ddws.gov.in/',
-    description: 'National campaign to clean up the streets, roads and infrastructure of India\'s cities, towns, and rural areas.'
+    description: 'National campaign to clean up the streets, roads and rural areas of India.'
   },
   {
     title: 'eGramSwaraj',
@@ -19,12 +19,12 @@ const initialSchemes = [
     description: 'Simplified work based accounting application for Panchayati Raj Institutions.'
   },
   {
-    title: 'Telangana e-Panchayat',
+    title: 'e-Panchayat Telangana',
     link: 'https://epanchayat.telangana.gov.in/cs',
     description: 'Digital services and information for Gram Panchayats in Telangana.'
   },
   {
-    title: 'Indiramma Indlu',
+    title: 'Indiramma Indlu Telangana',
     link: 'https://indirammaindlu.telangana.gov.in/',
     description: 'Housing scheme for the poor in Telangana state.'
   },
@@ -34,12 +34,12 @@ const initialSchemes = [
     description: 'Society for Elimination of Rural Poverty - Empowering rural poor through SHGs.'
   },
   {
-    title: 'Telangana Agriculture',
+    title: 'Agriculture Telangana',
     link: 'https://agri.telangana.gov.in/',
-    description: 'Portal for agricultural schemes, subsidies, and farmer support in Telangana.'
+    description: 'Portal for agricultural schemes and farmer support in Telangana.'
   },
   {
-    title: 'Society Registration',
+    title: 'Society Registration Telangana',
     link: 'https://registration.telangana.gov.in/societyRegistration.htm',
     description: 'Online registration portal for societies in Telangana.'
   },
@@ -49,12 +49,12 @@ const initialSchemes = [
     description: 'Telangana Social Welfare Residential Educational Institutions Society.'
   },
   {
-    title: 'Food Security Card',
-    link: 'https://epds.telangana.gov.in/FoodSecurityAct/',
+    title: 'EPDS Food Security',
+    link: 'https://epds.telangana.gov.in/FoodSecurityAct/?wicket:bookmarkablePage=:nic.fsc.foodsecurity.FscSearch',
     description: 'Check status and manage Food Security (Ration) Cards in Telangana.'
   },
   {
-    title: 'TG Cess',
+    title: 'TGCESS',
     link: 'https://tgcessltd.com/',
     description: 'Telangana Cooperative Electric Supply Society Limited.'
   }
