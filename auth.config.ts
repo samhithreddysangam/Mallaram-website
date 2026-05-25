@@ -5,9 +5,8 @@ export const authConfig = {
     signIn: '/login',
   },
   session: {
-    strategy: 'jwt', // Required for middleware session access
+    strategy: 'jwt',
   },
-  secret: process.env.AUTH_SECRET,
   trustHost: true,
   debug: true,
   callbacks: {

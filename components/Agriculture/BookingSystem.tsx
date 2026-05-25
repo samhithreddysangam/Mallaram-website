@@ -39,10 +39,6 @@ export default function BookingSystem({ locale }: BookingSystemProps) {
   const [searchResult, setSearchResult] = useState<any[] | null>(null);
   const [searching, setSearching] = useState(false);
 
-  useEffect(() => {
-    fetchSlots();
-  }, []);
-
   const fetchSlots = async () => {
     setLoading(true);
     try {
@@ -55,6 +51,10 @@ export default function BookingSystem({ locale }: BookingSystemProps) {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchSlots();
+  }, []);
 
   const handleBooking = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -21,7 +21,8 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
         }
 
         const trimmedIdentifier = identifier.trim().toLowerCase();
-        const trimmedPassword = password.trim();
+        // Do NOT trim passwords - they can have spaces intentionally
+        const passwordToMatch = password;
 
         try {
           // Find user by email OR phone (allowing phone login in the email field)
@@ -30,7 +31,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
               OR: [
                 { email: trimmedIdentifier },
                 { phone: trimmedIdentifier },
-                // Also check original just in case
+                // Also check original just in case it's not lowercase in DB
                 { email: identifier.trim() },
                 { phone: identifier.trim() },
               ],
@@ -46,7 +47,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
           console.log('User Role in DB:', user.role);
 
           // Direct comparison as currently implemented in the seed/user flow
-          const passwordsMatch = trimmedPassword === user.password;
+          const passwordsMatch = passwordToMatch === user.password;
           console.log('Password Match:', passwordsMatch);
 
           if (passwordsMatch) {

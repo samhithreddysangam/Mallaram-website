@@ -35,28 +35,12 @@ export default function AdminDashboard() {
   const [newScheme, setNewScheme] = useState({ title: '', link: '', description: '' });
   const [editingScheme, setEditingScheme] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchData();
-    autoExpire();
-  }, []);
-
   const autoExpire = async () => {
     try {
       await fetch('/api/admin/expire-bookings', { method: 'POST' });
     } catch (e) {
       console.error('Auto-expiry failed');
     }
-  };
-
-  const fetchData = async () => {
-    setLoading(true);
-    await Promise.all([
-      fetchBookings(),
-      fetchMarketPrices(),
-      fetchSlots(),
-      fetchSchemes()
-    ]);
-    setLoading(false);
   };
 
   const fetchBookings = async () => {
@@ -99,6 +83,23 @@ export default function AdminDashboard() {
       console.error('Failed to fetch schemes:', error);
     }
   };
+
+  const fetchData = async () => {
+    // loading is true by default, so we don't need to set it here
+    // unless we want to show loading on subsequent refreshes
+    await Promise.all([
+      fetchBookings(),
+      fetchMarketPrices(),
+      fetchSlots(),
+      fetchSchemes()
+    ]);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchData();
+    autoExpire();
+  }, []);
 
   const updateBookingStatus = async (id: string, status: string) => {
     // In a real app, this would be a PATCH/PUT request

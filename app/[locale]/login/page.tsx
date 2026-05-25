@@ -28,16 +28,16 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showDebug, setShowDebug] = useState(false);
 
+  const router = useRouter();
+
   // Redirect if already logged in
-  if (status === 'authenticated') {
-    const userRole = (session?.user as any)?.role;
-    const targetPath = userRole === 'ADMIN' ? `/${locale}/dashboard/admin` : `/${locale}/ikp-booking`;
-    
-    if (typeof window !== 'undefined') {
-      window.location.href = targetPath;
+  useEffect(() => {
+    if (status === 'authenticated') {
+      const userRole = (session?.user as any)?.role;
+      const targetPath = userRole === 'ADMIN' ? `/${locale}/dashboard/admin` : `/${locale}/ikp-booking`;
+      router.replace(targetPath);
     }
-    return null;
-  }
+  }, [status, session, locale, router]);
 
   if (status === 'loading') {
     return (
@@ -56,11 +56,23 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      await signIn('credentials', {
+      const result = await signIn('credentials', {
         email,
         password,
-        callbackUrl: `/${locale}/dashboard/admin`,
+        redirect: false,
       });
+
+      if (result?.error) {
+        if (result.error === 'CredentialsSignin') {
+          setError(auth.error);
+        } else {
+          setError('Invalid login credentials. Please try again.');
+        }
+      } else {
+        // Successful login, middleware or useEffect will handle redirection
+        // but let's be explicit here to avoid waiting for next render
+        window.location.reload(); // Refresh to ensure session is picked up
+      }
     } catch (err) {
       console.error('Login error:', err);
       setError('An unexpected error occurred. Please try again.');

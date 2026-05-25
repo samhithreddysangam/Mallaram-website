@@ -6,12 +6,15 @@ async function main() {
   // Create Admin
   const admin = await prisma.user.upsert({
     where: { email: 'arpitha@mallaram.in' },
-    update: {},
+    update: {
+      password: 'mallaram123', // Update password if user exists
+      role: 'ADMIN',
+    },
     create: {
       email: 'arpitha@mallaram.in',
       name: 'Admin Arpitha',
       phone: '9989120933',
-      password: 'mallaram123', // In real app, use hashed password
+      password: 'mallaram123',
       role: 'ADMIN',
     },
   });
