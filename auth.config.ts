@@ -7,7 +7,9 @@ export const authConfig = {
   session: {
     strategy: 'jwt', // Required for middleware session access
   },
+  secret: process.env.AUTH_SECRET,
   trustHost: true,
+  debug: true,
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
