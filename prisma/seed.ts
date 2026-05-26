@@ -155,6 +155,7 @@ async function main() {
     {
       name: 'Smt D. Anasuya Seethakka (Dansari Anasuya)',
       title: 'Minister of PR & RD',
+      imageUrl: '/images/seethakka.jpg',
       description: 'Working tirelessly for rural development and empowerment of Panchayati Raj institutions across Telangana.',
       order: 2,
       active: true,
@@ -162,6 +163,7 @@ async function main() {
     {
       name: 'Shri Aadi Srinivas',
       title: 'Hon\'ble MLA, Vemulawada',
+      imageUrl: '/images/aadhi-srinivas.jpg',
       description: 'Serving the constituency with dedication and commitment to public welfare and development.',
       order: 3,
       active: true,
@@ -169,6 +171,7 @@ async function main() {
     {
       name: 'Smt Garima Agarwal, IAS',
       title: 'Hon\'ble Collector, Rajanna Sircilla District',
+      imageUrl: '/images/garima-agarwal.webp',
       description: 'Leading district administration with a vision for inclusive growth and good governance.',
       order: 4,
       active: true,
@@ -176,6 +179,7 @@ async function main() {
     {
       name: 'Sangam Arpitha Reddy',
       title: 'Sarpanch, Mallaram Gram Panchayat',
+      imageUrl: '/images/arpitha-reddy.jpg',
       description: 'Leading the village towards digital transformation and sustainable development with community participation.',
       order: 5,
       active: true,
