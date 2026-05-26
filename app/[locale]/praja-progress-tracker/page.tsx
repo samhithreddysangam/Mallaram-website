@@ -59,24 +59,19 @@ interface Scheme {
   type: string;
 }
 
-// ─── Color Theme ───────────────────────────────────────────────────
+// ─── Color Theme (site-consistent: green only) ────────────────────
 const COLORS = {
   primary: '#15803d',
   primaryLight: '#22c55e',
   primaryDark: '#14532d',
-  blue: '#2563eb',
-  blueLight: '#3b82f6',
-  amber: '#f59e0b',
   red: '#ef4444',
-  purple: '#7c3aed',
-  teal: '#14b8a6',
   gray: '#6b7280',
 };
 
-const PIE_COLORS = ['#15803d', '#2563eb', '#f59e0b', '#7c3aed', '#14b8a6', '#ef4444', '#3b82f6', '#22c55e'];
+const PIE_COLORS = ['#15803d', '#22c55e', '#166534', '#14532d', '#4ade80', '#86efac', '#bbf7d0', '#dcfce7'];
 const STATUS_COLORS: Record<string, string> = {
   APPROVED: '#15803d',
-  PENDING: '#f59e0b',
+  PENDING: '#d97706',
   REJECTED: '#ef4444',
 };
 
@@ -107,38 +102,37 @@ function AnimatedCounter({ value, suffix = '', prefix = '', decimals = 0 }: { va
   return <span>{prefix}{display.toLocaleString('en-IN')}{suffix}</span>;
 }
 
-// ─── Stats Card ────────────────────────────────────────────────────
-function StatsCard({ title, value, icon: Icon, color, bgColor, accentColor, prefix = '', suffix = '' }: {
-  title: string; value: number; icon: any; color: string; bgColor: string; accentColor: string; prefix?: string; suffix?: string;
+// ─── Stats Card (site-card style) ─────────────────────────────────
+function StatsCard({ title, value, icon: Icon, accentColor = 'text-green-600' }: {
+  title: string; value: number; icon: any; accentColor?: string;
 }) {
   return (
     <motion.div
       whileHover={{ y: -4, scale: 1.01 }}
-      className="group relative overflow-hidden rounded-2xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 p-6 transition-all duration-300 hover:shadow-xl hover:shadow-gray-200/50 dark:hover:shadow-black/20"
+      className="group relative overflow-hidden bg-white dark:bg-gray-900 shadow-[0_8px_32px_rgba(0,0,0,0.03)] rounded-[3rem] border border-gray-100 dark:border-gray-800 hover:border-[#15803d]/40 p-8 transition-all duration-500"
     >
-      <div className={`absolute top-0 right-0 w-32 h-32 -mr-8 -mt-8 rounded-full ${bgColor} opacity-20 dark:opacity-10 transition-transform duration-500 group-hover:scale-150`} />
+      <div className="absolute top-0 right-0 w-48 h-48 -mr-12 -mt-12 rounded-full bg-[#15803d]/5 opacity-40 transition-transform duration-500 group-hover:scale-150" />
       <div className="relative z-10">
-        <div className="flex items-start justify-between mb-4">
-          <div className={`w-12 h-12 rounded-xl ${bgColor} flex items-center justify-center`}>
-            <Icon className={`w-6 h-6 ${color}`} />
+        <div className="flex items-start justify-between mb-5">
+          <div className="w-14 h-14 rounded-2xl bg-[#15803d]/8 flex items-center justify-center group-hover:bg-[#15803d] group-hover:text-white transition-all duration-500">
+            <Icon className="w-6 h-6 text-[#15803d] group-hover:text-white transition-colors" />
           </div>
-          <div className={`px-2.5 py-1 rounded-full ${bgColor} text-[9px] font-black uppercase tracking-widest ${color}`}>
+          <div className="px-3 py-1 rounded-full bg-[#15803d]/8 text-[9px] font-black uppercase tracking-[0.2em] text-[#15803d]">
             Live
           </div>
         </div>
         <div className={`text-3xl font-black tracking-tighter ${accentColor}`}>
-          <AnimatedCounter value={value} prefix={prefix} suffix={suffix} />
-        </div>
-        <div className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-1.5">
-          {title}
-        </div>
-        <div className={`mt-3 h-0.5 w-0 group-hover:w-full ${bgColor} transition-all duration-500 rounded-full`} />
+          <AnimatedCounter value={value} />
+        </div>          <div className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mt-1.5">
+            {title}
+          </div>
+        <div className="mt-4 h-px w-0 group-hover:w-full bg-gradient-to-r from-[#15803d]/40 to-transparent transition-all duration-500" />
       </div>
     </motion.div>
   );
 }
 
-// ─── Filters ────────────────────────────────────────────────────────
+// ─── Filters (site-card style) ────────────────────────────────────
 function FilterBar({ schemes, filters, onChange, onReset }: {
   schemes: Scheme[];
   filters: { schemeId: string; year: string; village: string; status: string; search: string; dateFrom: string; dateTo: string };
@@ -148,13 +142,13 @@ function FilterBar({ schemes, filters, onChange, onReset }: {
   const years = Array.from({ length: 6 }, (_, i) => (new Date().getFullYear() - i).toString());
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-6">
-      <div className="flex items-center justify-between mb-5">
-        <div className="flex items-center gap-2">
+    <div className="bg-white dark:bg-gray-900 shadow-[0_8px_32px_rgba(0,0,0,0.03)] rounded-[3rem] border border-gray-100 dark:border-gray-800 hover:border-[#15803d]/40 transition-all duration-500 p-8">
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-2.5">
           <Filter className="w-4 h-4 text-gray-400" />
-          <span className="text-xs font-black text-gray-400 uppercase tracking-widest">Filters</span>
+          <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Filters</span>
           {(filters.schemeId || filters.year || filters.village || filters.status || filters.search || filters.dateFrom || filters.dateTo) && (
-            <button onClick={onReset} className="flex items-center gap-1 px-2 py-1 text-[9px] font-black text-red-500 uppercase tracking-widest hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all">
+            <button onClick={onReset} className="flex items-center gap-1 px-3 py-1 text-[9px] font-black text-red-500 uppercase tracking-[0.2em] hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full transition-all">
               <X className="w-3 h-3" /> Clear
             </button>
           )}
@@ -164,7 +158,7 @@ function FilterBar({ schemes, filters, onChange, onReset }: {
         <select
           value={filters.schemeId}
           onChange={e => onChange({ ...filters, schemeId: e.target.value })}
-          className="px-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#15803d]/20 focus:border-[#15803d] transition-all"
+          className="px-4 py-3 bg-[#FAF9F6] dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl text-xs font-bold dark:text-white focus:outline-none focus:ring-2 focus:ring-[#15803d]/20 focus:border-[#15803d] transition-all"
         >
           <option value="">All Schemes</option>
           {schemes.map(s => <option key={s.id} value={s.id}>{s.title}</option>)}
@@ -172,7 +166,7 @@ function FilterBar({ schemes, filters, onChange, onReset }: {
         <select
           value={filters.year}
           onChange={e => onChange({ ...filters, year: e.target.value })}
-          className="px-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#15803d]/20 focus:border-[#15803d] transition-all"
+          className="px-4 py-3 bg-[#FAF9F6] dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl text-xs font-bold dark:text-white focus:outline-none focus:ring-2 focus:ring-[#15803d]/20 focus:border-[#15803d] transition-all"
         >
           <option value="">All Years</option>
           {years.map(y => <option key={y} value={y}>{y}</option>)}
@@ -180,7 +174,7 @@ function FilterBar({ schemes, filters, onChange, onReset }: {
         <select
           value={filters.status}
           onChange={e => onChange({ ...filters, status: e.target.value })}
-          className="px-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#15803d]/20 focus:border-[#15803d] transition-all"
+          className="px-4 py-3 bg-[#FAF9F6] dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl text-xs font-bold dark:text-white focus:outline-none focus:ring-2 focus:ring-[#15803d]/20 focus:border-[#15803d] transition-all"
         >
           <option value="">All Status</option>
           <option value="APPROVED">Approved</option>
@@ -190,7 +184,7 @@ function FilterBar({ schemes, filters, onChange, onReset }: {
         <select
           value={filters.village}
           onChange={e => onChange({ ...filters, village: e.target.value })}
-          className="px-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#15803d]/20 focus:border-[#15803d] transition-all"
+          className="px-4 py-3 bg-[#FAF9F6] dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl text-xs font-bold dark:text-white focus:outline-none focus:ring-2 focus:ring-[#15803d]/20 focus:border-[#15803d] transition-all"
         >
           <option value="">All Villages</option>
           <option value="Mallaram">Mallaram</option>
@@ -198,13 +192,13 @@ function FilterBar({ schemes, filters, onChange, onReset }: {
           <option value="Kodurupaka">Kodurupaka</option>
         </select>
         <div className="relative">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
           <input
             type="text"
             value={filters.search}
             onChange={e => onChange({ ...filters, search: e.target.value })}
             placeholder="Search..."
-            className="w-full pl-9 pr-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#15803d]/20 focus:border-[#15803d] transition-all"
+            className="w-full pl-10 pr-4 py-3 bg-[#FAF9F6] dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl text-xs font-bold dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#15803d]/20 focus:border-[#15803d] transition-all"
           />
         </div>
         <div className="relative col-span-2 md:col-span-1 lg:col-span-2 flex gap-2">
@@ -212,14 +206,14 @@ function FilterBar({ schemes, filters, onChange, onReset }: {
             type="date"
             value={filters.dateFrom}
             onChange={e => onChange({ ...filters, dateFrom: e.target.value })}
-            className="flex-1 px-3 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl text-[10px] font-bold focus:outline-none focus:ring-2 focus:ring-[#15803d]/20 focus:border-[#15803d] transition-all"
+            className="flex-1 px-3 py-3 bg-[#FAF9F6] dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl text-[10px] font-bold dark:text-white focus:outline-none focus:ring-2 focus:ring-[#15803d]/20 focus:border-[#15803d] transition-all"
             title="Date from"
           />
           <input
             type="date"
             value={filters.dateTo}
             onChange={e => onChange({ ...filters, dateTo: e.target.value })}
-            className="flex-1 px-3 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl text-[10px] font-bold focus:outline-none focus:ring-2 focus:ring-[#15803d]/20 focus:border-[#15803d] transition-all"
+            className="flex-1 px-3 py-3 bg-[#FAF9F6] dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl text-[10px] font-bold dark:text-white focus:outline-none focus:ring-2 focus:ring-[#15803d]/20 focus:border-[#15803d] transition-all"
             title="Date to"
           />
         </div>
@@ -272,22 +266,27 @@ function VerificationSystem({ locale }: { locale: Locale }) {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-6 md:p-8">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 rounded-xl bg-[#15803d]/10 flex items-center justify-center">
-          <Shield className="w-5 h-5 text-[#15803d]" />
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      className="bg-white dark:bg-gray-900 shadow-[0_8px_32px_rgba(0,0,0,0.03)] rounded-[3rem] border border-gray-100 dark:border-gray-800 hover:border-[#15803d]/40 transition-all duration-500 p-8 md:p-10"
+    >
+      <div className="flex items-center gap-4 mb-8">
+        <div className="w-14 h-14 rounded-2xl bg-[#15803d]/8 flex items-center justify-center">
+          <Shield className="w-6 h-6 text-[#15803d]" />
         </div>
         <div>
-          <h3 className="text-lg font-black text-gray-900 dark:text-white tracking-tight">Public Verification</h3>
-          <p className="text-xs text-gray-400 font-medium">Verify your application status securely</p>
+          <h3 className="text-xl font-black text-[#0A0A0A] dark:text-white uppercase tracking-tighter">Public Verification</h3>
+          <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mt-0.5">Verify your application status securely</p>
         </div>
       </div>
 
       {!result ? (
-        <form onSubmit={handleVerify} className="space-y-4">
+        <form onSubmit={handleVerify} className="space-y-5">
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5">
+              <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">
                 Aadhaar (Last 4 Digits)
               </label>
               <input
@@ -297,54 +296,52 @@ function VerificationSystem({ locale }: { locale: Locale }) {
                 value={aadhaar}
                 onChange={e => setAadhaar(e.target.value.replace(/\D/g, '').slice(0, 4))}
                 placeholder="XXXX"
-                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl text-sm font-bold text-center text-2xl tracking-[0.3em] focus:outline-none focus:ring-2 focus:ring-[#15803d]/20 focus:border-[#15803d] transition-all"
+                className="w-full px-4 py-3 bg-[#FAF9F6] dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl text-sm font-bold text-center text-2xl tracking-[0.3em] focus:outline-none focus:ring-2 focus:ring-[#15803d]/20 focus:border-[#15803d] transition-all"
                 disabled={!!appId}
               />
             </div>
             <div>
-              <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5">
+              <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">
                 OR Application ID
               </label>
               <input
                 type="text"
                 value={appId}
                 onChange={e => setAppId(e.target.value)}
-                placeholder="e.g., cm0abcdef12345..."
-                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#15803d]/20 focus:border-[#15803d] transition-all"
+                placeholder="e.g., cm0..."
+                className="w-full px-4 py-3 bg-[#FAF9F6] dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl text-xs font-bold dark:text-white focus:outline-none focus:ring-2 focus:ring-[#15803d]/20 focus:border-[#15803d] transition-all"
                 disabled={!!aadhaar}
               />
             </div>
           </div>
           {error && (
-            <div className="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-xl text-xs font-bold">
+            <div className="flex items-center gap-2.5 p-4 bg-red-50 text-red-600 rounded-2xl text-xs font-bold border border-red-100">
               <AlertTriangle className="w-4 h-4 shrink-0" />
               {error}
             </div>
           )}
-          <div className="flex gap-3">
-            <button
-              type="submit"
-              disabled={loading || (!aadhaar && !appId)}
-              className="flex-1 px-6 py-3 bg-[#15803d] hover:bg-[#14532d] disabled:opacity-50 text-white rounded-xl text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all shadow-lg shadow-[#15803d]/20"
-            >
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-              {loading ? 'Verifying...' : 'Verify Status'}
-            </button>
-          </div>
+          <button
+            type="submit"
+            disabled={loading || (!aadhaar && !appId)}
+            className="w-full px-6 py-4 bg-[#15803d] hover:bg-[#14532d] disabled:opacity-50 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] flex items-center justify-center gap-2.5 transition-all shadow-lg shadow-[#15803d]/20"
+          >
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+            {loading ? 'Verifying...' : 'Verify Status'}
+          </button>
         </form>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-5">
           {result.multiple ? (
             <div>
-              <div className="flex items-center gap-2 mb-3">
+              <div className="flex items-center gap-2.5 mb-4">
                 <CheckCircle2 className="w-5 h-5 text-[#15803d]" />
                 <span className="text-sm font-bold text-[#15803d]">{result.applications.length} application(s) found</span>
               </div>
               <div className="space-y-3 max-h-64 overflow-y-auto">
                 {result.applications.map((app: any) => (
-                  <div key={app.applicationId} className="p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-black text-gray-500 uppercase tracking-widest">{app.schemeName}</span>
+                  <div key={app.applicationId} className="p-5 bg-[#FAF9F6] rounded-2xl border border-gray-100">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">{app.schemeName}</span>
                       <StatusBadge status={app.status} />
                     </div>
                     <div className="grid grid-cols-2 gap-2 text-xs">
@@ -358,33 +355,33 @@ function VerificationSystem({ locale }: { locale: Locale }) {
             </div>
           ) : (
             <div>
-              <div className="flex items-center gap-2 mb-4">
+              <div className="flex items-center gap-2 mb-5">
                 <div className={`w-3 h-3 rounded-full ${result.application.status === 'APPROVED' ? 'bg-[#15803d]' : result.application.status === 'REJECTED' ? 'bg-red-500' : 'bg-amber-500'}`} />
-                <span className="text-sm font-bold text-gray-900 dark:text-white">Application Status</span>
+                <span className="text-sm font-bold text-[#0A0A0A] dark:text-white">Application Status</span>
               </div>
-              <div className="p-5 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700">
+              <div className="p-6 bg-[#FAF9F6] rounded-2xl border border-gray-100">
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Scheme</div>
-                    <div className="font-bold text-gray-900 dark:text-white">{result.application.schemeName}</div>
+                    <div className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1">Scheme</div>
+                    <div className="font-bold text-[#0A0A0A] dark:text-white">{result.application.schemeName}</div>
                   </div>
                   <div>
-                    <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Status</div>
+                    <div className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1">Status</div>
                     <StatusBadge status={result.application.status} />
                   </div>
                   <div>
-                    <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Application Date</div>
-                    <div className="font-bold text-gray-900 dark:text-white">{new Date(result.application.applicationDate).toLocaleDateString()}</div>
+                    <div className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1">Application Date</div>
+                    <div className="font-bold text-[#0A0A0A] dark:text-white">{new Date(result.application.applicationDate).toLocaleDateString()}</div>
                   </div>
                   {result.application.benefitAmount && (
                     <div>
-                      <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Benefit Amount</div>
+                      <div className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1">Benefit Amount</div>
                       <div className="font-bold text-[#15803d]">₹{result.application.benefitAmount.toLocaleString('en-IN')}</div>
                     </div>
                   )}
                   {result.application.rejectionReason && (
                     <div className="col-span-2">
-                      <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Reason</div>
+                      <div className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1">Reason</div>
                       <div className="font-bold text-red-500">{result.application.rejectionReason}</div>
                     </div>
                   )}
@@ -395,33 +392,33 @@ function VerificationSystem({ locale }: { locale: Locale }) {
 
           <button
             onClick={handleReset}
-            className="w-full px-6 py-3 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-xl text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all"
+            className="w-full px-6 py-4 bg-[#FAF9F6] hover:bg-gray-100 text-gray-500 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] flex items-center justify-center gap-2.5 transition-all border border-gray-100"
           >
             <RefreshCw className="w-4 h-4" />
             Check Another
           </button>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }
 
 function StatusBadge({ status }: { status: string }) {
   const config = {
-    APPROVED: { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-[#15803d]', dot: 'bg-[#15803d]', label: 'Approved' },
-    PENDING: { bg: 'bg-amber-100 dark:bg-amber-900/30', text: 'text-amber-600', dot: 'bg-amber-500', label: 'Pending' },
-    REJECTED: { bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-600', dot: 'bg-red-500', label: 'Rejected' },
+    APPROVED: { bg: 'bg-green-100', text: 'text-[#15803d]', dot: 'bg-[#15803d]', label: 'Approved' },
+    PENDING: { bg: 'bg-amber-100', text: 'text-amber-600', dot: 'bg-amber-500', label: 'Pending' },
+    REJECTED: { bg: 'bg-red-100', text: 'text-red-600', dot: 'bg-red-500', label: 'Rejected' },
   };
   const c = config[status as keyof typeof config] || config.PENDING;
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full ${c.bg} ${c.text} text-[9px] font-black uppercase tracking-widest`}>
+    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full ${c.bg} ${c.text} text-[9px] font-black uppercase tracking-[0.2em]`}>
       <span className={`w-1.5 h-1.5 rounded-full ${c.dot}`} />
       {c.label}
     </span>
   );
 }
 
-// ─── Beneficiary Table ─────────────────────────────────────────────
+// ─── Beneficiary Table (site-card style) ──────────────────────────
 function BeneficiaryTable({ locale }: { locale: Locale }) {
   const [applications, setApplications] = useState<ApplicationRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -452,7 +449,6 @@ function BeneficiaryTable({ locale }: { locale: Locale }) {
   useEffect(() => { fetchData(search, page); }, [page]);
   useEffect(() => { const t = setTimeout(() => { setPage(1); fetchData(search, 1); }, 300); return () => clearTimeout(t); }, [search]);
 
-  // Export CSV
   const exportCSV = () => {
     const headers = ['Applicant Name', 'Scheme', 'Village', 'Ward', 'Status', 'Amount', 'Application Date', 'Approval Date'];
     const rows = applications.map(a => [
@@ -470,19 +466,23 @@ function BeneficiaryTable({ locale }: { locale: Locale }) {
     URL.revokeObjectURL(url);
   };
 
-  // Print
   const handlePrint = () => window.print();
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden">
-      <div className="p-6 border-b border-gray-100 dark:border-gray-800">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      className="bg-white dark:bg-gray-900 shadow-[0_8px_32px_rgba(0,0,0,0.03)] rounded-[3rem] border border-gray-100 dark:border-gray-800 hover:border-[#15803d]/40 transition-all duration-500 overflow-hidden"
+    >
+      <div className="p-8 border-b border-gray-100 dark:border-gray-800">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-5">
           <div>
-            <h3 className="text-lg font-black text-gray-900 dark:text-white tracking-tight">Beneficiary Records</h3>
-            <p className="text-xs text-gray-400 font-medium">Complete list of all welfare applications and beneficiaries</p>
+            <h3 className="text-xl font-black text-[#0A0A0A] dark:text-white uppercase tracking-tighter">Beneficiary Records</h3>
+            <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mt-0.5">Complete list of all welfare applications and beneficiaries</p>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[9px] text-gray-400 font-bold flex items-center gap-1">
+            <span className="text-[9px] text-gray-400 font-bold flex items-center gap-1.5">
               <Clock className="w-3 h-3" /> Updated {lastUpdated.toLocaleTimeString()}
             </span>
           </div>
@@ -495,14 +495,14 @@ function BeneficiaryTable({ locale }: { locale: Locale }) {
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Search by name, phone or application ID..."
-              className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[#15803d]/20 focus:border-[#15803d] transition-all"
+              className="w-full pl-11 pr-4 py-3 bg-[#FAF9F6] dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl text-sm font-bold dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#15803d]/20 focus:border-[#15803d] transition-all"
             />
           </div>
           <div className="flex gap-2">
-            <button onClick={exportCSV} className="px-4 py-3 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-100 dark:border-gray-700 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all">
+            <button onClick={exportCSV} className="px-5 py-3 bg-[#FAF9F6] dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-100 dark:border-gray-700 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2.5 transition-all">
               <FileSpreadsheet className="w-4 h-4 text-[#15803d]" /> CSV
             </button>
-            <button onClick={handlePrint} className="px-4 py-3 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-100 dark:border-gray-700 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all">
+            <button onClick={handlePrint} className="px-5 py-3 bg-[#FAF9F6] dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-100 dark:border-gray-700 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2.5 transition-all">
               <Printer className="w-4 h-4" /> Print
             </button>
           </div>
@@ -512,52 +512,52 @@ function BeneficiaryTable({ locale }: { locale: Locale }) {
       <div className="overflow-x-auto">
         <table className="w-full text-left print:table-auto">
           <thead>
-            <tr className="bg-gray-50/50 dark:bg-gray-800/50 text-[10px] text-gray-400 font-black uppercase tracking-widest">
-              <th className="px-6 py-4">Applicant</th>
-              <th className="px-6 py-4">Scheme</th>
-              <th className="px-6 py-4">Village</th>
-              <th className="px-6 py-4">Date</th>
-              <th className="px-6 py-4">Status</th>
-              <th className="px-6 py-4 text-right">Amount</th>
+            <tr className="bg-[#FAF9F6] dark:bg-gray-800/50 text-[10px] text-gray-400 font-black uppercase tracking-[0.2em]">
+              <th className="px-8 py-4">Applicant</th>
+              <th className="px-8 py-4">Scheme</th>
+              <th className="px-8 py-4">Village</th>
+              <th className="px-8 py-4">Date</th>
+              <th className="px-8 py-4">Status</th>
+              <th className="px-8 py-4 text-right">Amount</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
             {loading ? (
-              <tr><td colSpan={6} className="px-6 py-20 text-center"><Loader2 className="w-6 h-6 animate-spin mx-auto text-gray-300" /></td></tr>
+              <tr><td colSpan={6} className="px-8 py-20 text-center"><Loader2 className="w-6 h-6 animate-spin mx-auto text-gray-300" /></td></tr>
             ) : applications.length === 0 ? (
-              <tr><td colSpan={6} className="px-6 py-16 text-center text-gray-300 dark:text-gray-600 font-bold italic">No records found.</td></tr>
+              <tr><td colSpan={6} className="px-8 py-16 text-center text-gray-300 font-bold italic">No records found.</td></tr>
             ) : applications.map((app) => (
-              <tr key={app.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors group">
-                <td className="px-6 py-4">
+              <tr key={app.id} className="hover:bg-[#FAF9F6]/80 dark:hover:bg-gray-800/30 transition-colors group">
+                <td className="px-8 py-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-[#15803d]/10 flex items-center justify-center text-[#15803d] text-xs font-black">
+                    <div className="w-9 h-9 rounded-2xl bg-[#15803d]/8 flex items-center justify-center text-[#15803d] text-sm font-black">
                       {app.applicantName.charAt(0)}
                     </div>
                     <div>
-                      <div className="font-bold text-sm text-gray-900 dark:text-white">{app.applicantName}</div>
+                      <div className="font-bold text-sm text-[#0A0A0A] dark:text-white">{app.applicantName}</div>
                       {app.applicantPhone && <div className="text-[10px] text-gray-400 font-medium">{app.applicantPhone}</div>}
                     </div>
                   </div>
                 </td>
-                <td className="px-6 py-4">
-                  <span className="text-xs font-bold text-gray-700 dark:text-gray-300">{app.scheme.title}</span>
+                <td className="px-8 py-4">
+                  <span className="text-xs font-bold text-gray-600 dark:text-gray-300">{app.scheme.title}</span>
                 </td>
-                <td className="px-6 py-4">
+                <td className="px-8 py-4">
                   <div className="flex items-center gap-1.5">
                     <MapPin className="w-3 h-3 text-gray-400" />
                     <span className="text-xs font-medium text-gray-500">{app.village}{app.ward ? ` (${app.ward})` : ''}</span>
                   </div>
                 </td>
-                <td className="px-6 py-4">
+                <td className="px-8 py-4">
                   <div className="text-xs font-bold text-gray-500">
                     {new Date(app.applicationDate).toLocaleDateString()}
                   </div>
                 </td>
-                <td className="px-6 py-4">
+                <td className="px-8 py-4">
                   <StatusBadge status={app.status} />
                 </td>
-                <td className="px-6 py-4 text-right">
-                  <span className="text-sm font-black text-gray-900 dark:text-white">
+                <td className="px-8 py-4 text-right">
+                  <span className="text-sm font-black text-[#0A0A0A] dark:text-white">
                     {app.benefitAmount ? `₹${app.benefitAmount.toLocaleString('en-IN')}` : '—'}
                   </span>
                 </td>
@@ -567,23 +567,22 @@ function BeneficiaryTable({ locale }: { locale: Locale }) {
         </table>
       </div>
 
-      {/* Pagination */}
       {totalPages > 1 && (
-        <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
+        <div className="px-8 py-4 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
           <span className="text-[10px] font-bold text-gray-400">Page {page} of {totalPages}</span>
           <div className="flex gap-2">
             <button disabled={page <= 1} onClick={() => setPage(p => Math.max(1, p - 1))}
-              className="px-3 py-1.5 bg-gray-50 dark:bg-gray-800 disabled:opacity-30 rounded-lg text-xs font-bold hover:bg-gray-100 dark:hover:bg-gray-700 transition-all">
+              className="px-3 py-1.5 bg-[#FAF9F6] dark:bg-gray-800 disabled:opacity-30 rounded-xl text-xs font-bold hover:bg-gray-100 dark:hover:bg-gray-700 transition-all">
               <ChevronLeft className="w-4 h-4" />
             </button>
             <button disabled={page >= totalPages} onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-              className="px-3 py-1.5 bg-gray-50 dark:bg-gray-800 disabled:opacity-30 rounded-lg text-xs font-bold hover:bg-gray-100 dark:hover:bg-gray-700 transition-all">
+              className="px-3 py-1.5 bg-[#FAF9F6] dark:bg-gray-800 disabled:opacity-30 rounded-xl text-xs font-bold hover:bg-gray-100 dark:hover:bg-gray-700 transition-all">
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }
 
@@ -601,13 +600,11 @@ export default function PrajaProgressTrackerPage() {
   const [filters, setFilters] = useState({ schemeId: '', year: '', village: '', status: '', search: '', dateFrom: '', dateTo: '' });
   const [activeChartTab, setActiveChartTab] = useState('schemes');
 
-  // Dark mode
   useEffect(() => {
     if (darkMode) document.documentElement.classList.add('dark');
     else document.documentElement.classList.remove('dark');
   }, [darkMode]);
 
-  // Fetch data
   const fetchData = useCallback(async () => {
     try {
       const params = new URLSearchParams();
@@ -654,24 +651,34 @@ export default function PrajaProgressTrackerPage() {
     <main className={`min-h-screen transition-colors duration-300 ${darkMode ? 'dark bg-gray-950' : 'bg-[#FAF9F6]'}`}>
       <Navigation locale={locale} />
 
-      <div className="pt-40 lg:pt-52 max-w-7xl mx-auto px-4 pb-20">
-        {/* Header */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-10">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="pt-[80px] lg:pt-[200px] max-w-7xl mx-auto px-4 pb-20"
+      >
+        {/* ─── Section Header (site-consistent) ─── */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-16"
+        >
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div>
-              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#15803d]/10 text-[#15803d] text-[9px] font-black uppercase tracking-[0.2em] mb-4 border border-[#15803d]/20">
-                <BarChart3 className="w-3.5 h-3.5" />
-                Transparent Governance
+              <span className="inline-block px-4 py-1.5 rounded-full bg-[#15803d]/10 text-[#15803d] text-[10px] font-black uppercase tracking-[0.3em] mb-6 border border-[#15803d]/20">
+                <span className="flex items-center gap-2">
+                  <BarChart3 className="w-3.5 h-3.5" />
+                  Transparent Governance
+                </span>
               </span>
-              <h1 className="text-4xl md:text-6xl font-black text-gray-900 dark:text-white mb-3 uppercase tracking-tighter">
+              <h1 className="text-5xl md:text-7xl font-black text-[#0A0A0A] dark:text-white uppercase tracking-tighter leading-[0.9] mb-4">
                 Praja Progress <span className="text-[#15803d]">Tracker</span>
               </h1>
-              <p className="text-gray-500 dark:text-gray-400 font-medium max-w-2xl">
+              <p className="text-gray-500 font-medium max-w-2xl text-lg">
                 Track Applications, Approvals &amp; Welfare Benefits Delivered Transparently
               </p>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm">
+            <div className="flex items-center gap-3 shrink-0">
+              <div className="flex items-center gap-2.5 px-5 py-3 bg-white dark:bg-gray-900 shadow-[0_8px_32px_rgba(0,0,0,0.03)] rounded-2xl border border-gray-100 dark:border-gray-800">
                 <Clock className="w-3.5 h-3.5 text-gray-400" />
                 <span className="text-[10px] font-bold text-gray-400">
                   Last Updated: {lastUpdated.toLocaleTimeString()}
@@ -679,54 +686,81 @@ export default function PrajaProgressTrackerPage() {
               </div>
               <button
                 onClick={() => setDarkMode(!darkMode)}
-                className="w-10 h-10 flex items-center justify-center bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 hover:shadow-md transition-all"
+                className="w-11 h-11 flex items-center justify-center bg-white dark:bg-gray-900 shadow-[0_8px_32px_rgba(0,0,0,0.03)] rounded-2xl border border-gray-100 dark:border-gray-800 hover:border-[#15803d]/40 transition-all"
                 title={darkMode ? 'Light Mode' : 'Dark Mode'}
               >
-                {darkMode ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className="w-4 h-4 text-gray-500" />}
+                {darkMode ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className="w-4 h-4 text-gray-400" />}
               </button>
             </div>
           </div>
         </motion.div>
 
-        {/* Stats Cards */}
+        {/* ─── Stats Cards (grid with whileInView) ─── */}
         {loadingStats ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-10">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-5 mb-12">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-6 animate-pulse">
-                <div className="h-12 w-12 bg-gray-100 dark:bg-gray-800 rounded-xl mb-4" />
-                <div className="h-8 bg-gray-100 dark:bg-gray-800 rounded w-20 mb-2" />
-                <div className="h-3 bg-gray-100 dark:bg-gray-800 rounded w-24" />
+              <div key={i} className="bg-white dark:bg-gray-900 shadow-[0_8px_32px_rgba(0,0,0,0.03)] rounded-[3rem] border border-gray-100 dark:border-gray-800 p-8 animate-pulse">
+                <div className="h-14 w-14 bg-gray-100 rounded-2xl mb-5" />
+                <div className="h-8 bg-gray-100 rounded w-20 mb-2" />
+                <div className="h-3 bg-gray-100 rounded w-24" />
               </div>
             ))}
           </div>
         ) : stats ? (
           <>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-10">
-              <StatsCard title="Total Applications" value={stats.totalApplications} icon={FileBarChart} color="text-[#15803d]" bgColor="bg-[#15803d]/10" accentColor="text-gray-900 dark:text-white" />
-              <StatsCard title="Approved" value={stats.approvedApplications} icon={CheckCircle2} color="text-green-600" bgColor="bg-green-100 dark:bg-green-900/30" accentColor="text-[#15803d]" />
-              <StatsCard title="Pending" value={stats.pendingApplications} icon={Clock} color="text-amber-600" bgColor="bg-amber-100 dark:bg-amber-900/30" accentColor="text-amber-500" />
-              <StatsCard title="Rejected" value={stats.rejectedApplications} icon={XCircle} color="text-red-600" bgColor="bg-red-100 dark:bg-red-900/30" accentColor="text-red-500" />
-              <StatsCard title="Beneficiaries" value={stats.totalBeneficiaries} icon={Users} color="text-blue-600" bgColor="bg-blue-100 dark:bg-blue-900/30" accentColor="text-blue-600" />
-              <StatsCard title="Amount Distributed" value={stats.welfareAmountDistributed} icon={IndianRupee} color="text-purple-600" bgColor="bg-purple-100 dark:bg-purple-900/30" accentColor="text-purple-600" prefix="₹" />
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-5 mb-12">
+              {[
+                { title: 'Total Applications', value: stats.totalApplications, icon: FileBarChart, color: 'text-green-600' },
+                { title: 'Approved', value: stats.approvedApplications, icon: CheckCircle2, color: 'text-green-600' },
+                { title: 'Pending', value: stats.pendingApplications, icon: Clock, color: 'text-amber-500' },
+                { title: 'Rejected', value: stats.rejectedApplications, icon: XCircle, color: 'text-red-500' },
+                { title: 'Beneficiaries', value: stats.totalBeneficiaries, icon: Users, color: 'text-green-600' },
+                { title: 'Amount Distributed', value: stats.welfareAmountDistributed, icon: IndianRupee, color: 'text-green-600' },
+              ].map((card, i) => (
+                <motion.div
+                  key={card.title}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.08 }}
+                >
+                  <StatsCard
+                    title={card.title}
+                    value={card.value}
+                    icon={card.icon}
+                    accentColor={card.color}
+                  />
+                </motion.div>
+              ))}
             </div>
 
-            {/* Filters */}
-            <div className="mb-8">
+            {/* ─── Filters ─── */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="mb-8"
+            >
               <FilterBar schemes={schemes} filters={filters} onChange={setFilters} onReset={resetFilters} />
-            </div>
+            </motion.div>
 
-            {/* Charts Section */}
-            <div className="mb-10">
-              <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+            {/* ─── Charts Section ─── */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="mb-12"
+            >
+              <div className="bg-white dark:bg-gray-900 shadow-[0_8px_32px_rgba(0,0,0,0.03)] rounded-[3rem] border border-gray-100 dark:border-gray-800 hover:border-[#15803d]/40 transition-all duration-500 overflow-hidden">
                 <div className="flex items-center border-b border-gray-100 dark:border-gray-800 overflow-x-auto no-scrollbar">
                   {chartConfigs.map(tab => (
                     <button
                       key={tab.id}
                       onClick={() => setActiveChartTab(tab.id)}
-                      className={`flex items-center gap-2 px-5 py-4 text-[10px] font-black uppercase tracking-widest transition-all border-b-2 shrink-0 ${
+                      className={`flex items-center gap-2.5 px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] transition-all border-b-2 shrink-0 ${
                         activeChartTab === tab.id
                           ? 'text-[#15803d] border-[#15803d] bg-[#15803d]/5'
-                          : 'text-gray-400 border-transparent hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800'
+                          : 'text-gray-400 border-transparent hover:text-gray-500 hover:bg-[#FAF9F6] dark:hover:bg-gray-800'
                       }`}
                     >
                       <tab.icon className="w-3.5 h-3.5" />
@@ -735,7 +769,7 @@ export default function PrajaProgressTrackerPage() {
                   ))}
                 </div>
 
-                <div className="p-6">
+                <div className="p-8">
                   {analytics && (
                     <>
                       {activeChartTab === 'schemes' && (
@@ -746,12 +780,12 @@ export default function PrajaProgressTrackerPage() {
                               <XAxis dataKey="name" tick={{ fontSize: 11 }} tickLine={false} />
                               <YAxis tick={{ fontSize: 11 }} tickLine={false} />
                               <Tooltip
-                                contentStyle={{ borderRadius: '12px', border: '1px solid #e5e7eb', fontSize: '12px' }}
+                                contentStyle={{ borderRadius: '16px', border: '1px solid #e5e7eb', fontSize: '12px' }}
                                 formatter={(value: any) => [value.toLocaleString('en-IN'), '']}
                               />
                               <Legend />
-                              <Bar dataKey="beneficiaries" name="Beneficiaries" fill={COLORS.primary} radius={[6, 6, 0, 0]} />
-                              <Bar dataKey="amount" name="Amount (₹)" fill={COLORS.blue} radius={[6, 6, 0, 0]} />
+                              <Bar dataKey="beneficiaries" name="Beneficiaries" fill={COLORS.primary} radius={[8, 8, 0, 0]} />
+                              <Bar dataKey="amount" name="Amount (₹)" fill={COLORS.primaryLight} radius={[8, 8, 0, 0]} />
                             </BarChart>
                           </ResponsiveContainer>
                         </div>
@@ -764,10 +798,10 @@ export default function PrajaProgressTrackerPage() {
                               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                               <XAxis dataKey="month" tick={{ fontSize: 11 }} tickLine={false} />
                               <YAxis tick={{ fontSize: 11 }} tickLine={false} />
-                              <Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid #e5e7eb', fontSize: '12px' }} />
+                              <Tooltip contentStyle={{ borderRadius: '16px', border: '1px solid #e5e7eb', fontSize: '12px' }} />
                               <Legend />
-                              <Line type="monotone" dataKey="applications" name="Applications" stroke={COLORS.primary} strokeWidth={2} dot={{ r: 4 }} activeDot={{ r: 6 }} />
-                              <Line type="monotone" dataKey="approved" name="Approved" stroke={COLORS.blue} strokeWidth={2} dot={{ r: 4 }} />
+                              <Line type="monotone" dataKey="applications" name="Applications" stroke={COLORS.primary} strokeWidth={2.5} dot={{ r: 4, fill: COLORS.primary }} activeDot={{ r: 6 }} />
+                              <Line type="monotone" dataKey="approved" name="Approved" stroke={COLORS.primaryLight} strokeWidth={2.5} dot={{ r: 4 }} />
                             </LineChart>
                           </ResponsiveContainer>
                         </div>
@@ -800,10 +834,10 @@ export default function PrajaProgressTrackerPage() {
                                 {(() => {
                                   const hasData = [analytics.approvedVsPending.approved, analytics.approvedVsPending.pending, analytics.approvedVsPending.rejected].some(v => v > 0);
                                   if (!hasData) return <Cell fill="#e5e7eb" />;
-                                  return PIE_COLORS.slice(0, 3).map((color, i) => <Cell key={i} fill={color} />);
+                                  return [COLORS.primary, COLORS.primaryLight, COLORS.red].map((color, i) => <Cell key={i} fill={color} />);
                                 })()}
                               </Pie>
-                              <Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid #e5e7eb' }} />
+                              <Tooltip contentStyle={{ borderRadius: '16px', border: '1px solid #e5e7eb' }} />
                             </PieChart>
                           </ResponsiveContainer>
                         </div>
@@ -817,9 +851,9 @@ export default function PrajaProgressTrackerPage() {
                               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                               <XAxis type="number" tick={{ fontSize: 11 }} tickLine={false} />
                               <YAxis dataKey="name" type="category" tick={{ fontSize: 11 }} tickLine={false} />
-                              <Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid #e5e7eb', fontSize: '12px' }} />
+                              <Tooltip contentStyle={{ borderRadius: '16px', border: '1px solid #e5e7eb', fontSize: '12px' }} />
                               <Legend />
-                              <Bar dataKey="beneficiaries" name="Beneficiaries" fill={COLORS.teal} radius={[0, 6, 6, 0]} />
+                              <Bar dataKey="beneficiaries" name="Beneficiaries" fill={COLORS.primary} radius={[0, 8, 8, 0]} />
                             </BarChart>
                           </ResponsiveContainer>
                         </div>
@@ -838,9 +872,9 @@ export default function PrajaProgressTrackerPage() {
                               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                               <XAxis dataKey="month" tick={{ fontSize: 11 }} tickLine={false} />
                               <YAxis tick={{ fontSize: 11 }} tickLine={false} />
-                              <Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid #e5e7eb', fontSize: '12px' }}
+                              <Tooltip contentStyle={{ borderRadius: '16px', border: '1px solid #e5e7eb', fontSize: '12px' }}
                                 formatter={(value: any) => [`₹${value.toLocaleString('en-IN')}`, 'Amount']} />
-                              <Area type="monotone" dataKey="amount" name="Welfare Amount" stroke={COLORS.primary} strokeWidth={2} fill="url(#amountGradient)" />
+                              <Area type="monotone" dataKey="amount" name="Welfare Amount" stroke={COLORS.primary} strokeWidth={2.5} fill="url(#amountGradient)" />
                             </AreaChart>
                           </ResponsiveContainer>
                         </div>
@@ -849,10 +883,10 @@ export default function PrajaProgressTrackerPage() {
                   )}
                 </div>
               </div>
-            </div>
+            </motion.div>
 
-            {/* Grid: Beneficiary Table + Verification */}
-            <div className="grid lg:grid-cols-3 gap-8 mb-10">
+            {/* ─── Grid: Beneficiary Table + Verification ─── */}
+            <div className="grid lg:grid-cols-3 gap-8 mb-12">
               <div className="lg:col-span-2">
                 <BeneficiaryTable locale={locale} />
               </div>
@@ -863,38 +897,40 @@ export default function PrajaProgressTrackerPage() {
           </>
         ) : (
           <div className="text-center py-20">
-            <AlertTriangle className="w-16 h-16 text-gray-200 dark:text-gray-700 mx-auto mb-4" />
-            <h3 className="text-xl font-black text-gray-300 dark:text-gray-600">Unable to load dashboard data</h3>
-            <p className="text-gray-300 dark:text-gray-600 font-medium mt-1">Please check the database connection.</p>
+            <AlertTriangle className="w-16 h-16 text-gray-200 mx-auto mb-4" />
+            <h3 className="text-xl font-black text-gray-300">Unable to load dashboard data</h3>
+            <p className="text-gray-300 font-medium mt-1">Please check the database connection.</p>
           </div>
         )}
 
-        {/* Footer info */}
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
-          className="mt-16 p-6 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800"
+        {/* ─── Footer info banner ─── */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}              className="mt-20 p-8 bg-white dark:bg-gray-900 shadow-[0_8px_32px_rgba(0,0,0,0.03)] rounded-[3rem] border border-gray-100 dark:border-gray-800 hover:border-[#15803d]/40 transition-all duration-500"
         >
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <Shield className="w-5 h-5 text-[#15803d]" />
               <div>
-                <div className="text-sm font-bold text-gray-900 dark:text-white">Data Transparency Commitment</div>
-                <p className="text-[10px] text-gray-400 font-medium">All data displayed is verified and updated in real-time from official Gram Panchayat records.</p>
+                <div className="text-sm font-bold text-[#0A0A0A] dark:text-white">Data Transparency Commitment</div>
+                <p className="text-[10px] text-gray-400 font-medium mt-0.5">All data displayed is verified and updated in real-time from official Gram Panchayat records.</p>
               </div>
             </div>
-            <div className="flex items-center gap-4">
-              <span className="text-[10px] text-gray-400 font-bold flex items-center gap-1">
-                <Check className="w-3 h-3 text-[#15803d]" /> Aadhaar data masked
+            <div className="flex items-center gap-6">
+              <span className="text-[10px] text-gray-400 font-bold flex items-center gap-1.5">
+                <Check className="w-3.5 h-3.5 text-[#15803d]" /> Aadhaar data masked
               </span>
-              <span className="text-[10px] text-gray-400 font-bold flex items-center gap-1">
-                <Check className="w-3 h-3 text-[#15803d]" /> Secure verification
+              <span className="text-[10px] text-gray-400 font-bold flex items-center gap-1.5">
+                <Check className="w-3.5 h-3.5 text-[#15803d]" /> Secure verification
               </span>
-              <span className="text-[10px] text-gray-400 font-bold flex items-center gap-1">
-                <Check className="w-3 h-3 text-[#15803d]" /> Real-time sync
+              <span className="text-[10px] text-gray-400 font-bold flex items-center gap-1.5">
+                <Check className="w-3.5 h-3.5 text-[#15803d]" /> Real-time sync
               </span>
             </div>
           </div>
         </motion.div>
-      </div>
+      </motion.div>
 
       <Footer locale={locale} />
     </main>
