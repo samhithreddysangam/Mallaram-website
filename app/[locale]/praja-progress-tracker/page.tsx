@@ -8,10 +8,10 @@ import Navigation from '@/components/Navigation/Navigation';
 import Footer from '@/components/Footer/Footer';
 import {
   Users, IndianRupee, Clock, TrendingUp,
-  Search, Printer, X,
-  CheckCircle2, XCircle, Loader2, ChevronLeft, ChevronRight, Shield,
-  FileBarChart, MapPin, AlertTriangle, RefreshCw, BarChart3,
-  Eye, Activity, Award, Zap, Download
+  Search, X,
+  CheckCircle2, XCircle, Loader2, ChevronLeft, Shield,
+  FileBarChart, AlertTriangle, RefreshCw, BarChart3,
+  Eye, Activity, Award, Zap, MapPin
 } from 'lucide-react';
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
@@ -62,22 +62,6 @@ interface AnalyticsData {
   approvedVsPending: { approved: number; pending: number; rejected: number };
   villageWiseDistribution: { name: string; beneficiaries: number; amount: number }[];
   welfareAmountTrends: { month: string; amount: number }[];
-}
-
-interface ApplicationRecord {
-  id: string;
-  applicantName: string;
-  applicantPhone: string | null;
-  schemeId: string;
-  scheme: { title: string };
-  village: string;
-  ward: string | null;
-  status: string;
-  benefitAmount: number | null;
-  applicationDate: string;
-  approvalDate: string | null;
-  rejectionDate: string | null;
-  rejectionReason: string | null;
 }
 
 interface Scheme { id: string; title: string; type: string; }
@@ -791,9 +775,6 @@ export default function PrajaProgressTrackerPage() {
         </div>
       </section>
 
-      {/* ═══════════════ BENEFICIARY TABLE ═══════════════ */}
-      <BeneficiaryTableSection locale={locale} />
-
       {/* ═══════════════ VERIFICATION + TRANSPARENCY ═══════════════ */}
       <section className="py-24 bg-[#FAF9F6] relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
@@ -858,201 +839,7 @@ export default function PrajaProgressTrackerPage() {
   );
 }
 
-// ═══════════════════════════════════════════════════════════════
-// BENEFICIARY TABLE SECTION
-// ═══════════════════════════════════════════════════════════════
-function BeneficiaryTableSection({ locale }: { locale: Locale }) {
-  const [applications, setApplications] = useState<ApplicationRecord[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [search, setSearch] = useState('');
 
-  const fetchData = useCallback(async (searchTerm = '', pageNum = 1) => {
-    setLoading(true);
-    try {
-      const params = new URLSearchParams();
-      if (searchTerm) params.set('search', searchTerm);
-      params.set('page', pageNum.toString());
-      params.set('limit', '15');
-      const res = await fetch(`/api/applications?${params}`);
-      const data = await res.json();
-      setApplications(data.applications || []);
-      setTotalPages(data.totalPages || 1);
-    } catch (error) {
-      console.error('Failed to fetch applications:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => { fetchData(search, page); }, [page]);
-  useEffect(() => { const t = setTimeout(() => { setPage(1); fetchData(search, 1); }, 300); return () => clearTimeout(t); }, [search]);
-
-  const exportCSV = () => {
-    const headers = ['Applicant Name', 'Scheme', 'Village', 'Ward', 'Status', 'Amount', 'Application Date', 'Approval Date'];
-    const rows = applications.map(a => [
-      a.applicantName, a.scheme.title, a.village, a.ward || '', a.status,
-      a.benefitAmount ? `\u20b9${a.benefitAmount}` : '', new Date(a.applicationDate).toLocaleDateString(),
-      a.approvalDate ? new Date(a.approvalDate).toLocaleDateString() : '',
-    ]);
-    const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `praja-progress-${new Date().toISOString().split('T')[0]}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
-  const handlePrint = () => window.print();
-
-  return (
-    <section className="py-32 bg-white relative overflow-hidden print:py-10">
-      <div className="absolute inset-0 pointer-events-none opacity-40">
-        <div className="absolute top-[10%] right-[5%] w-[400px] h-[400px] bg-[#15803d]/5 blur-[100px] rounded-full" />
-        <div className="absolute bottom-[20%] left-[5%] w-[300px] h-[300px] bg-[#1e3a5f]/5 blur-[80px] rounded-full" />
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 relative z-10">
-        <SectionHeader
-          badge="Records"
-          title="Beneficiary"
-          highlight="Records"
-          description="Complete list of all welfare applications and beneficiaries. Search, filter, and export data for offline analysis."
-        />
-
-        {/* Controls: Search + Export */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mb-8"
-        >
-          <div className="p-6 md:p-8 bg-[#FAF9F6] rounded-[2.5rem] border border-gray-100 shadow-sm">
-            <div className="flex flex-col md:flex-row gap-4 items-stretch md:items-center">
-              {/* Search */}
-              <div className="relative flex-1">
-                <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input
-                  type="text" value={search}
-                  onChange={e => setSearch(e.target.value)}
-                  placeholder="Search by name, phone or application ID..."
-                  className="w-full pl-12 pr-5 py-4 bg-white border border-gray-100 rounded-2xl text-sm font-bold placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#15803d]/20 focus:border-[#15803d] transition-all"
-                />
-              </div>
-              {/* Export buttons */}
-              <div className="flex gap-3 shrink-0">
-                <button onClick={exportCSV}
-                  className="px-6 py-4 bg-white hover:bg-[#15803d] hover:text-white border border-gray-100 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2.5 transition-all group">
-                  <Download className="w-4 h-4 text-[#15803d] group-hover:text-white transition-colors" /> CSV
-                </button>
-                <button onClick={handlePrint}
-                  className="px-6 py-4 bg-white hover:bg-gray-50 border border-gray-100 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2.5 transition-all">
-                  <Printer className="w-4 h-4" /> Print
-                </button>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Table */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="bg-white shadow-[0_8px_32px_rgba(0,0,0,0.03)] rounded-[2.5rem] border border-gray-100 overflow-hidden"
-        >
-          <div className="overflow-x-auto">
-            <table className="w-full text-left print:table-auto">                <thead className="sticky top-0 z-10">
-                  <tr className="bg-[#FAF9F6] text-[10px] text-gray-400 font-black uppercase tracking-[0.2em]">
-                  <th className="px-6 md:px-8 py-5">Applicant</th>
-                  <th className="px-6 md:px-8 py-5">Scheme</th>
-                  <th className="px-6 md:px-8 py-5 hidden md:table-cell">Village</th>
-                  <th className="px-6 md:px-8 py-5 hidden sm:table-cell">Date</th>
-                  <th className="px-6 md:px-8 py-5">Status</th>
-                  <th className="px-6 md:px-8 py-5 text-right">Amount</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-50">
-                {loading ? (
-                  <tr>
-                    <td colSpan={6} className="px-8 py-20 text-center">
-                      <Loader2 className="w-6 h-6 animate-spin mx-auto text-gray-300" />
-                    </td>
-                  </tr>
-                ) : applications.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="px-8 py-16 text-center">
-                      <div className="flex flex-col items-center gap-2">
-                        <FileBarChart className="w-10 h-10 text-gray-200" />
-                        <span className="text-gray-300 font-bold italic">No records found.</span>
-                      </div>
-                    </td>
-                  </tr>
-                ) : applications.map((app) => (
-                  <tr key={app.id} className="hover:bg-[#FAF9F6]/80 transition-colors group">
-                    <td className="px-6 md:px-8 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#15803d] to-[#1e3a5f] flex items-center justify-center text-white text-sm font-black shadow-sm">
-                          {app.applicantName.charAt(0)}
-                        </div>
-                        <div>
-                          <div className="font-bold text-sm text-[#0A0A0A]">{app.applicantName}</div>
-                          {app.applicantPhone && <div className="text-[10px] text-gray-400 font-medium">{app.applicantPhone}</div>}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 md:px-8 py-4">
-                      <span className="inline-block px-3 py-1 bg-[#15803d]/5 text-[#15803d] rounded-xl text-[10px] font-bold">{app.scheme.title}</span>
-                    </td>
-                    <td className="px-6 md:px-8 py-4 hidden md:table-cell">
-                      <div className="flex items-center gap-1.5">
-                        <MapPin className="w-3 h-3 text-gray-400" />
-                        <span className="text-xs font-medium text-gray-500">{app.village}{app.ward ? ` (${app.ward})` : ''}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 md:px-8 py-4 hidden sm:table-cell">
-                      <div className="text-xs font-bold text-gray-500">
-                        {new Date(app.applicationDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
-                      </div>
-                    </td>
-                    <td className="px-6 md:px-8 py-4">
-                      <StatusBadge status={app.status} />
-                    </td>
-                    <td className="px-6 md:px-8 py-4 text-right">
-                      <span className="text-sm font-black text-[#0A0A0A]">
-                        {app.benefitAmount ? `\u20b9${app.benefitAmount.toLocaleString('en-IN')}` : '\u2014'}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="px-6 md:px-8 py-5 border-t border-gray-100 flex items-center justify-between bg-[#FAF9F6]/50">
-              <span className="text-[10px] font-bold text-gray-400">Page {page} of {totalPages}</span>
-              <div className="flex gap-2">
-                <button disabled={page <= 1} onClick={() => setPage(p => Math.max(1, p - 1))}
-                  className="px-4 py-2 bg-white disabled:opacity-30 rounded-xl text-xs font-bold hover:bg-gray-100 transition-all border border-gray-100 shadow-sm">
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-                <button disabled={page >= totalPages} onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                  className="px-4 py-2 bg-white disabled:opacity-30 rounded-xl text-xs font-bold hover:bg-gray-100 transition-all border border-gray-100 shadow-sm">
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          )}
-        </motion.div>
-      </div>
-    </section>
-  );
-}
 
 // ═══════════════════════════════════════════════════════════════
 // VERIFICATION SYSTEM WIDGET
