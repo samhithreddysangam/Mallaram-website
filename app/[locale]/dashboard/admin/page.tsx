@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams, useSearchParams } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { Locale, getDictionary } from '@/lib/i18n';
 import Navigation from '@/components/Navigation/Navigation';
 import Footer from '@/components/Footer/Footer';
@@ -77,20 +77,20 @@ export default function AdminDashboard() {
   const [editingEvent, setEditingEvent] = useState<string | null>(null);
   const [newEvent, setNewEvent] = useState({ title: '', description: '', imageUrl: '', date: '', category: 'local', order: '0' });
   
-  // Welcome Animation
-  const searchParams = useSearchParams();
-  const justLoggedIn = searchParams.get('welcome') === 'true';
-  const [showWelcome, setShowWelcome] = useState(justLoggedIn);
+  // Welcome Animation (uses window.location to avoid Suspense boundary requirement)
+  const [showWelcome, setShowWelcome] = useState(false);
   
   useEffect(() => {
-    if (justLoggedIn) {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('welcome') === 'true') {
+      setShowWelcome(true);
       const timer = setTimeout(() => {
         setShowWelcome(false);
         window.history.replaceState({}, '', window.location.pathname);
       }, 4500);
       return () => clearTimeout(timer);
     }
-  }, [justLoggedIn]);
+  }, []);
   
   // Form States
   const [newPrice, setNewPrice] = useState({ cropName: '', price: '', unit: 'Quintal', district: 'Rajanna Sircilla' });
