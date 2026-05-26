@@ -15,75 +15,6 @@ interface Scheme {
   description: string | null;
 }
 
-const DEFAULT_SCHEMES: Scheme[] = [
-  {
-    id: 'mgnrega',
-    title: 'MGNREGA',
-    link: 'https://nrega.dord.gov.in/MGNREGA_new/Nrega_home.aspx',
-    description: 'Mahatma Gandhi National Rural Employment Guarantee Act portal for employment and wage information.'
-  },
-  {
-    id: 'swachh-bharat',
-    title: 'Swachh Bharat Mission',
-    link: 'https://swachhbharatmission.ddws.gov.in/',
-    description: 'National campaign to clean up the streets, roads and rural areas of India.'
-  },
-  {
-    id: 'egramswaraj',
-    title: 'eGramSwaraj',
-    link: 'https://egramswaraj.gov.in/welcome.do',
-    description: 'Simplified work based accounting application for Panchayati Raj Institutions.'
-  },
-  {
-    id: 'epanchayat',
-    title: 'e-Panchayat Telangana',
-    link: 'https://epanchayat.telangana.gov.in/cs',
-    description: 'Digital services and information for Gram Panchayats in Telangana.'
-  },
-  {
-    id: 'indirammaindlu',
-    title: 'Indiramma Indlu Telangana',
-    link: 'https://indirammaindlu.telangana.gov.in/',
-    description: 'Housing scheme for the poor in Telangana state.'
-  },
-  {
-    id: 'serp',
-    title: 'SERP Telangana',
-    link: 'https://www.serp.telangana.gov.in/',
-    description: 'Society for Elimination of Rural Poverty - Empowering rural poor through SHGs.'
-  },
-  {
-    id: 'agri',
-    title: 'Agriculture Telangana',
-    link: 'https://agri.telangana.gov.in/',
-    description: 'Portal for agricultural schemes and farmer support in Telangana.'
-  },
-  {
-    id: 'registration',
-    title: 'Society Registration Telangana',
-    link: 'https://registration.telangana.gov.in/societyRegistration.htm',
-    description: 'Online registration portal for societies in Telangana.'
-  },
-  {
-    id: 'tgswreis',
-    title: 'TGSWREIS',
-    link: 'https://tgswreis.telangana.gov.in/',
-    description: 'Telangana Social Welfare Residential Educational Institutions Society.'
-  },
-  {
-    id: 'food-security',
-    title: 'EPDS Food Security',
-    link: 'https://epds.telangana.gov.in/FoodSecurityAct/?wicket:bookmarkablePage=:nic.fsc.foodsecurity.FscSearch',
-    description: 'Check status and manage Food Security (Ration) Cards in Telangana.'
-  },
-  {
-    id: 'tgcess',
-    title: 'TGCESS',
-    link: 'https://tgcessltd.com/',
-    description: 'Telangana Cooperative Electric Supply Society Limited.'
-  }
-];
-
 export default function SchemesPage() {
   const params = useParams();
   const locale = (params?.locale as Locale) || 'en';
@@ -94,17 +25,11 @@ export default function SchemesPage() {
     const fetchSchemes = async () => {
       try {
         const res = await fetch('/api/schemes');
-        if (res.ok) {
-          const data = await res.json();
-          // Use fetched data if available, otherwise use defaults
-          setSchemes(data.length > 0 ? data : DEFAULT_SCHEMES);
-        } else {
-          // If API fails, use defaults
-          setSchemes(DEFAULT_SCHEMES);
-        }
+        const data = await res.json();
+        setSchemes(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error('Failed to fetch schemes:', error);
-        setSchemes(DEFAULT_SCHEMES);
+        setSchemes([]);
       } finally {
         setLoading(false);
       }

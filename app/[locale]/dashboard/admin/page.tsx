@@ -59,7 +59,7 @@ export default function AdminDashboard() {
     try {
       const res = await fetch('/api/bookings');
       const data = await res.json();
-      setBookings(data);
+      setBookings(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Failed to fetch bookings:', error);
     }
@@ -69,7 +69,7 @@ export default function AdminDashboard() {
     try {
       const res = await fetch('/api/market-prices');
       const data = await res.json();
-      setMarketPrices(data);
+      setMarketPrices(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Failed to fetch market prices:', error);
     }
@@ -80,7 +80,7 @@ export default function AdminDashboard() {
       // Fetch all slots (including potentially expired ones for management)
       const res = await fetch('/api/slots?all=true');
       const data = await res.json();
-      setSlots(data);
+      setSlots(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Failed to fetch slots:', error);
     }
@@ -90,7 +90,7 @@ export default function AdminDashboard() {
     try {
       const res = await fetch('/api/gallery');
       const data = await res.json();
-      setGalleryImages(data);
+      setGalleryImages(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Failed to fetch gallery:', error);
     }
@@ -100,7 +100,7 @@ export default function AdminDashboard() {
     try {
       const res = await fetch('/api/fund-usage');
       const data = await res.json();
-      setFundRecords(data);
+      setFundRecords(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Failed to fetch fund usage:', error);
     }
@@ -110,7 +110,7 @@ export default function AdminDashboard() {
     try {
       const res = await fetch('/api/schemes');
       const data = await res.json();
-      setSchemes(data);
+      setSchemes(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Failed to fetch schemes:', error);
     }
@@ -530,14 +530,45 @@ export default function AdminDashboard() {
           <div className="bg-white rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 p-8">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
               <div>
-                <h3 className="text-2xl font-black text-[#0A0A0A] tracking-tighter">Government Schemes</h3>
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Manage links shown on schemes page</p>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-blue-50 flex items-center justify-center">
+                    <ExternalLink className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <h3 className="text-2xl font-black text-[#0A0A0A] tracking-tighter">Government Schemes</h3>
+                </div>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-2 ml-[52px]">Manage links shown on schemes page</p>
               </div>
+              <button 
+                onClick={() => {
+                  setEditingScheme(null);
+                  setNewScheme({ title: '', link: '', description: '' });
+                  setShowSchemeModal(true);
+                }}
+                className="px-6 py-3 bg-blue-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all flex items-center gap-2 shadow-xl shadow-blue-600/20"
+              >
+                <Plus className="w-4 h-4" />
+                Add Scheme
+              </button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {schemes.length === 0 ? (
-                <div className="col-span-full text-center py-12 text-gray-300 font-bold italic">No schemes configured.</div>
+                <div className="col-span-full text-center py-16 text-gray-300 font-bold italic">
+                  No schemes configured yet.
+                  <div className="mt-6">
+                    <button 
+                      onClick={() => {
+                        setEditingScheme(null);
+                        setNewScheme({ title: '', link: '', description: '' });
+                        setShowSchemeModal(true);
+                      }}
+                      className="px-8 py-4 bg-blue-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all inline-flex items-center gap-2 shadow-xl shadow-blue-600/20"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Add Your First Scheme
+                    </button>
+                  </div>
+                </div>
               ) : schemes.map((scheme) => (
                 <div key={scheme.id} className="p-6 rounded-3xl bg-gray-50 border border-gray-100 hover:border-blue-200 transition-all group">
                   <div className="flex justify-between items-start mb-4">

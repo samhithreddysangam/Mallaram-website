@@ -17,7 +17,10 @@ export default function Gallery({ locale }: GalleryProps) {
     fetch('/api/gallery')
       .then(res => res.json())
       .then(data => {
-        setImages(data);
+        if (!Array.isArray(data)) {
+          console.warn('Gallery API returned unexpected response:', data);
+        }
+        setImages(Array.isArray(data) ? data : []);
         setLoading(false);
       })
       .catch(err => {

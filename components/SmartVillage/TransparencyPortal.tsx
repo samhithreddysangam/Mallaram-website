@@ -17,7 +17,10 @@ export default function TransparencyPortal({ locale }: TransparencyPortalProps) 
     fetch('/api/fund-usage')
       .then(res => res.json())
       .then(data => {
-        setFundRecords(data);
+        if (!Array.isArray(data)) {
+          console.warn('Fund usage API returned unexpected response:', data);
+        }
+        setFundRecords(Array.isArray(data) ? data : []);
         setLoading(false);
       })
       .catch(err => {
