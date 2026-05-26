@@ -45,6 +45,29 @@ export async function GET() {
     const userCount = await prisma.user.count();
     status.totalUsers = userCount;
 
+    // Check if new Prisma models are available
+    status.prismaModels = Object.getOwnPropertyNames(prisma)
+      .filter(k => !k.startsWith('_') && !k.startsWith('$') && typeof (prisma as any)[k] === 'object' && (prisma as any)[k]?.findMany)
+      .join(', ');
+    status.hasGalleryModel = !!(prisma as any).galleryImage;
+    status.hasFundUsageModel = !!(prisma as any).fundUsage;
+
+    // Try querying gallery images
+    try {
+      const galleryCount = await (prisma as any).galleryImage?.count();
+      status.galleryCount = galleryCount;
+    } catch (e: any) {
+      status.galleryQueryError = e.message;
+    }
+
+    // Try querying fund usage
+    try {
+      const fundCount = await (prisma as any).fundUsage?.count();
+      status.fundCount = fundCount;
+    } catch (e: any) {
+      status.fundQueryError = e.message;
+    }
+
   } catch (error: any) {
     status.database = 'error';
     status.error = error.message;
