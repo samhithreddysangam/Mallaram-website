@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { Locale, getDictionary } from '@/lib/i18n';
 import Navigation from '@/components/Navigation/Navigation';
@@ -9,7 +9,7 @@ import { motion } from 'framer-motion';
 import { Mail, Lock, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { signIn, useSession } from 'next-auth/react';
 
-export default function LoginPage() {
+function LoginForm() {
   const params = useParams();
   const searchParams = useSearchParams();
   const { data: session, status } = useSession();
@@ -248,5 +248,23 @@ export default function LoginPage() {
 
       <Footer locale={locale} />
     </main>
+  );
+}
+
+export default function LoginPage() {
+  const params = useParams();
+  const rawLocale = params?.locale;
+  const locale = (Array.isArray(rawLocale) ? rawLocale[0] : rawLocale) as Locale || 'en';
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen bg-[#FDFBF7]">
+        <Navigation locale={locale} />
+        <div className="pt-32 pb-20 px-4 flex justify-center items-center min-h-[calc(100vh-80px)]">
+          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+        </div>
+      </main>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }
