@@ -2161,6 +2161,98 @@ export default function AdminDashboard() {
           </div>
         )}
 
+        {/* Village Official Modal */}
+        {showOfficialModal && (
+          <div className="fixed inset-0 bg-[#0A0A0A]/90 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-[2.5rem] shadow-2xl p-10 w-full max-w-lg relative">
+              <button onClick={() => setShowOfficialModal(false)} className="absolute top-8 right-8 text-gray-300 hover:text-[#0A0A0A] transition-colors"><X className="w-6 h-6"/></button>
+              <h3 className="text-3xl font-black text-[#0A0A0A] mb-2 tracking-tighter">
+                {editingOfficial ? 'Update Official' : 'Add Village Official'}
+              </h3>
+              <p className="text-gray-400 mb-8 font-medium">
+                {editingOfficial ? 'Update official details and photo' : 'Add a new village administrator or official'}
+              </p>
+
+              <form onSubmit={handleAddOfficial} className="space-y-6">
+                <div className="grid grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Full Name</label>
+                    <input
+                      type="text"
+                      value={officialForm.name}
+                      onChange={(e) => setOfficialForm({ ...officialForm, name: e.target.value })}
+                      className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-[#15803d]/10 focus:border-[#15803d] font-bold"
+                      placeholder="e.g., Sangam Arpitha"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Title / Position</label>
+                    <input
+                      type="text"
+                      value={officialForm.title}
+                      onChange={(e) => setOfficialForm({ ...officialForm, title: e.target.value })}
+                      className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-[#15803d]/10 focus:border-[#15803d] font-bold"
+                      placeholder="e.g., Sarpanch, Mallaram"
+                      required
+                    />
+                  </div>
+                  <div className="col-span-2">
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Photo</label>
+                    <div className="relative">
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp,image/gif"
+                        onChange={(e) => setOfficialForm({ ...officialForm, file: e.target.files?.[0] || null })}
+                        className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-[#15803d]/10 focus:border-[#15803d] font-bold file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-[#15803d]/10 file:text-[#15803d] file:font-black file:text-[10px] file:uppercase file:tracking-widest hover:file:bg-[#15803d]/20"
+                      />
+                    </div>
+                    <p className="text-[10px] text-gray-400 font-medium mt-2">JPEG, PNG, WebP, or GIF. Max 10MB. Leave empty to keep existing photo when editing.</p>
+                  </div>
+                  <div className="col-span-2">
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Description / Bio</label>
+                    <textarea
+                      value={officialForm.description}
+                      onChange={(e) => setOfficialForm({ ...officialForm, description: e.target.value })}
+                      className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-[#15803d]/10 focus:border-[#15803d] font-bold min-h-[80px]"
+                      placeholder="Brief description or bio of the official..."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Display Order</label>
+                    <input
+                      type="number"
+                      value={officialForm.order}
+                      onChange={(e) => setOfficialForm({ ...officialForm, order: e.target.value })}
+                      className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-[#15803d]/10 focus:border-[#15803d] font-bold"
+                      placeholder="0"
+                    />
+                  </div>
+                </div>
+
+                <div className="p-4 bg-[#15803d]/5 rounded-2xl border border-[#15803d]/10">
+                  <div className="flex items-center gap-2 text-[10px] font-black text-[#15803d] uppercase tracking-widest mb-1">
+                    <Shield className="w-3 h-3" />
+                    Village Administration
+                  </div>
+                  <p className="text-xs font-medium text-gray-400">
+                    {editingOfficial
+                      ? 'Changes will reflect on the public Village Administration page immediately.'
+                      : 'The official will appear on the public Village Administration page ordered by display order.'}
+                  </p>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={uploadingOfficial || !officialForm.name || !officialForm.title}
+                  className="w-full py-5 bg-[#15803d] text-white rounded-[1.5rem] font-black uppercase tracking-widest hover:scale-[1.02] transition-all shadow-xl shadow-[#15803d]/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {uploadingOfficial ? 'Uploading...' : editingOfficial ? 'Save Changes' : 'Add Official'}
+                </button>
+              </form>
+            </motion.div>
+          </div>
+        )}
       <Footer locale={locale} />
     </main>
   );
