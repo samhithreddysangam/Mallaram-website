@@ -6,7 +6,8 @@ import { Locale, getDictionary } from '@/lib/i18n';
 import Navigation from '@/components/Navigation/Navigation';
 import Footer from '@/components/Footer/Footer';
 import { motion } from 'framer-motion';
-import { Search, Database, Upload, Check, X, IndianRupee, Plus, Bell, MapPin, Calendar, Clock, Trash2, ExternalLink, Edit, Image, Landmark, DollarSign, Tag, Activity, Droplets, Shield } from 'lucide-react';
+import Link from 'next/link';
+import { Search, Database, Upload, Check, X, IndianRupee, Plus, Bell, MapPin, Calendar, Clock, Trash2, ExternalLink, Edit, Image, Landmark, DollarSign, Tag, Activity, Droplets, Shield, BarChart3 } from 'lucide-react';
 import { WeatherWidget } from '@/components/Agriculture/AgriWidgets';
 
 export default function AdminDashboard() {
@@ -672,6 +673,13 @@ export default function AdminDashboard() {
             <p className="text-gray-500 font-medium">Manage village agricultural operations & infrastructure</p>
           </div>
           <div className="flex flex-wrap gap-3">
+            <Link
+              href={`/${locale}/dashboard/admin/praja-tracker`}
+              className="px-6 py-3 bg-[#15803d] text-white rounded-2xl text-sm font-bold hover:bg-[#14532d] transition-all flex items-center gap-2 shadow-xl shadow-[#15803d]/20"
+            >
+              <BarChart3 className="w-4 h-4" />
+              Praja Tracker
+            </Link>
             <button 
               onClick={() => setShowSlotModal(true)}
               className="px-6 py-3 bg-[#0A0A0A] text-white rounded-2xl text-sm font-bold hover:bg-black transition-all flex items-center gap-2 shadow-xl shadow-black/10"

@@ -63,7 +63,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ applications: safeResults, multiple: true });
     }
 
-    // Single application result
+    if (!application) {
+      return NextResponse.json({ error: 'Application not found' }, { status: 404 });
+    }
+
     return NextResponse.json({
       application: {
         applicationId: application.id,

@@ -1,8 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { ArrowRight, Code2 } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { HiOutlineMail, HiOutlinePhone, HiOutlineLocationMarker } from 'react-icons/hi';
 import { FaInstagram, FaFacebook, FaTwitter, FaLinkedin } from 'react-icons/fa';
 import { Locale, getDictionary, getTranslations } from '@/lib/i18n';
@@ -123,29 +122,7 @@ export default function Footer({ locale }: FooterProps) {
               </div>
            </div>
 
-           <motion.a 
-              href="https://slick-portfolio-brown.vercel.app/"
-              target="_blank"
-              rel="noopener noreferrer"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              className="group flex flex-col items-end"
-           >
-              <span className="text-[8px] font-bold text-gray-300 uppercase tracking-[0.5em] mb-3 leading-none">Crafted with precision</span>
-              <div className="flex items-center gap-4">
-                 <div className="text-right">
-                   <span className="block text-[11px] font-black text-[#0A0A0A] uppercase tracking-[0.1em] group-hover:text-[#15803d] transition-colors leading-none mb-1">
-                      Shivaganesh Gajavelli
-                   </span>
-                   <span className="text-[8px] font-bold text-[#15803d] uppercase tracking-[0.2em] opacity-0 group-hover:opacity-100 transition-all">
-                      View Portfolio
-                   </span>
-                 </div>
-                 <div className="w-10 h-10 rounded-2xl bg-white border border-gray-100 shadow-sm flex items-center justify-center group-hover:bg-[#15803d] group-hover:border-[#15803d] group-hover:text-white transition-all duration-500">
-                    <ArrowRight className="w-4 h-4 -rotate-45 transition-transform duration-500 group-hover:scale-110" />
-                 </div>
-              </div>
-           </motion.a>
+
         </div>
       </div>
     </footer>

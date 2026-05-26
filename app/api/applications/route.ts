@@ -143,7 +143,7 @@ export async function PUT(request: Request) {
       if (existingBeneficiary) {
         await prisma.beneficiary.update({
           where: { id: existingBeneficiary.id },
-          data: { benefitAmount: amount },
+          data: { benefitAmount: amount ?? 0 },
         });
       } else {
         await prisma.beneficiary.create({
@@ -154,7 +154,7 @@ export async function PUT(request: Request) {
             schemeId: application.schemeId,
             village: application.village,
             ward: application.ward,
-            benefitAmount: amount,
+            benefitAmount: amount ?? 0,
             applicationId: id,
           },
         });

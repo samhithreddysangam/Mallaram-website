@@ -17,11 +17,10 @@ export async function GET(request: Request) {
 
     // Date range overrides year filter if both are provided
     if (dateFrom || dateTo) {
-      yearFilter = {
-        ...(dateFrom ? { gte: new Date(dateFrom) } : {}),
-        ...(dateTo ? { lte: new Date(dateTo + 'T23:59:59.999Z') } : {}),
-      };
-      if (Object.keys(yearFilter).length === 0) yearFilter = undefined;
+      const dateFilter: { gte?: Date; lte?: Date } = {};
+      if (dateFrom) dateFilter.gte = new Date(dateFrom);
+      if (dateTo) dateFilter.lte = new Date(dateTo + 'T23:59:59.999Z');
+      yearFilter = dateFilter.gte || dateFilter.lte ? dateFilter as { gte: Date; lte: Date } : undefined;
     }
 
     // 1. Scheme-wise beneficiary distribution

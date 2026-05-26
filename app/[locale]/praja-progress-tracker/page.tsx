@@ -153,7 +153,7 @@ function FilterBar({ schemes, filters, onChange, onReset }: {
         <div className="flex items-center gap-2">
           <Filter className="w-4 h-4 text-gray-400" />
           <span className="text-xs font-black text-gray-400 uppercase tracking-widest">Filters</span>
-          {(filters.schemeId || filters.year || filters.village || filters.status || filters.search) && (
+          {(filters.schemeId || filters.year || filters.village || filters.status || filters.search || filters.dateFrom || filters.dateTo) && (
             <button onClick={onReset} className="flex items-center gap-1 px-2 py-1 text-[9px] font-black text-red-500 uppercase tracking-widest hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all">
               <X className="w-3 h-3" /> Clear
             </button>
@@ -636,7 +636,7 @@ export default function PrajaProgressTrackerPage() {
     } finally {
       setLoadingStats(false);
     }
-  }, [filters.schemeId, filters.year, filters.village]);
+  }, [filters.schemeId, filters.year, filters.village, filters.dateFrom, filters.dateTo]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
@@ -760,7 +760,7 @@ export default function PrajaProgressTrackerPage() {
                       {activeChartTab === 'growth' && (
                         <div className="h-80">
                           <ResponsiveContainer width="100%" height="100%">
-                            <LineChart data={analytics.monthWiseGrowth.length > 0 ? analytics.monthWiseGrowth : [{ month: 'No Data', applications: 0, approved: 0 }]}>
+                            <LineChart data={analytics.monthWiseGrowth.length > 0 ? analytics.monthWiseGrowth : [{ month: 'No Data', applications: 0, approved: 0, rejected: 0, pending: 0 }]}>
                               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                               <XAxis dataKey="month" tick={{ fontSize: 11 }} tickLine={false} />
                               <YAxis tick={{ fontSize: 11 }} tickLine={false} />
@@ -792,8 +792,8 @@ export default function PrajaProgressTrackerPage() {
                                 outerRadius={130}
                                 paddingAngle={4}
                                 dataKey="value"
-                                label={({ name, percent }) => {
-                                  if (name === 'No Data') return '';
+                                label={({ name, percent }: { name?: string; percent?: number }) => {
+                                  if (name === 'No Data' || percent === undefined) return '';
                                   return `${name} ${(percent * 100).toFixed(0)}%`;
                                 }}
                               >

@@ -31,13 +31,13 @@ export default function Navigation({ locale }: NavigationProps) {
     { key: 'about', href: `/${locale}#about` },
     { key: 'dashboard', href: `/${locale}/ikp-booking` },
     { key: 'schemes', href: `/${locale}/schemes` },
+    { key: 'prajaTracker', href: `/${locale}/praja-progress-tracker` },
     { key: 'facilities', href: `/${locale}#facilities` },
     { key: 'gallery', href: `/${locale}#gallery` },
     { key: 'events', href: `/${locale}#events` },
     { key: 'complaint', href: `/${locale}#complaint` },
     { key: 'contact', href: `/${locale}#contact` },
     { key: 'villageAdmin', href: `/${locale}/village-administration` },
-    { key: 'prajaTracker', href: `/${locale}/praja-progress-tracker` },
   ];
 
   const toggleLanguage = () => {
@@ -90,7 +90,7 @@ export default function Navigation({ locale }: NavigationProps) {
           {/* RIGHT: Nav Links & Controls */}
           <div className="flex-1 flex justify-start items-center gap-3">
             <div className="hidden xl:flex items-center gap-0.5">
-              {navItems.slice(5).map((item) => (
+              {navItems.slice(5, 9).map((item) => (
                 <Link
                   key={item.key}
                   href={item.href}
