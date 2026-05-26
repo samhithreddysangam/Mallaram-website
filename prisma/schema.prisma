@@ -110,6 +110,18 @@ model FundUsage {
   description   String?
   date          DateTime  @default(now())
   category      String?   // e.g., Infrastructure, Education, Healthcare
+  phase         String    @default("Completed") // Planning, In Progress, Completed, Approved
+  fundSource    String?   // e.g., State Government, Central Government, 15th Finance Commission
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model FundAllocation {
+  id            String    @id @default(cuid())
+  totalAmount   Float     // Total grant/budget amount from this source
+  source        String?   // e.g., "State Government", "Central Government", "15th Finance Commission"
+  fiscalYear    String    @default("2025-2026") // e.g., "2025-2026"
+  description   String?   // Optional description of this allocation
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }

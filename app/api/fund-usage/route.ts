@@ -16,7 +16,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { label, amount, description, date, category } = body;
+    const { label, amount, description, date, category, phase, fundSource } = body;
 
     if (!label || amount === undefined) {
       return NextResponse.json({ error: 'Label and amount are required' }, { status: 400 });
@@ -29,6 +29,8 @@ export async function POST(request: Request) {
         description: description || null,
         date: date ? new Date(date) : new Date(),
         category: category || null,
+        phase: phase || 'Completed',
+        fundSource: fundSource || null,
       },
     });
 
@@ -42,7 +44,7 @@ export async function POST(request: Request) {
 export async function PUT(request: Request) {
   try {
     const body = await request.json();
-    const { id, label, amount, description, date, category } = body;
+    const { id, label, amount, description, date, category, phase, fundSource } = body;
 
     if (!id) {
       return NextResponse.json({ error: 'ID is required' }, { status: 400 });
@@ -56,6 +58,8 @@ export async function PUT(request: Request) {
         ...(description !== undefined && { description }),
         ...(date !== undefined && { date: new Date(date) }),
         ...(category !== undefined && { category }),
+        ...(phase !== undefined && { phase }),
+        ...(fundSource !== undefined && { fundSource }),
       },
     });
 

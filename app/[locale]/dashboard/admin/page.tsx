@@ -33,7 +33,13 @@ export default function AdminDashboard() {
   const [fundRecords, setFundRecords] = useState<any[]>([]);
   const [showFundModal, setShowFundModal] = useState(false);
   const [editingFund, setEditingFund] = useState<string | null>(null);
-  const [newFund, setNewFund] = useState({ label: '', amount: '', description: '', date: new Date().toISOString().split('T')[0], category: '' });
+  const [newFund, setNewFund] = useState({ label: '', amount: '', description: '', date: new Date().toISOString().split('T')[0], category: '', phase: 'Completed', fundSource: '' });
+  
+  // Fund Allocations
+  const [fundAllocations, setFundAllocations] = useState<any[]>([]);
+  const [showAllocModal, setShowAllocModal] = useState(false);
+  const [editingAlloc, setEditingAlloc] = useState<string | null>(null);
+  const [newAlloc, setNewAlloc] = useState({ totalAmount: '', source: '', fiscalYear: '2025-2026', description: '' });
   
   // Market Prices editing
   const [editingPrice, setEditingPrice] = useState<string | null>(null);
@@ -135,6 +141,16 @@ export default function AdminDashboard() {
     }
   };
 
+  const fetchFundAllocations = async () => {
+    try {
+      const res = await fetch('/api/fund-allocations');
+      const data = await res.json();
+      setFundAllocations(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error('Failed to fetch fund allocations:', error);
+    }
+  };
+
   const fetchSchemes = async () => {
     try {
       const res = await fetch('/api/schemes');
@@ -195,6 +211,7 @@ export default function AdminDashboard() {
       fetchSchemes(),
       fetchGallery(),
       fetchFundUsage(),
+      fetchFundAllocations(),
       fetchVillageMetrics(),
       fetchVillagePerformance(),
       fetchWaterSources(),
@@ -360,7 +377,7 @@ export default function AdminDashboard() {
       });
       if (res.ok) {
         setShowFundModal(false);
-        setNewFund({ label: '', amount: '', description: '', date: new Date().toISOString().split('T')[0], category: '' });
+        setNewFund({ label: '', amount: '', description: '', date: new Date().toISOString().split('T')[0], category: '', phase: 'Completed', fundSource: '' });
         setEditingFund(null);
         fetchFundUsage();
       }
@@ -386,9 +403,57 @@ export default function AdminDashboard() {
       description: record.description || '',
       date: new Date(record.date).toISOString().split('T')[0],
       category: record.category || '',
+      phase: record.phase || 'Completed',
+      fundSource: record.fundSource || '',
     });
     setEditingFund(record.id);
     setShowFundModal(true);
+  };
+
+  // Fund Allocations CRUD
+  const handleAddAlloc = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const method = editingAlloc ? 'PUT' : 'POST';
+      const body = editingAlloc 
+        ? { id: editingAlloc, ...newAlloc }
+        : newAlloc;
+      
+      const res = await fetch('/api/fund-allocations', {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (res.ok) {
+        setShowAllocModal(false);
+        setNewAlloc({ totalAmount: '', source: '', fiscalYear: '2025-2026', description: '' });
+        setEditingAlloc(null);
+        fetchFundAllocations();
+      }
+    } catch (error) {
+      console.error('Failed to save fund allocation:', error);
+    }
+  };
+
+  const handleDeleteAlloc = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this fund allocation?')) return;
+    try {
+      const res = await fetch(`/api/fund-allocations?id=${id}`, { method: 'DELETE' });
+      if (res.ok) fetchFundAllocations();
+    } catch (error) {
+      console.error('Failed to delete fund allocation:', error);
+    }
+  };
+
+  const startEditAlloc = (record: any) => {
+    setNewAlloc({
+      totalAmount: record.totalAmount.toString(),
+      source: record.source || '',
+      fiscalYear: record.fiscalYear || '2025-2026',
+      description: record.description || '',
+    });
+    setEditingAlloc(record.id);
+    setShowAllocModal(true);
   };
 
   const startEditScheme = (scheme: any) => {
@@ -1345,7 +1410,7 @@ export default function AdminDashboard() {
               <button 
                 onClick={() => {
                   setEditingFund(null);
-                  setNewFund({ label: '', amount: '', description: '', date: new Date().toISOString().split('T')[0], category: '' });
+                  setNewFund({ label: '', amount: '', description: '', date: new Date().toISOString().split('T')[0], category: '', phase: 'Completed', fundSource: '' });
                   setShowFundModal(true);
                 }}
                 className="px-6 py-3 bg-amber-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all flex items-center gap-2 shadow-xl shadow-amber-600/20"
@@ -1366,9 +1431,10 @@ export default function AdminDashboard() {
                     <tr className="bg-amber-50/50 text-[10px] text-gray-400 font-black uppercase tracking-widest">
                       <th className="px-6 py-4">Label / Purpose</th>
                       <th className="px-6 py-4">Category</th>
+                      <th className="px-6 py-4">Phase</th>
+                      <th className="px-6 py-4">Source</th>
                       <th className="px-6 py-4">Amount</th>
                       <th className="px-6 py-4">Date</th>
-                      <th className="px-6 py-4">Description</th>
                       <th className="px-6 py-4 text-right">Actions</th>
                     </tr>
                   </thead>
@@ -1381,6 +1447,29 @@ export default function AdminDashboard() {
                             <span className="px-3 py-1 bg-amber-100 text-amber-700 rounded-lg text-[9px] font-black uppercase tracking-widest">
                               {record.category}
                             </span>
+                          ) : (
+                            <span className="text-gray-300 text-[10px] font-bold">—</span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest"
+                            style={{
+                              backgroundColor: record.phase === 'Completed' ? '#dcfce7' :
+                                record.phase === 'In Progress' ? '#fef3c7' :
+                                record.phase === 'Planning' ? '#dbeafe' :
+                                record.phase === 'Approved' ? '#f3e8ff' : '#f3f4f6',
+                              color: record.phase === 'Completed' ? '#15803d' :
+                                record.phase === 'In Progress' ? '#b45309' :
+                                record.phase === 'Planning' ? '#1d4ed8' :
+                                record.phase === 'Approved' ? '#7c3aed' : '#374151'
+                            }}
+                          >
+                            {record.phase || 'Completed'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          {record.fundSource ? (
+                            <span className="text-[10px] font-bold text-gray-500">{record.fundSource}</span>
                           ) : (
                             <span className="text-gray-300 text-[10px] font-bold">—</span>
                           )}
@@ -1443,6 +1532,116 @@ export default function AdminDashboard() {
                   </div>
                 </div>
               </div>
+            )}
+          </div>
+        </div>
+
+        {/* Fund Allocations Management Section */}
+        <div className="mb-12">
+          <div className="bg-white rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 p-8 overflow-hidden">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+              <div>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-emerald-50 flex items-center justify-center">
+                    <DollarSign className="w-5 h-5 text-emerald-600" />
+                  </div>
+                  <h3 className="text-2xl font-black text-[#0A0A0A] tracking-tighter">Fund Allocations</h3>
+                </div>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-2 ml-[52px]">Manage total government fund grants allocated to the village</p>
+              </div>
+              <button 
+                onClick={() => {
+                  setEditingAlloc(null);
+                  setNewAlloc({ totalAmount: '', source: '', fiscalYear: '2025-2026', description: '' });
+                  setShowAllocModal(true);
+                }}
+                className="px-6 py-3 bg-emerald-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all flex items-center gap-2 shadow-xl shadow-emerald-600/20"
+              >
+                <Plus className="w-4 h-4" />
+                Add Allocation
+              </button>
+            </div>
+
+            {fundAllocations.length === 0 ? (
+              <div className="text-center py-16 text-gray-300 font-bold italic">
+                No fund allocations yet. Click "Add Allocation" to record government fund grants.
+              </div>
+            ) : (
+              <>
+                {/* Summary */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+                  <div className="p-6 rounded-2xl bg-emerald-50 border border-emerald-100">
+                    <div className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-2">Total Allocated</div>
+                    <div className="text-2xl font-black text-[#0A0A0A]">
+                      ₹{fundAllocations.reduce((sum: number, a: any) => sum + a.totalAmount, 0).toLocaleString()}
+                    </div>
+                  </div>
+                  <div className="p-6 rounded-2xl bg-green-50 border border-green-100">
+                    <div className="text-[10px] font-black text-green-600 uppercase tracking-widest mb-2">Used So Far</div>
+                    <div className="text-2xl font-black text-[#0A0A0A]">
+                      ₹{fundRecords.reduce((sum: number, r: any) => sum + r.amount, 0).toLocaleString()}
+                    </div>
+                  </div>
+                  <div className="p-6 rounded-2xl bg-blue-50 border border-blue-100">
+                    <div className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-2">Remaining</div>
+                    <div className="text-2xl font-black text-[#0A0A0A]">
+                      ₹{(fundAllocations.reduce((sum: number, a: any) => sum + a.totalAmount, 0) - fundRecords.reduce((sum: number, r: any) => sum + r.amount, 0)).toLocaleString()}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left">
+                    <thead>
+                      <tr className="bg-emerald-50/50 text-[10px] text-gray-400 font-black uppercase tracking-widest">
+                        <th className="px-6 py-4">Source</th>
+                        <th className="px-6 py-4">Fiscal Year</th>
+                        <th className="px-6 py-4">Amount</th>
+                        <th className="px-6 py-4">Description</th>
+                        <th className="px-6 py-4 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-50">
+                      {fundAllocations.map((alloc) => (
+                        <tr key={alloc.id} className="hover:bg-emerald-50/20 transition-colors group">
+                          <td className="px-6 py-4 font-black text-[#0A0A0A]">{alloc.source || 'General Grant'}</td>
+                          <td className="px-6 py-4">
+                            <span className="px-3 py-1 bg-gray-100 text-gray-600 rounded-lg text-[9px] font-black uppercase tracking-widest">
+                              {alloc.fiscalYear}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="font-black text-lg text-[#0A0A0A]">
+                              ₹{alloc.totalAmount.toLocaleString()}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="text-xs font-medium text-gray-400 line-clamp-1">
+                              {alloc.description || '—'}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <button 
+                                onClick={() => startEditAlloc(alloc)}
+                                className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </button>
+                              <button 
+                                onClick={() => handleDeleteAlloc(alloc.id)}
+                                className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </>
             )}
           </div>
         </div>
@@ -1883,6 +2082,36 @@ export default function AdminDashboard() {
                     </select>
                   </div>
                 </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Phase</label>
+                    <select
+                      value={newFund.phase}
+                      onChange={(e) => setNewFund({ ...newFund, phase: e.target.value })}
+                      className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 font-bold"
+                    >
+                      <option value="Planning">Planning</option>
+                      <option value="In Progress">In Progress</option>
+                      <option value="Completed">Completed</option>
+                      <option value="Approved">Approved</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Fund Source</label>
+                    <select
+                      value={newFund.fundSource}
+                      onChange={(e) => setNewFund({ ...newFund, fundSource: e.target.value })}
+                      className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 font-bold"
+                    >
+                      <option value="">Select source</option>
+                      <option value="State Government">State Government</option>
+                      <option value="Central Government">Central Government</option>
+                      <option value="15th Finance Commission">15th Finance Commission</option>
+                      <option value="Panchayat Funds">Panchayat Funds</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                </div>
                 <div>
                   <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Full Description</label>
                   <textarea
@@ -2248,6 +2477,77 @@ export default function AdminDashboard() {
                   className="w-full py-5 bg-[#15803d] text-white rounded-[1.5rem] font-black uppercase tracking-widest hover:scale-[1.02] transition-all shadow-xl shadow-[#15803d]/20 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {uploadingOfficial ? 'Uploading...' : editingOfficial ? 'Save Changes' : 'Add Official'}
+                </button>
+              </form>
+            </motion.div>
+          </div>
+        )}
+        {/* Fund Allocations Modal */}
+        {showAllocModal && (
+          <div className="fixed inset-0 bg-[#0A0A0A]/90 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-[2.5rem] shadow-2xl p-10 w-full max-w-lg relative">
+              <button onClick={() => setShowAllocModal(false)} className="absolute top-8 right-8 text-gray-300 hover:text-[#0A0A0A] transition-colors"><X className="w-6 h-6"/></button>
+              <h3 className="text-3xl font-black text-[#0A0A0A] mb-2 tracking-tighter">
+                {editingAlloc ? 'Update Allocation' : 'Add Fund Allocation'}
+              </h3>
+              <p className="text-gray-400 mb-8 font-medium">
+                {editingAlloc ? 'Update government fund grant details' : 'Record a new government fund grant allocated to the village'}
+              </p>
+              
+              <form onSubmit={handleAddAlloc} className="space-y-6">
+                <div>
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Total Amount (₹)</label>
+                  <input
+                    type="number"
+                    value={newAlloc.totalAmount}
+                    onChange={(e) => setNewAlloc({ ...newAlloc, totalAmount: e.target.value })}
+                    className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 font-bold"
+                    placeholder="5000000"
+                    min="0"
+                    required
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Fund Source</label>
+                    <select
+                      value={newAlloc.source}
+                      onChange={(e) => setNewAlloc({ ...newAlloc, source: e.target.value })}
+                      className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 font-bold"
+                    >
+                      <option value="">Select source</option>
+                      <option value="State Government">State Government</option>
+                      <option value="Central Government">Central Government</option>
+                      <option value="15th Finance Commission">15th Finance Commission</option>
+                      <option value="Panchayat Funds">Panchayat Funds</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Fiscal Year</label>
+                    <select
+                      value={newAlloc.fiscalYear}
+                      onChange={(e) => setNewAlloc({ ...newAlloc, fiscalYear: e.target.value })}
+                      className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 font-bold"
+                    >
+                      <option value="2024-2025">2024-2025</option>
+                      <option value="2025-2026">2025-2026</option>
+                      <option value="2026-2027">2026-2027</option>
+                      <option value="2027-2028">2027-2028</option>
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Description (Optional)</label>
+                  <textarea
+                    value={newAlloc.description}
+                    onChange={(e) => setNewAlloc({ ...newAlloc, description: e.target.value })}
+                    className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 font-bold min-h-[80px]"
+                    placeholder="e.g., 15th Finance Commission Grant for Mallaram Panchayat"
+                  />
+                </div>
+                <button type="submit" className="w-full py-5 bg-emerald-600 text-white rounded-[1.5rem] font-black uppercase tracking-widest hover:scale-[1.02] transition-all shadow-xl shadow-emerald-600/20 mt-4">
+                  {editingAlloc ? 'Save Changes' : 'Add Allocation'}
                 </button>
               </form>
             </motion.div>
