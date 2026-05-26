@@ -186,13 +186,145 @@ async function main() {
     console.log(`Gallery already has ${existingGalleryCount} records. Skipping gallery seed.`);
   }
 
+  // ─── Welfare Applications & Beneficiaries for Praja Progress Tracker ───────────────
+  console.log('Seeding welfare applications & beneficiaries...');
+
+  // First ensure we have welfare-type schemes
+  const welfareSchemeNames = [
+    { title: 'Rythu Bandhu', type: 'welfare', link: 'https://rythubandhu.telangana.gov.in/', description: 'Investment support to farmers - ₹5,000 per acre per season.' },
+    { title: 'KCR Kits', type: 'welfare', link: 'https://www.telangana.gov.in/', description: 'Maternal and child health support scheme for pregnant women.' },
+    { title: 'Aasara Pensions', type: 'welfare', link: 'https://www.telangana.gov.in/', description: 'Social security pensions for elderly, widows, and disabled persons.' },
+    { title: 'Kalyana Lakshmi', type: 'welfare', link: 'https://www.telangana.gov.in/', description: 'Financial assistance for marriage of girls from poor families.' },
+    { title: 'Indiramma Housing', type: 'welfare', link: 'https://indirammaindlu.telangana.gov.in/', description: 'Free house sites and financial assistance for houseless poor.' },
+  ];
+
+  const welfareSchemes: string[] = [];
+  for (const ws of welfareSchemeNames) {
+    const existing = await prisma.scheme.findFirst({ where: { title: ws.title } });
+    if (existing) {
+      welfareSchemes.push(existing.id);
+    } else {
+      const created = await prisma.scheme.create({ data: ws });
+      welfareSchemes.push(created.id);
+    }
+  }
+
+  // Clear existing applications and beneficiaries
+  await prisma.beneficiary.deleteMany({});
+  await prisma.welfareApplication.deleteMany({});
+
+  // Generate seed application data
+  const villages = ['Mallaram', 'Vemulawada', 'Kodurupaka'];
+  const wards = ['Ward 1', 'Ward 2', 'Ward 3', 'Ward 4', 'Ward 5'];
+  
+  interface SeedApplicant {
+    name: string;
+    phone: string;
+    aadhaarLast4: string;
+    village: string;
+    ward: string;
+  }
+
+  const seedApplicants: SeedApplicant[] = [
+    { name: 'Sangam Arpitha', phone: '9989120933', aadhaarLast4: '4521', village: 'Mallaram', ward: 'Ward 1' },
+    { name: 'Koduru Ramesh', phone: '9876543210', aadhaarLast4: '7834', village: 'Mallaram', ward: 'Ward 2' },
+    { name: 'Bandi Laxmi', phone: '8765432109', aadhaarLast4: '1298', village: 'Vemulawada', ward: 'Ward 3' },
+    { name: 'Peddapally Naresh', phone: '7654321098', aadhaarLast4: '5632', village: 'Mallaram', ward: 'Ward 1' },
+    { name: 'Gunda Swapna', phone: '6543210987', aadhaarLast4: '9076', village: 'Kodurupaka', ward: 'Ward 4' },
+    { name: 'Mekaiah Yadav', phone: '5432109876', aadhaarLast4: '3401', village: 'Mallaram', ward: 'Ward 2' },
+    { name: 'Vennela Shruthi', phone: '4321098765', aadhaarLast4: '6745', village: 'Vemulawada', ward: 'Ward 5' },
+    { name: 'Are Raju', phone: '3210987654', aadhaarLast4: '2189', village: 'Kodurupaka', ward: 'Ward 3' },
+    { name: 'Sangam Prakash', phone: '9988776655', aadhaarLast4: '5567', village: 'Mallaram', ward: 'Ward 1' },
+    { name: 'Boora Anitha', phone: '8877665544', aadhaarLast4: '8923', village: 'Mallaram', ward: 'Ward 4' },
+    { name: 'Pendota Shekar', phone: '7766554433', aadhaarLast4: '1456', village: 'Vemulawada', ward: 'Ward 2' },
+    { name: 'Gopanpally Srilatha', phone: '6655443322', aadhaarLast4: '3789', village: 'Kodurupaka', ward: 'Ward 5' },
+    { name: 'Kotte Srinu', phone: '5544332211', aadhaarLast4: '9012', village: 'Mallaram', ward: 'Ward 3' },
+    { name: 'Meka Chinna', phone: '4433221100', aadhaarLast4: '2345', village: 'Vemulawada', ward: 'Ward 1' },
+    { name: 'Anumula Padma', phone: '3322110099', aadhaarLast4: '6789', village: 'Mallaram', ward: 'Ward 2' },
+    { name: 'Battula Mahesh', phone: '2211009988', aadhaarLast4: '0123', village: 'Kodurupaka', ward: 'Ward 4' },
+    { name: 'Shaik Jabeen', phone: '1199008877', aadhaarLast4: '4567', village: 'Mallaram', ward: 'Ward 5' },
+    { name: 'Bandari Lavanya', phone: '9988007766', aadhaarLast4: '8901', village: 'Vemulawada', ward: 'Ward 3' },
+    { name: 'Jajula Rajitha', phone: '8877006655', aadhaarLast4: '2345', village: 'Mallaram', ward: 'Ward 1' },
+    { name: 'Pallavi Swathi', phone: '7766005544', aadhaarLast4: '6789', village: 'Mallaram', ward: 'Ward 2' },
+  ];
+
+  const statuses = ['APPROVED', 'APPROVED', 'APPROVED', 'PENDING', 'REJECTED', 'APPROVED', 'PENDING', 'APPROVED', 'APPROVED', 'REJECTED'];
+  const benefitAmounts = [5000, 10000, 2500, 15000, 0, 7500, 0, 3000, 12000, 0];
+
+  // Generate applications spread across the last 12 months
+  const now = new Date();
+  let totalDistributed = 0;
+  let appCount = 0;
+
+  for (let monthOffset = 11; monthOffset >= 0; monthOffset--) {
+    const baseDate = new Date(now);
+    baseDate.setMonth(baseDate.getMonth() - monthOffset);
+    baseDate.setDate(1);
+
+    // Generate 5-8 applications per month
+    const appsThisMonth = 5 + Math.floor(Math.random() * 4);
+
+    for (let i = 0; i < appsThisMonth; i++) {
+      const applicant = seedApplicants[appCount % seedApplicants.length];
+      const schemeId = welfareSchemes[appCount % welfareSchemes.length];
+      const status = statuses[appCount % statuses.length];
+      const amountRow = Math.floor(appCount / statuses.length);
+      const benefitAmount = benefitAmounts[(appCount + amountRow) % benefitAmounts.length];
+      
+      const appDate = new Date(baseDate);
+      appDate.setDate(1 + Math.floor(Math.random() * 25));
+      
+      const approvalDate = status === 'APPROVED' ? new Date(appDate.getTime() + 3 * 24 * 60 * 60 * 1000) : null;
+      const rejectionDate = status === 'REJECTED' ? new Date(appDate.getTime() + 2 * 24 * 60 * 60 * 1000) : null;
+
+      const application = await prisma.welfareApplication.create({
+        data: {
+          applicantName: applicant.name,
+          applicantPhone: applicant.phone,
+          applicantAadhaar: applicant.aadhaarLast4,
+          schemeId,
+          village: applicant.village,
+          ward: applicant.ward,
+          status,
+          benefitAmount: benefitAmount > 0 ? benefitAmount : null,
+          applicationDate: appDate,
+          approvalDate,
+          rejectionDate,
+          rejectionReason: status === 'REJECTED' ? 'Incomplete documentation' : null,
+        },
+      });
+
+      if (status === 'APPROVED' && benefitAmount > 0) {
+        await prisma.beneficiary.create({
+          data: {
+            name: applicant.name,
+            phone: applicant.phone,
+            aadhaarMasked: applicant.aadhaarLast4,
+            schemeId,
+            village: applicant.village,
+            ward: applicant.ward,
+            benefitAmount,
+            benefitDate: approvalDate || appDate,
+            applicationId: application.id,
+          },
+        });
+        totalDistributed += benefitAmount;
+      }
+
+      appCount++;
+    }
+  }
+
   console.log('\n✅ All seed data created successfully!');
   console.log(`  - Admin user: arpitha@mallaram.in`);
   console.log(`  - IKP Slots: 7 days × 4 time slots = 28 slots`);
   console.log(`  - Crop Prices: 4 crops`);
-  console.log(`  - Schemes: ${initialSchemes.length} government schemes`);
+  console.log(`  - Schemes: ${initialSchemes.length} government schemes + ${welfareSchemeNames.length} welfare schemes`);
   console.log(`  - Fund Usage: ${fundRecords.length} financial records`);
   console.log(`  - Gallery Images: ${galleryImages.length} records`);
+  console.log(`  - Welfare Applications: ${appCount} records (12 months history)`);
+  console.log(`  - Beneficiaries: multiple records`);
+  console.log(`  - Total Welfare Amount Distributed: ₹${totalDistributed.toLocaleString('en-IN')}`);
 }
 
 main()

@@ -91,8 +91,48 @@ model Scheme {
   title         String
   link          String
   description   String?
+  type          String    @default("portal") // "portal" or "welfare"
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+  applications  WelfareApplication[]
+  beneficiaries Beneficiary[]
+}
+
+model WelfareApplication {
+  id              String    @id @default(cuid())
+  applicantName   String
+  applicantPhone  String?
+  applicantAadhaar String?  // Only last 4 digits stored for privacy
+  schemeId        String
+  scheme          Scheme    @relation(fields: [schemeId], references: [id])
+  village         String    @default("Mallaram")
+  ward            String?
+  status          String    @default("PENDING") // PENDING, APPROVED, REJECTED
+  benefitAmount   Float?
+  applicationDate DateTime  @default(now())
+  approvalDate    DateTime?
+  rejectionDate   DateTime?
+  rejectionReason String?
+  beneficiary     Beneficiary?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model Beneficiary {
+  id              String    @id @default(cuid())
+  name            String
+  phone           String?
+  aadhaarMasked   String?   // Only last 4 digits
+  schemeId        String
+  scheme          Scheme    @relation(fields: [schemeId], references: [id])
+  village         String    @default("Mallaram")
+  ward            String?
+  benefitAmount   Float
+  benefitDate     DateTime  @default(now())
+  applicationId   String?   @unique
+  application     WelfareApplication? @relation(fields: [applicationId], references: [id])
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 }
 
 model GalleryImage {

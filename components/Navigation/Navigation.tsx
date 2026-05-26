@@ -37,6 +37,7 @@ export default function Navigation({ locale }: NavigationProps) {
     { key: 'complaint', href: `/${locale}#complaint` },
     { key: 'contact', href: `/${locale}#contact` },
     { key: 'villageAdmin', href: `/${locale}/village-administration` },
+    { key: 'prajaTracker', href: `/${locale}/praja-progress-tracker` },
   ];
 
   const toggleLanguage = () => {

@@ -93,4 +93,5 @@ export const publicRoutes = [
   { path: '/privacy', changefreq: 'monthly', priority: 0.3 },
   { path: '/terms', changefreq: 'monthly', priority: 0.3 },
   { path: '/login', changefreq: 'monthly', priority: 0.2 },
+  { path: '/praja-progress-tracker', changefreq: 'daily', priority: 0.9 },
 ] as const;
