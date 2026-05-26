@@ -7,7 +7,7 @@ import Navigation from '@/components/Navigation/Navigation';
 import Footer from '@/components/Footer/Footer';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { Search, Database, Upload, Check, X, IndianRupee, Plus, Bell, MapPin, Calendar, Clock, Trash2, ExternalLink, Edit, Image, Landmark, DollarSign, Tag, Activity, Droplets, Shield, BarChart3 } from 'lucide-react';
+import { Search, Database, Upload, Check, X, IndianRupee, Plus, Bell, MapPin, Calendar, CalendarDays, Clock, Trash2, ExternalLink, Edit, Image, Landmark, DollarSign, Tag, Activity, Droplets, Shield, BarChart3 } from 'lucide-react';
 import { WeatherWidget } from '@/components/Agriculture/AgriWidgets';
 
 export default function AdminDashboard() {
@@ -70,6 +70,12 @@ export default function AdminDashboard() {
   const [editingOfficial, setEditingOfficial] = useState<string | null>(null);
   const [uploadingOfficial, setUploadingOfficial] = useState(false);
   const [officialForm, setOfficialForm] = useState({ name: '', title: '', description: '', order: '0', file: null as File | null });
+  
+  // Village Events
+  const [villageEvents, setVillageEvents] = useState<any[]>([]);
+  const [showEventModal, setShowEventModal] = useState(false);
+  const [editingEvent, setEditingEvent] = useState<string | null>(null);
+  const [newEvent, setNewEvent] = useState({ title: '', description: '', imageUrl: '', date: '', category: 'local', order: '0' });
   
   // Form States
   const [newPrice, setNewPrice] = useState({ cropName: '', price: '', unit: 'Quintal', district: 'Rajanna Sircilla' });
@@ -206,6 +212,16 @@ export default function AdminDashboard() {
     }
   };
 
+  const fetchVillageEvents = async () => {
+    try {
+      const res = await fetch('/api/events');
+      const data = await res.json();
+      setVillageEvents(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error('Failed to fetch events:', error);
+    }
+  };
+
   const fetchPrajaApplications = async () => {
     try {
       // Fetch stats from dedicated endpoint for accurate counts
@@ -243,6 +259,7 @@ export default function AdminDashboard() {
       fetchVillagePerformance(),
       fetchWaterSources(),
       fetchVillageOfficials(),
+      fetchVillageEvents(),
       fetchPrajaApplications(),
     ]);
     setLoading(false);
@@ -677,6 +694,52 @@ export default function AdminDashboard() {
     setShowOfficialModal(true);
   };
 
+  // Village Events CRUD
+  const handleAddEvent = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const method = editingEvent ? 'PUT' : 'POST';
+      const url = editingEvent ? `/api/events?id=${editingEvent}` : '/api/events';
+      const body = { ...newEvent, order: parseInt(newEvent.order) || 0 };
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (res.ok) {
+        setShowEventModal(false);
+        setNewEvent({ title: '', description: '', imageUrl: '', date: '', category: 'local', order: '0' });
+        setEditingEvent(null);
+        fetchVillageEvents();
+      }
+    } catch (error) {
+      console.error('Failed to save event:', error);
+    }
+  };
+
+  const handleDeleteEvent = async (id: string) => {
+    if (!confirm('Delete this event from the Village Events page?')) return;
+    try {
+      const res = await fetch(`/api/events?id=${id}`, { method: 'DELETE' });
+      if (res.ok) fetchVillageEvents();
+    } catch (error) {
+      console.error('Failed to delete event:', error);
+    }
+  };
+
+  const startEditEvent = (event: any) => {
+    setNewEvent({
+      title: event.title,
+      description: event.description || '',
+      imageUrl: event.imageUrl || '',
+      date: event.date || '',
+      category: event.category || 'local',
+      order: event.order?.toString() || '0',
+    });
+    setEditingEvent(event.id);
+    setShowEventModal(true);
+  };
+
   const startEditWaterSource = (source: any) => {
     setNewWaterSource({
       label: source.label,
@@ -784,6 +847,7 @@ export default function AdminDashboard() {
             { id: 'performance', label: 'Performance', icon: '🏆' },
             { id: 'water', label: 'Water Supply', icon: '💧' },
             { id: 'officials', label: 'Officials', icon: '👤' },
+            { id: 'events', label: 'Events', icon: '🎉' },
             { id: 'slots', label: 'IKP Slots', icon: '📅' },
             { id: 'schemes', label: 'Schemes', icon: '🔗' },
             { id: 'gallery', label: 'Gallery', icon: '🖼' },
@@ -1818,6 +1882,80 @@ export default function AdminDashboard() {
           </div>
         </div>
 
+        {/* Village Events Management Section */}
+        <div id="section-events" className="mb-12 scroll-mt-48">
+          <div className="bg-white rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 p-8">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+              <div>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-purple-50 flex items-center justify-center">
+                    <CalendarDays className="w-5 h-5 text-purple-600" />
+                  </div>
+                  <h3 className="text-2xl font-black text-[#0A0A0A] tracking-tighter">Village Events</h3>
+                </div>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-2 ml-[52px]">Manage events shown on the home page Events section — Festivals & Local Events</p>
+              </div>
+              <button 
+                onClick={() => {
+                  setEditingEvent(null);
+                  setNewEvent({ title: '', description: '', imageUrl: '', date: '', category: 'local', order: '0' });
+                  setShowEventModal(true);
+                }}
+                className="px-6 py-3 bg-purple-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all flex items-center gap-2 shadow-xl shadow-purple-600/20"
+              >
+                <Plus className="w-4 h-4" />
+                Add Event
+              </button>
+            </div>
+
+            {villageEvents.length === 0 ? (
+              <div className="text-center py-16 text-gray-300 font-bold italic">
+                No events added yet. Click "Add Event" to show village events on the home page.
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {villageEvents.map((event) => (
+                  <div key={event.id} className="p-6 rounded-2xl bg-gray-50 border border-gray-100 group hover:border-purple-300 transition-all relative">
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="w-14 h-14 rounded-xl bg-white overflow-hidden shadow-sm">
+                        {event.imageUrl ? (
+                          <img src={event.imageUrl} alt={event.title} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-purple-600/30">
+                            <CalendarDays className="w-6 h-6" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button 
+                          onClick={() => startEditEvent(event)}
+                          className="p-1.5 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-all"
+                        >
+                          <Edit className="w-3.5 h-3.5" />
+                        </button>
+                        <button 
+                          onClick={() => handleDeleteEvent(event.id)}
+                          className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                    <div className="text-[#15803d] text-[9px] font-black uppercase tracking-widest mb-1">{event.date}</div>
+                    <h4 className="font-black text-[#0A0A0A] mb-1">{event.title}</h4>
+                    <div className="inline-block px-2 py-0.5 rounded-md bg-purple-100 text-purple-700 text-[9px] font-black uppercase tracking-widest mb-2">
+                      {event.category === 'festivals' ? 'Festival' : 'Local Event'}
+                    </div>
+                    {event.description && (
+                      <p className="text-[10px] text-gray-400 font-medium mt-1 line-clamp-2">{event.description}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* Main Booking Table */}
         <div id="section-bookings" className="scroll-mt-48">
         <div className="bg-white rounded-[3rem] shadow-2xl shadow-gray-200/50 border border-gray-100 overflow-hidden">
@@ -2722,6 +2860,89 @@ export default function AdminDashboard() {
                 </div>
                 <button type="submit" className="w-full py-5 bg-emerald-600 text-white rounded-[1.5rem] font-black uppercase tracking-widest hover:scale-[1.02] transition-all shadow-xl shadow-emerald-600/20 mt-4">
                   {editingAlloc ? 'Save Changes' : 'Add Allocation'}
+                </button>
+              </form>
+            </motion.div>
+          </div>
+        )}
+
+        {/* Events Modal */}
+        {showEventModal && (
+          <div className="fixed inset-0 bg-[#0A0A0A]/90 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-[2.5rem] shadow-2xl p-10 w-full max-w-lg relative">
+              <button onClick={() => setShowEventModal(false)} className="absolute top-8 right-8 text-gray-300 hover:text-[#0A0A0A] transition-colors"><X className="w-6 h-6"/></button>
+              <h3 className="text-3xl font-black text-[#0A0A0A] mb-2 tracking-tighter">
+                {editingEvent ? 'Update Event' : 'Add Village Event'}
+              </h3>
+              <p className="text-gray-400 mb-8 font-medium">
+                {editingEvent ? 'Update the event details below.' : 'Add a new event to show on the home page.'}
+              </p>
+              <form onSubmit={handleAddEvent} className="space-y-6">
+                <div>
+                  <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Event Title</label>
+                  <input
+                    type="text"
+                    value={newEvent.title}
+                    onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
+                    className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 font-bold"
+                    placeholder="e.g., Bathukamma Celebrations"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Description</label>
+                  <textarea
+                    value={newEvent.description}
+                    onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
+                    className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 font-bold min-h-[80px]"
+                    placeholder="Describe the event..."
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Date</label>
+                    <input
+                      type="text"
+                      value={newEvent.date}
+                      onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })}
+                      className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 font-bold"
+                      placeholder="e.g., 15 Oct 2025"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Category</label>
+                    <select
+                      value={newEvent.category}
+                      onChange={(e) => setNewEvent({ ...newEvent, category: e.target.value })}
+                      className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 font-bold appearance-none"
+                    >
+                      <option value="local">Local Event</option>
+                      <option value="festivals">Festival</option>
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Image URL</label>
+                  <input
+                    type="url"
+                    value={newEvent.imageUrl}
+                    onChange={(e) => setNewEvent({ ...newEvent, imageUrl: e.target.value })}
+                    className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 font-bold"
+                    placeholder="https://example.com/event.jpg"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Display Order</label>
+                  <input
+                    type="number"
+                    value={newEvent.order}
+                    onChange={(e) => setNewEvent({ ...newEvent, order: e.target.value })}
+                    className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 font-bold"
+                    placeholder="0"
+                  />
+                </div>
+                <button type="submit" className="w-full py-5 bg-purple-600 text-white rounded-[1.5rem] font-black uppercase tracking-widest hover:scale-[1.02] transition-all shadow-xl shadow-purple-600/20 mt-4">
+                  {editingEvent ? 'Save Changes' : 'Add Event'}
                 </button>
               </form>
             </motion.div>
