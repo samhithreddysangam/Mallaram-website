@@ -82,6 +82,10 @@ export default function AdminDashboard() {
   });
   const [newScheme, setNewScheme] = useState({ title: '', link: '', description: '' });
   const [editingScheme, setEditingScheme] = useState<string | null>(null);
+  
+  // Praja Tracker
+  const [prajaApplications, setPrajaApplications] = useState<any[]>([]);
+  const [prajaStats, setPrajaStats] = useState({ total: 0, approved: 0, pending: 0, rejected: 0 });
 
   const autoExpire = async () => {
     try {
@@ -202,6 +206,28 @@ export default function AdminDashboard() {
     }
   };
 
+  const fetchPrajaApplications = async () => {
+    try {
+      // Fetch stats from dedicated endpoint for accurate counts
+      const [statsRes, appsRes] = await Promise.all([
+        fetch('/api/praja-stats'),
+        fetch('/api/applications?limit=5'),
+      ]);
+      const stats = await statsRes.json();
+      const appsData = await appsRes.json();
+      
+      setPrajaApplications(appsData.applications || []);
+      setPrajaStats({
+        total: stats.totalApplications || 0,
+        approved: stats.approvedApplications || 0,
+        pending: stats.pendingApplications || 0,
+        rejected: stats.rejectedApplications || 0,
+      });
+    } catch (error) {
+      console.error('Failed to fetch praja applications:', error);
+    }
+  };
+
   const fetchData = async () => {
     // loading is true by default, so we don't need to set it here
     // unless we want to show loading on subsequent refreshes
@@ -216,7 +242,8 @@ export default function AdminDashboard() {
       fetchVillageMetrics(),
       fetchVillagePerformance(),
       fetchWaterSources(),
-      fetchVillageOfficials()
+      fetchVillageOfficials(),
+      fetchPrajaApplications(),
     ]);
     setLoading(false);
   };
@@ -746,9 +773,146 @@ export default function AdminDashboard() {
           </motion.div>
         </div>
 
+        {/* Section Navigation Tabs */}
+        <div className="flex gap-2 overflow-x-auto pb-2 mb-12 scrollbar-hide border-b border-gray-100">
+          {[
+            { id: 'overview', label: 'Overview', icon: '📊' },
+            { id: 'praja', label: 'Praja Tracker', icon: '📋' },
+            { id: 'prices', label: 'Market Prices', icon: '💰' },
+            { id: 'weather', label: 'Weather', icon: '🌤' },
+            { id: 'metrics', label: 'Village Metrics', icon: '📈' },
+            { id: 'performance', label: 'Performance', icon: '🏆' },
+            { id: 'water', label: 'Water Supply', icon: '💧' },
+            { id: 'officials', label: 'Officials', icon: '👤' },
+            { id: 'slots', label: 'IKP Slots', icon: '📅' },
+            { id: 'schemes', label: 'Schemes', icon: '🔗' },
+            { id: 'gallery', label: 'Gallery', icon: '🖼' },
+            { id: 'funds', label: 'Fund Usage', icon: '💰' },
+            { id: 'allocations', label: 'Allocations', icon: '💵' },
+            { id: 'bookings', label: 'Bookings', icon: '📋' },
+          ].map((tab) => (
+            tab.id === 'praja' ? (
+              <Link
+                key={tab.id}
+                href={`/${locale}/dashboard/admin/praja-tracker`}
+                className="flex-shrink-0 px-4 py-2.5 rounded-xl bg-[#15803d] text-white text-[10px] font-black uppercase tracking-widest hover:bg-[#14532d] transition-all flex items-center gap-1.5 shadow-sm"
+              >
+                <BarChart3 className="w-3.5 h-3.5" />
+                {tab.label}
+              </Link>
+            ) : (
+              <a
+                key={tab.id}
+                href={`#section-${tab.id}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById(`section-${tab.id}`)?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="flex-shrink-0 px-4 py-2.5 rounded-xl bg-gray-100 text-gray-600 text-[10px] font-black uppercase tracking-widest hover:bg-gray-200 hover:text-[#0A0A0A] transition-all"
+              >
+                {tab.icon} {tab.label}
+              </a>
+            )
+          ))}
+        </div>
+
+        {/* Praja Progress Tracker Section */}
+        <div id="section-praja" className="mb-12 scroll-mt-48">
+          <div className="bg-white rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 p-8">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+              <div>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-[#15803d]/10 flex items-center justify-center">
+                    <BarChart3 className="w-5 h-5 text-[#15803d]" />
+                  </div>
+                  <h3 className="text-2xl font-black text-[#0A0A0A] tracking-tighter">Praja Progress Tracker</h3>
+                </div>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-2 ml-[52px]">Welfare applications & beneficiary management</p>
+              </div>
+              <Link
+                href={`/${locale}/dashboard/admin/praja-tracker`}
+                className="px-6 py-3 bg-[#15803d] text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all flex items-center gap-2 shadow-xl shadow-[#15803d]/20"
+              >
+                <BarChart3 className="w-4 h-4" />
+                Full Management →
+              </Link>
+            </div>
+
+            {/* Stats Cards */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+              <div className="p-5 rounded-2xl bg-gray-50 border border-gray-100">
+                <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Total Applications</div>
+                <div className="text-3xl font-black text-[#0A0A0A]">{prajaStats.total || 0}</div>
+              </div>
+              <div className="p-5 rounded-2xl bg-green-50 border border-green-100">
+                <div className="text-[10px] font-black text-[#15803d] uppercase tracking-widest mb-1">Approved</div>
+                <div className="text-3xl font-black text-[#15803d]">{prajaStats.approved || 0}</div>
+              </div>
+              <div className="p-5 rounded-2xl bg-amber-50 border border-amber-100">
+                <div className="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-1">Pending</div>
+                <div className="text-3xl font-black text-amber-600">{prajaStats.pending || 0}</div>
+              </div>
+              <div className="p-5 rounded-2xl bg-red-50 border border-red-100">
+                <div className="text-[10px] font-black text-red-500 uppercase tracking-widest mb-1">Rejected</div>
+                <div className="text-3xl font-black text-red-500">{prajaStats.rejected || 0}</div>
+              </div>
+            </div>
+
+            {/* Recent Applications Preview */}
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="bg-gray-50/50 text-[10px] text-gray-400 font-black uppercase tracking-widest">
+                    <th className="px-6 py-4">Applicant</th>
+                    <th className="px-6 py-4">Scheme</th>
+                    <th className="px-6 py-4">Village</th>
+                    <th className="px-6 py-4">Date</th>
+                    <th className="px-6 py-4">Status</th>
+                    <th className="px-6 py-4 text-right">Amount</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {prajaApplications.length === 0 ? (
+                    <tr><td colSpan={6} className="px-6 py-12 text-center text-gray-300 font-bold italic">No applications found.</td></tr>
+                  ) : prajaApplications.slice(0, 5).map((app: any) => (
+                    <tr key={app.id} className="hover:bg-gray-50/30 transition-colors">
+                      <td className="px-6 py-4">
+                        <div className="font-bold text-sm text-[#0A0A0A]">{app.applicantName}</div>
+                        {app.applicantPhone && <div className="text-[10px] text-gray-400">{app.applicantPhone}</div>}
+                      </td>
+                      <td className="px-6 py-4 text-xs font-bold text-gray-600">{app.scheme?.title || '—'}</td>
+                      <td className="px-6 py-4 text-xs text-gray-500">{app.village}{app.ward ? ` / ${app.ward}` : ''}</td>
+                      <td className="px-6 py-4 text-xs text-gray-500">{new Date(app.applicationDate).toLocaleDateString()}</td>
+                      <td className="px-6 py-4">
+                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${
+                          app.status === 'APPROVED' ? 'bg-green-100 text-[#15803d]' :
+                          app.status === 'PENDING' ? 'bg-amber-100 text-amber-600' :
+                          'bg-red-100 text-red-600'
+                        }`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${
+                            app.status === 'APPROVED' ? 'bg-[#15803d]' :
+                            app.status === 'PENDING' ? 'bg-amber-500' : 'bg-red-500'
+                          }`} />
+                          {app.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <span className="font-black text-sm">{app.benefitAmount ? `₹${app.benefitAmount.toLocaleString('en-IN')}` : '—'}</span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        {/* Section IDs for existing sections */}
+        <div id="section-overview"></div>
+
         <div className="grid lg:grid-cols-3 gap-8 mb-12">
-          {/* Market Prices Section - Redesigned with full CRUD */}
-          <div className="lg:col-span-2">
+            {/* Market Prices Section - Redesigned with full CRUD */}
+          <div id="section-prices" className="lg:col-span-2 scroll-mt-48">
             <div className="bg-white h-full rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden">
               <div className="p-8 border-b border-gray-50">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
@@ -881,7 +1045,7 @@ export default function AdminDashboard() {
           </div>
 
           {/* Weather Section */}
-          <div className="lg:col-span-1">
+          <div id="section-weather" className="lg:col-span-1 scroll-mt-48">
             <div className="bg-white h-full rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 p-8">
               <h3 className="text-xl font-black text-[#0A0A0A] mb-6 flex items-center gap-3">
                 <div className="w-3 h-3 rounded-full bg-[#22FF88] animate-pulse"></div>
@@ -897,7 +1061,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Village Metrics Management Section */}
-        <div className="mb-12">
+        <div id="section-metrics" className="mb-12 scroll-mt-48">
           <div className="bg-white rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 p-8">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
               <div>
@@ -977,7 +1141,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Village Performance Management Section */}
-        <div className="mb-12">
+        <div id="section-performance" className="mb-12 scroll-mt-48">
           <div className="bg-white rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 p-8">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
               <div>
@@ -1044,7 +1208,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Water Sources Management Section */}
-        <div className="mb-12">
+        <div id="section-water" className="mb-12 scroll-mt-48">
           <div className="bg-white rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 p-8">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
               <div>
@@ -1112,7 +1276,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Village Officials Management Section */}
-        <div className="mb-12">
+        <div id="section-officials" className="mb-12 scroll-mt-48">
           <div className="bg-white rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 p-8 overflow-hidden">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
               <div>
@@ -1185,7 +1349,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* New Horizontal IKP Slots Section */}
-        <div className="mb-12">
+        <div id="section-slots" className="mb-12 scroll-mt-48">
           <div className="bg-white rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 p-8 overflow-hidden">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
               <div>
@@ -1272,7 +1436,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Schemes Management Section */}
-        <div className="mb-12">
+        <div id="section-schemes" className="mb-12 scroll-mt-48">
           <div className="bg-white rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 p-8">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
               <div>
@@ -1348,7 +1512,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Gallery Management Section */}
-        <div className="mb-12">
+        <div id="section-gallery" className="mb-12 scroll-mt-48">
           <div className="bg-white rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 p-8 overflow-hidden">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
               <div>
@@ -1403,7 +1567,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Fund Usage Management Section */}
-        <div className="mb-12">
+        <div id="section-funds" className="mb-12 scroll-mt-48">
           <div className="bg-white rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 p-8 overflow-hidden">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
               <div>
@@ -1545,7 +1709,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Fund Allocations Management Section */}
-        <div className="mb-12">
+        <div id="section-allocations" className="mb-12 scroll-mt-48">
           <div className="bg-white rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 p-8 overflow-hidden">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
               <div>
@@ -1655,6 +1819,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Main Booking Table */}
+        <div id="section-bookings" className="scroll-mt-48">
         <div className="bg-white rounded-[3rem] shadow-2xl shadow-gray-200/50 border border-gray-100 overflow-hidden">
           <div className="p-8 lg:p-10 border-b border-gray-50 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div>
@@ -1761,6 +1926,7 @@ export default function AdminDashboard() {
             </table>
           </div>
         </div>
+        </div> {/* end section-bookings */}
 
         {/* Slot Creation Modal */}
         {showSlotModal && (
