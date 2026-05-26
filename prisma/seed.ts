@@ -147,6 +147,7 @@ async function main() {
     {
       name: 'Shri A. Revanth Reddy',
       title: 'Hon\'ble Chief Minister, Telangana',
+      imageUrl: '/images/revanth-reddy.jpg',
       description: 'Under the leadership of Revanth Reddy, our village has taken a crucial step towards transparent and accountable governance through Digital Telangana.',
       order: 1,
       active: true,

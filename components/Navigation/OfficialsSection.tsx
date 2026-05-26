@@ -32,7 +32,7 @@ function OfficialImage({ official }: { official: VillageOfficial }) {
           <img 
             src={official.imageUrl} 
             alt={official.name}
-            className="w-full h-full object-cover scale-[1.25] translate-y-[10%]" 
+            className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-700 ease-out" 
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#15803d]/5 to-[#15803d]/10">
