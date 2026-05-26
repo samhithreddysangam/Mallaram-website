@@ -2,7 +2,7 @@ export type Locale = 'en' | 'te';
 
 export type Dictionary = {
   common: { appName: string; tagline: string; subtitle: string };
-  nav: { home: string; about: string; dashboard: string; schemes: string; facilities: string; gallery: string; events: string; contact: string; complaint: string; governance: string };
+  nav: { home: string; about: string; dashboard: string; schemes: string; facilities: string; gallery: string; events: string; contact: string; complaint: string; governance: string; villageAdmin: string };
   hero: { title: string; tagline: string; subtitle: string; cta: string };
   ikp: {
     title: string;
@@ -92,7 +92,7 @@ export const defaultLocale: Locale = 'en';
 // English dictionary (default)
 const enDict: Dictionary = {
   common: { appName: "Mallaram Village", tagline: "Mana Ooru", subtitle: "Smart village rooted in nature" },
-  nav: { home: "Home", about: "About", dashboard: "IKP Booking", schemes: "Govt Schemes", facilities: "Facilities", gallery: "Gallery", events: "Events", contact: "Contact", complaint: "Complaint", governance: "Smart Village" },
+  nav: { home: "Home", about: "About", dashboard: "IKP Booking", schemes: "Govt Schemes", facilities: "Facilities", gallery: "Gallery", events: "Events", contact: "Contact", complaint: "Complaint", governance: "Smart Village", villageAdmin: "Village Administration" },
   hero: { title: "Mallaram", tagline: "Mana Ooru", subtitle: "Smart village rooted in nature", cta: "Submit Complaint" },
   ikp: {
     title: "IKP Centre Booking",
@@ -219,7 +219,7 @@ const enDict: Dictionary = {
 // Telugu dictionary
 const teDict: Dictionary = {
   common: { appName: "మల్లారం గ్రామం", tagline: "మనా ఊరు", subtitle: "స్మార్ట్ విలేజ్" },
-  nav: { home: "హోమ్", about: "పాలన", dashboard: "IKP బుకింగ్", schemes: "పథకాలు", facilities: "సౌకర్యాలు", gallery: "ఫోటోలు", events: "కార్యక్రమాలు", contact: "సంప్రదింపు", complaint: "ఫిర్యాదు", governance: "స్మార్ట్ విలేజ్" },
+  nav: { home: "హోమ్", about: "పాలన", dashboard: "IKP బుకింగ్", schemes: "పథకాలు", facilities: "సౌకర్యాలు", gallery: "ఫోటోలు", events: "కార్యక్రమాలు", contact: "సంప్రదింపు", complaint: "ఫిర్యాదు", governance: "స్మార్ట్ విలేజ్", villageAdmin: "గ్రామ పాలన" },
   hero: { title: "మల్లారం", tagline: "మనా ఊరు", subtitle: "స్మార్ట్ విలేజ్", cta: "ఫిర్యాదు" },
   ikp: {
     title: "IKP సెంటర్ బుకింగ్",

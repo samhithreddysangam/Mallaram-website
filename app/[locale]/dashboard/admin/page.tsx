@@ -6,7 +6,7 @@ import { Locale, getDictionary } from '@/lib/i18n';
 import Navigation from '@/components/Navigation/Navigation';
 import Footer from '@/components/Footer/Footer';
 import { motion } from 'framer-motion';
-import { Search, Database, Upload, Check, X, IndianRupee, Plus, Bell, MapPin, Calendar, Clock, Trash2, ExternalLink, Edit, Image, Landmark, DollarSign, Tag, Activity, Droplets } from 'lucide-react';
+import { Search, Database, Upload, Check, X, IndianRupee, Plus, Bell, MapPin, Calendar, Clock, Trash2, ExternalLink, Edit, Image, Landmark, DollarSign, Tag, Activity, Droplets, Shield } from 'lucide-react';
 import { WeatherWidget } from '@/components/Agriculture/AgriWidgets';
 
 export default function AdminDashboard() {
@@ -56,6 +56,13 @@ export default function AdminDashboard() {
   const [showWaterSourceModal, setShowWaterSourceModal] = useState(false);
   const [editingWaterSource, setEditingWaterSource] = useState<string | null>(null);
   const [newWaterSource, setNewWaterSource] = useState({ label: '', level: '50', status: 'Normal', icon: 'Droplets', order: '0' });
+  
+  // Village Officials
+  const [villageOfficials, setVillageOfficials] = useState<any[]>([]);
+  const [showOfficialModal, setShowOfficialModal] = useState(false);
+  const [editingOfficial, setEditingOfficial] = useState<string | null>(null);
+  const [uploadingOfficial, setUploadingOfficial] = useState(false);
+  const [officialForm, setOfficialForm] = useState({ name: '', title: '', description: '', order: '0', file: null as File | null });
   
   // Form States
   const [newPrice, setNewPrice] = useState({ cropName: '', price: '', unit: 'Quintal', district: 'Rajanna Sircilla' });
@@ -168,6 +175,16 @@ export default function AdminDashboard() {
     }
   };
 
+  const fetchVillageOfficials = async () => {
+    try {
+      const res = await fetch('/api/village-officials');
+      const data = await res.json();
+      setVillageOfficials(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error('Failed to fetch village officials:', error);
+    }
+  };
+
   const fetchData = async () => {
     // loading is true by default, so we don't need to set it here
     // unless we want to show loading on subsequent refreshes
@@ -180,7 +197,8 @@ export default function AdminDashboard() {
       fetchFundUsage(),
       fetchVillageMetrics(),
       fetchVillagePerformance(),
-      fetchWaterSources()
+      fetchWaterSources(),
+      fetchVillageOfficials()
     ]);
     setLoading(false);
   };
@@ -511,6 +529,59 @@ export default function AdminDashboard() {
     } catch (error) {
       console.error('Failed to delete water source:', error);
     }
+  };
+
+  // Village Official CRUD
+  const handleAddOfficial = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!officialForm.name || !officialForm.title) return;
+    setUploadingOfficial(true);
+    try {
+      const formData = new FormData();
+      formData.append('name', officialForm.name);
+      formData.append('title', officialForm.title);
+      formData.append('description', officialForm.description || '');
+      formData.append('order', officialForm.order || '0');
+      if (officialForm.file) {
+        formData.append('image', officialForm.file);
+      }
+
+      const method = editingOfficial ? 'PUT' : 'POST';
+      const url = editingOfficial ? `/api/village-officials?id=${editingOfficial}` : '/api/village-officials';
+      const res = await fetch(url, { method, body: formData });
+      if (res.ok) {
+        setShowOfficialModal(false);
+        setOfficialForm({ name: '', title: '', description: '', order: '0', file: null as File | null });
+        setEditingOfficial(null);
+        fetchVillageOfficials();
+      }
+    } catch (error) {
+      console.error('Failed to save official:', error);
+    } finally {
+      setUploadingOfficial(false);
+    }
+  };
+
+  const handleDeleteOfficial = async (id: string) => {
+    if (!confirm('Delete this official from the Village Administration page?')) return;
+    try {
+      const res = await fetch(`/api/village-officials?id=${id}`, { method: 'DELETE' });
+      if (res.ok) fetchVillageOfficials();
+    } catch (error) {
+      console.error('Failed to delete official:', error);
+    }
+  };
+
+  const startEditOfficial = (official: any) => {
+    setOfficialForm({
+      name: official.name,
+      title: official.title,
+      description: official.description || '',
+      order: official.order?.toString() || '0',
+      file: null,
+    });
+    setEditingOfficial(official.id);
+    setShowOfficialModal(true);
   };
 
   const startEditWaterSource = (source: any) => {
@@ -960,6 +1031,79 @@ export default function AdminDashboard() {
                       <span className="text-sm font-black text-sky-600">{source.level}%</span>
                     </div>
                     <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{source.status}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Village Officials Management Section */}
+        <div className="mb-12">
+          <div className="bg-white rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 p-8 overflow-hidden">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+              <div>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-[#15803d]/10 flex items-center justify-center">
+                    <Shield className="w-5 h-5 text-[#15803d]" />
+                  </div>
+                  <h3 className="text-2xl font-black text-[#0A0A0A] tracking-tighter">Village Administrators</h3>
+                </div>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-2 ml-[52px]">Manage officials shown on the Village Administration page</p>
+              </div>
+              <button 
+                onClick={() => {
+                  setEditingOfficial(null);
+                  setOfficialForm({ name: '', title: '', description: '', order: '0', file: null });
+                  setShowOfficialModal(true);
+                }}
+                className="px-6 py-3 bg-[#15803d] text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all flex items-center gap-2 shadow-xl shadow-[#15803d]/20"
+              >
+                <Plus className="w-4 h-4" />
+                Add Official
+              </button>
+            </div>
+
+            {villageOfficials.length === 0 ? (
+              <div className="text-center py-16 text-gray-300 font-bold italic">
+                No officials added yet. Click "Add Official" to show village administration details.
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {villageOfficials.map((official) => (
+                  <div key={official.id} className="p-6 rounded-2xl bg-gray-50 border border-gray-100 group hover:border-[#15803d]/30 transition-all relative">
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="w-14 h-14 rounded-xl bg-white overflow-hidden shadow-sm">
+                        {official.imageUrl ? (
+                          <img src={official.imageUrl} alt={official.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-[#15803d]/30">
+                            <Shield className="w-6 h-6" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button 
+                          onClick={() => startEditOfficial(official)}
+                          className="p-1.5 text-gray-400 hover:text-[#15803d] hover:bg-[#15803d]/10 rounded-lg transition-all"
+                        >
+                          <Edit className="w-3.5 h-3.5" />
+                        </button>
+                        <button 
+                          onClick={() => handleDeleteOfficial(official.id)}
+                          className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                    <h4 className="font-black text-[#0A0A0A] mb-1">{official.name}</h4>
+                    <div className="inline-block px-2 py-0.5 rounded-md bg-[#15803d]/10 text-[#15803d] text-[9px] font-black uppercase tracking-widest mb-2">
+                      {official.title}
+                    </div>
+                    {official.description && (
+                      <p className="text-[10px] text-gray-400 font-medium mt-2 line-clamp-2">{official.description}</p>
+                    )}
                   </div>
                 ))}
               </div>

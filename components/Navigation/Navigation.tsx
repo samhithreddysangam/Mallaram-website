@@ -36,6 +36,7 @@ export default function Navigation({ locale }: NavigationProps) {
     { key: 'events', href: `/${locale}#events` },
     { key: 'complaint', href: `/${locale}#complaint` },
     { key: 'contact', href: `/${locale}#contact` },
+    { key: 'villageAdmin', href: `/${locale}/village-administration` },
   ];
 
   const toggleLanguage = () => {

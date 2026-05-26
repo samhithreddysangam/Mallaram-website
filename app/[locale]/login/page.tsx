@@ -50,6 +50,32 @@ export default function LoginPage() {
     );
   }
 
+  const getErrorMessage = (errKey: string | null) => {
+    if (!errKey) return null;
+
+    if (errKey === 'Configuration' || errKey.includes('Config') || errKey.includes('secret') || errKey.includes('500') || errKey.includes('MissingSecret')) {
+      return (
+        <div className="space-y-1.5 text-left w-full">
+          <p className="font-extrabold text-red-700 text-sm flex items-center gap-1.5">
+            ⚠️ Auth Server Misconfigured
+          </p>
+          <p className="text-xs text-red-600 font-bold leading-relaxed">
+            The production deployment is missing the <code className="bg-red-100/80 px-1 py-0.5 rounded font-mono text-[10px]">AUTH_SECRET</code> environment variable.
+          </p>
+          <p className="text-[11px] text-red-500 font-semibold leading-relaxed">
+            Please run <code className="bg-red-100/50 px-1 py-0.5 rounded font-mono">npx auth secret</code> and add it as <code className="bg-red-100/50 px-1 py-0.5 rounded font-mono">AUTH_SECRET</code> in your hosting settings (e.g. Vercel dashboard), then redeploy.
+          </p>
+        </div>
+      );
+    }
+
+    if (errKey === 'CredentialsSignin' || errKey === 'CallbackRouteError') {
+      return <span className="font-bold text-red-600">{auth.error || 'Invalid login credentials. Please try again.'}</span>;
+    }
+
+    return <span className="font-bold text-red-600">{errKey}</span>;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -63,19 +89,32 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
-        if (result.error === 'CredentialsSignin') {
-          setError(auth.error);
+        console.error('Sign in result error:', result.error);
+        if (result.error === 'CredentialsSignin' || result.error === 'CallbackRouteError') {
+          setError('CredentialsSignin');
+        } else if (result.error === 'Configuration' || result.error.includes('Config')) {
+          setError('Configuration');
         } else {
-          setError('Invalid login credentials. Please try again.');
+          setError(result.error);
         }
       } else {
-        // Successful login, middleware or useEffect will handle redirection
-        // but let's be explicit here to avoid waiting for next render
-        window.location.reload(); // Refresh to ensure session is picked up
+        // Successful login, direct user to dashboard immediately
+        const userRole = (session?.user as any)?.role;
+        const targetPath = userRole === 'ADMIN' ? `/${locale}/dashboard/admin` : `/${locale}/ikp-booking`;
+        router.replace(targetPath);
+        // Fallback hard refresh to ensure session state updates
+        setTimeout(() => {
+          window.location.href = targetPath;
+        }, 100);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Login error:', err);
-      setError('An unexpected error occurred. Please try again.');
+      const errMsg = err?.message || '';
+      if (errMsg.includes('Configuration') || errMsg.includes('secret') || errMsg.includes('MissingSecret')) {
+        setError('Configuration');
+      } else {
+        setError('An unexpected error occurred. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -100,10 +139,12 @@ export default function LoginPage() {
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="mb-8 p-4 bg-red-50 border border-red-100 text-red-600 rounded-2xl text-sm font-bold flex items-center gap-3"
+              className="mb-8 p-4 bg-red-50 border border-red-100 rounded-2xl flex items-start gap-3 shadow-sm"
             >
-              <div className="w-2 h-2 rounded-full bg-red-600 animate-pulse"></div>
-              {urlError === 'CredentialsSignin' ? auth.error : (error || auth.error)}
+              <div className="w-2 h-2 rounded-full bg-red-600 animate-pulse mt-1.5 shrink-0"></div>
+              <div className="flex-1">
+                {getErrorMessage(error || urlError)}
+              </div>
             </motion.div>
           )}
 

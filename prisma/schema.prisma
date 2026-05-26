@@ -137,6 +137,18 @@ model VillagePerformance {
   updatedAt     DateTime  @updatedAt
 }
 
+model VillageOfficial {
+  id            String    @id @default(cuid())
+  name          String
+  title         String    // e.g., "Sarpanch, Mallaram", "Panchayat Secretary"
+  imageUrl      String?   // path to uploaded image
+  description   String?   // optional bio/description
+  order         Int       @default(0)
+  active        Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
 model WaterSource {
   id            String    @id @default(cuid())
   label         String    // e.g., "Main Reservoir"
