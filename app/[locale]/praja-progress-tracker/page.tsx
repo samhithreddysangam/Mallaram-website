@@ -141,7 +141,7 @@ function StatsCard({ title, value, icon: Icon, color, bgColor, accentColor, pref
 // ─── Filters ────────────────────────────────────────────────────────
 function FilterBar({ schemes, filters, onChange, onReset }: {
   schemes: Scheme[];
-  filters: { schemeId: string; year: string; village: string; status: string; search: string };
+  filters: { schemeId: string; year: string; village: string; status: string; search: string; dateFrom: string; dateTo: string };
   onChange: (f: typeof filters) => void;
   onReset: () => void;
 }) {
@@ -160,7 +160,7 @@ function FilterBar({ schemes, filters, onChange, onReset }: {
           )}
         </div>
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-3">
         <select
           value={filters.schemeId}
           onChange={e => onChange({ ...filters, schemeId: e.target.value })}
@@ -205,6 +205,22 @@ function FilterBar({ schemes, filters, onChange, onReset }: {
             onChange={e => onChange({ ...filters, search: e.target.value })}
             placeholder="Search..."
             className="w-full pl-9 pr-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#15803d]/20 focus:border-[#15803d] transition-all"
+          />
+        </div>
+        <div className="relative col-span-2 md:col-span-1 lg:col-span-2 flex gap-2">
+          <input
+            type="date"
+            value={filters.dateFrom}
+            onChange={e => onChange({ ...filters, dateFrom: e.target.value })}
+            className="flex-1 px-3 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl text-[10px] font-bold focus:outline-none focus:ring-2 focus:ring-[#15803d]/20 focus:border-[#15803d] transition-all"
+            title="Date from"
+          />
+          <input
+            type="date"
+            value={filters.dateTo}
+            onChange={e => onChange({ ...filters, dateTo: e.target.value })}
+            className="flex-1 px-3 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl text-[10px] font-bold focus:outline-none focus:ring-2 focus:ring-[#15803d]/20 focus:border-[#15803d] transition-all"
+            title="Date to"
           />
         </div>
       </div>
@@ -582,7 +598,7 @@ export default function PrajaProgressTrackerPage() {
   const [loadingStats, setLoadingStats] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
 
-  const [filters, setFilters] = useState({ schemeId: '', year: '', village: '', status: '', search: '' });
+  const [filters, setFilters] = useState({ schemeId: '', year: '', village: '', status: '', search: '', dateFrom: '', dateTo: '' });
   const [activeChartTab, setActiveChartTab] = useState('schemes');
 
   // Dark mode
@@ -598,6 +614,8 @@ export default function PrajaProgressTrackerPage() {
       if (filters.schemeId) params.set('schemeId', filters.schemeId);
       if (filters.year) params.set('year', filters.year);
       if (filters.village) params.set('village', filters.village);
+      if (filters.dateFrom) params.set('dateFrom', filters.dateFrom);
+      if (filters.dateTo) params.set('dateTo', filters.dateTo);
 
       const [statsRes, analyticsRes, schemesRes] = await Promise.all([
         fetch('/api/praja-stats'),
@@ -622,7 +640,7 @@ export default function PrajaProgressTrackerPage() {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  const resetFilters = () => setFilters({ schemeId: '', year: '', village: '', status: '', search: '' });
+  const resetFilters = () => setFilters({ schemeId: '', year: '', village: '', status: '', search: '', dateFrom: '', dateTo: '' });
 
   const chartConfigs = [
     { id: 'schemes', label: 'Scheme-wise', icon: Layers },
@@ -760,19 +778,30 @@ export default function PrajaProgressTrackerPage() {
                           <ResponsiveContainer width="100%" height="100%">
                             <PieChart>
                               <Pie
-                                data={[
-                                  { name: 'Approved', value: analytics.approvedVsPending.approved },
-                                  { name: 'Pending', value: analytics.approvedVsPending.pending },
-                                  { name: 'Rejected', value: analytics.approvedVsPending.rejected },
-                                ].filter(d => d.value > 0)}
+                                data={(() => {
+                                  const raw = [
+                                    { name: 'Approved', value: analytics.approvedVsPending.approved },
+                                    { name: 'Pending', value: analytics.approvedVsPending.pending },
+                                    { name: 'Rejected', value: analytics.approvedVsPending.rejected },
+                                  ];
+                                  const filtered = raw.filter(d => d.value > 0);
+                                  return filtered.length > 0 ? filtered : [{ name: 'No Data', value: 1 }];
+                                })()}
                                 cx="50%" cy="50%"
                                 innerRadius={80}
                                 outerRadius={130}
                                 paddingAngle={4}
                                 dataKey="value"
-                                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                                label={({ name, percent }) => {
+                                  if (name === 'No Data') return '';
+                                  return `${name} ${(percent * 100).toFixed(0)}%`;
+                                }}
                               >
-                                {PIE_COLORS.slice(0, 3).map((color, i) => <Cell key={i} fill={color} />)}
+                                {(() => {
+                                  const hasData = [analytics.approvedVsPending.approved, analytics.approvedVsPending.pending, analytics.approvedVsPending.rejected].some(v => v > 0);
+                                  if (!hasData) return <Cell fill="#e5e7eb" />;
+                                  return PIE_COLORS.slice(0, 3).map((color, i) => <Cell key={i} fill={color} />);
+                                })()}
                               </Pie>
                               <Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid #e5e7eb' }} />
                             </PieChart>

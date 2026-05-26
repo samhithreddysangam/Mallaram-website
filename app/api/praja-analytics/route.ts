@@ -6,12 +6,23 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const filterScheme = searchParams.get('schemeId');
     const filterYear = searchParams.get('year');
+    const dateFrom = searchParams.get('dateFrom');
+    const dateTo = searchParams.get('dateTo');
 
     // Build date filters
-    const yearFilter = filterYear ? {
+    let yearFilter = filterYear ? {
       gte: new Date(`${filterYear}-01-01`),
       lte: new Date(`${filterYear}-12-31`),
     } : undefined;
+
+    // Date range overrides year filter if both are provided
+    if (dateFrom || dateTo) {
+      yearFilter = {
+        ...(dateFrom ? { gte: new Date(dateFrom) } : {}),
+        ...(dateTo ? { lte: new Date(dateTo + 'T23:59:59.999Z') } : {}),
+      };
+      if (Object.keys(yearFilter).length === 0) yearFilter = undefined;
+    }
 
     // 1. Scheme-wise beneficiary distribution
     const schemeWiseAgg = await prisma.beneficiary.groupBy({

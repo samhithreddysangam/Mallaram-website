@@ -57,8 +57,7 @@ export default function Navigation({ locale }: NavigationProps) {
           </div>
 
           {/* Nav Links (Desktop) */}
-          <div className="hidden xl:flex flex-1 justify-end items-center gap-0.5">
-            {navItems.slice(0, 4).map((item) => (
+          <div className="hidden xl:flex flex-1 justify-end items-center gap-0.5">              {navItems.slice(0, 5).map((item) => (
               <Link
                 key={item.key}
                 href={item.href}
@@ -91,7 +90,7 @@ export default function Navigation({ locale }: NavigationProps) {
           {/* RIGHT: Nav Links & Controls */}
           <div className="flex-1 flex justify-start items-center gap-3">
             <div className="hidden xl:flex items-center gap-0.5">
-              {navItems.slice(4, 8).map((item) => (
+              {navItems.slice(5).map((item) => (
                 <Link
                   key={item.key}
                   href={item.href}
