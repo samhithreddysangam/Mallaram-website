@@ -3,35 +3,41 @@ import Credentials from 'next-auth/providers/credentials';
 import { authConfig } from './auth.config';
 import { prisma } from '@/lib/prisma';
 
+const isDev = process.env.NODE_ENV === 'development';
+
+const log = (...args: any[]) => {
+  if (isDev) console.log(...args);
+};
+
+const logError = (...args: any[]) => {
+  if (isDev) console.error(...args);
+};
+
 export const { auth, signIn, signOut, handlers } = NextAuth({
   ...authConfig,
-  debug: true,
+  // debug is now controlled by authConfig (enabled only in development)
   providers: [
     Credentials({
       async authorize(credentials) {
         const identifier = credentials?.email as string;
         const password = credentials?.password as string;
 
-        console.log('--- Auth Attempt ---');
-        console.log('Identifier:', identifier);
+        log('--- Auth Attempt ---');
         
         if (!identifier || !password) {
-          console.log('Status: Missing credentials');
+          log('Status: Missing credentials');
           return null;
         }
 
         const trimmedIdentifier = identifier.trim().toLowerCase();
-        // Do NOT trim passwords - they can have spaces intentionally
         const passwordToMatch = password;
 
         try {
-          // Find user by email OR phone (allowing phone login in the email field)
           const user = await prisma.user.findFirst({
             where: {
               OR: [
                 { email: trimmedIdentifier },
                 { phone: trimmedIdentifier },
-                // Also check original just in case it's not lowercase in DB
                 { email: identifier.trim() },
                 { phone: identifier.trim() },
               ],
@@ -39,19 +45,16 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
           });
 
           if (!user) {
-            console.log('Status: User not found in DB');
+            log('Status: User not found in DB');
             return null;
           }
 
-          console.log('User found:', user.email || user.phone);
-          console.log('User Role in DB:', user.role);
+          log('User found:', user.email || user.phone);
 
-          // Direct comparison as currently implemented in the seed/user flow
           const passwordsMatch = passwordToMatch === user.password;
-          console.log('Password Match:', passwordsMatch);
 
           if (passwordsMatch) {
-            console.log('Status: Success, Role:', user.role);
+            log('Status: Auth success, Role:', user.role);
             return {
               id: user.id,
               name: user.name,
@@ -59,10 +62,10 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
               role: user.role,
             };
           } else {
-            console.log('Status: Password mismatch');
+            log('Status: Password mismatch');
           }
         } catch (error: any) {
-          console.error('Database/Prisma Error:', error.message);
+          logError('Database Error:', error.message);
           throw error;
         }
 
@@ -70,5 +73,4 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
       },
     }),
   ],
-  // Use callbacks from authConfig
 });

@@ -35,8 +35,12 @@ export default function AdminDashboard() {
   const [editingFund, setEditingFund] = useState<string | null>(null);
   const [newFund, setNewFund] = useState({ label: '', amount: '', description: '', date: new Date().toISOString().split('T')[0], category: '' });
   
+  // Market Prices editing
+  const [editingPrice, setEditingPrice] = useState<string | null>(null);
+  const [priceSearch, setPriceSearch] = useState('');
+  
   // Form States
-  const [newPrice, setNewPrice] = useState({ cropName: '', price: '', unit: 'Quintal' });
+  const [newPrice, setNewPrice] = useState({ cropName: '', price: '', unit: 'Quintal', district: 'Rajanna Sircilla' });
   const [newSlot, setNewSlot] = useState({ 
     date: new Date().toISOString().split('T')[0], 
     startTime: '09:00', 
@@ -144,19 +148,46 @@ export default function AdminDashboard() {
   const handleAddPrice = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch('/api/market-prices', {
-        method: 'POST',
+      const method = editingPrice ? 'PUT' : 'POST';
+      const url = editingPrice 
+        ? `/api/market-prices?id=${editingPrice}`
+        : '/api/market-prices';
+      
+      const res = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newPrice),
       });
       if (res.ok) {
         setShowPriceModal(false);
-        setNewPrice({ cropName: '', price: '', unit: 'Quintal' });
+        setNewPrice({ cropName: '', price: '', unit: 'Quintal', district: 'Rajanna Sircilla' });
+        setEditingPrice(null);
         fetchMarketPrices();
       }
     } catch (error) {
-      console.error('Failed to add price:', error);
+      console.error('Failed to save price:', error);
     }
+  };
+
+  const handleDeletePrice = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this market price entry?')) return;
+    try {
+      const res = await fetch(`/api/market-prices?id=${id}`, { method: 'DELETE' });
+      if (res.ok) fetchMarketPrices();
+    } catch (error) {
+      console.error('Failed to delete price:', error);
+    }
+  };
+
+  const startEditPrice = (price: any) => {
+    setNewPrice({
+      cropName: price.cropName,
+      price: price.price.toString(),
+      unit: price.unit || 'Quintal',
+      district: price.district || 'Rajanna Sircilla',
+    });
+    setEditingPrice(price.id);
+    setShowPriceModal(true);
   };
 
   const handleAddSlot = async (e: React.FormEvent) => {
@@ -337,7 +368,11 @@ export default function AdminDashboard() {
               Add Scheme
             </button>
             <button 
-              onClick={() => setShowPriceModal(true)}
+              onClick={() => {
+                setEditingPrice(null);
+                setNewPrice({ cropName: '', price: '', unit: 'Quintal', district: 'Rajanna Sircilla' });
+                setShowPriceModal(true);
+              }}
               className="px-6 py-3 bg-[#22FF88] text-[#0A0A0A] rounded-2xl text-sm font-bold hover:bg-[#1DE97B] transition-all flex items-center gap-2 shadow-xl shadow-[#22FF88]/20"
             >
               <IndianRupee className="w-4 h-4" />
@@ -381,18 +416,68 @@ export default function AdminDashboard() {
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8 mb-12">
-          {/* Market Prices Section */}
+          {/* Market Prices Section - Redesigned with full CRUD */}
           <div className="lg:col-span-2">
             <div className="bg-white h-full rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden">
-              <div className="p-8 border-b border-gray-50 flex items-center justify-between">
-                <h2 className="text-2xl font-black text-[#0A0A0A] tracking-tighter flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-[#22FF88]/10 flex items-center justify-center text-[#22FF88]">
-                    <IndianRupee className="w-6 h-6" />
+              <div className="p-8 border-b border-gray-50">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                  <div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-2xl bg-[#22FF88]/10 flex items-center justify-center text-[#22FF88]">
+                        <IndianRupee className="w-6 h-6" />
+                      </div>
+                      <h2 className="text-2xl font-black text-[#0A0A0A] tracking-tighter">Market Prices</h2>
+                    </div>
+                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-2 ml-[52px]">Rajanna Sircilla District • Manage crop price data</p>
                   </div>
-                  Market Prices
-                </h2>
-                <div className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Rajanna Sircilla Dist.</div>
+                  <button 
+                    onClick={() => {
+                      setEditingPrice(null);
+                      setNewPrice({ cropName: '', price: '', unit: 'Quintal', district: 'Rajanna Sircilla' });
+                      setShowPriceModal(true);
+                    }}
+                    className="px-6 py-3 bg-[#22FF88] text-[#0A0A0A] rounded-2xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all flex items-center gap-2 shadow-xl shadow-[#22FF88]/20"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add Price
+                  </button>
+                </div>
+
+                {/* Search Bar */}
+                <div className="relative group">
+                  <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-[#22FF88] transition-colors" />
+                  <input
+                    type="text"
+                    value={priceSearch}
+                    onChange={(e) => setPriceSearch(e.target.value)}
+                    placeholder="Search crops..."
+                    className="w-full pl-12 pr-6 py-3.5 bg-gray-50 border border-gray-100 rounded-2xl text-sm focus:outline-none focus:ring-4 focus:ring-[#22FF88]/10 focus:border-[#22FF88] transition-all font-bold"
+                  />
+                </div>
+
+                {/* Stats Row */}
+                {marketPrices.length > 0 && (
+                  <div className="grid grid-cols-3 gap-4 mt-6">
+                    <div className="p-4 rounded-2xl bg-green-50 border border-green-100">
+                      <div className="text-[10px] font-black text-green-600 uppercase tracking-widest mb-1">Total Crops</div>
+                      <div className="text-xl font-black text-[#0A0A0A]">{marketPrices.length}</div>
+                    </div>
+                    <div className="p-4 rounded-2xl bg-green-50 border border-green-100">
+                      <div className="text-[10px] font-black text-green-600 uppercase tracking-widest mb-1">Avg Price</div>
+                      <div className="text-xl font-black text-[#0A0A0A]">
+                        ₹{Math.round(marketPrices.reduce((s: number, p: any) => s + p.price, 0) / marketPrices.length).toLocaleString()}
+                      </div>
+                    </div>
+                    <div className="p-4 rounded-2xl bg-blue-50 border border-blue-100">
+                      <div className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-1">Last Updated</div>
+                      <div className="text-sm font-black text-[#0A0A0A]">
+                        {new Date(Math.max(...marketPrices.map((p: any) => new Date(p.date).getTime()))).toLocaleDateString()}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
+
               <div className="overflow-x-auto">
                 <table className="w-full text-left">
                   <thead>
@@ -400,22 +485,64 @@ export default function AdminDashboard() {
                       <th className="px-8 py-5">Crop Name</th>
                       <th className="px-8 py-5">Price / Quintal</th>
                       <th className="px-8 py-5">Last Updated</th>
+                      <th className="px-8 py-5 text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-50">
                     {marketPrices.length === 0 ? (
-                      <tr><td colSpan={3} className="px-8 py-12 text-center text-gray-300 font-bold italic">No pricing data synced.</td></tr>
-                    ) : marketPrices.map((price) => (
-                      <tr key={price.id} className="hover:bg-gray-50/30 transition-colors group">
-                        <td className="px-8 py-5 font-black text-[#0A0A0A]">{price.cropName}</td>
-                        <td className="px-8 py-5">
-                          <span className="px-4 py-2 bg-green-50 text-green-600 rounded-xl font-black text-lg">
-                            ₹{price.price.toLocaleString()}
-                          </span>
-                        </td>
-                        <td className="px-8 py-5 text-xs font-bold text-gray-400">{new Date(price.date).toLocaleDateString()}</td>
-                      </tr>
-                    ))}
+                      <tr><td colSpan={4} className="px-8 py-12 text-center text-gray-300 font-bold italic">No pricing data synced.</td></tr>
+                    ) : (() => {
+                      const filtered = priceSearch 
+                        ? marketPrices.filter((p: any) => p.cropName.toLowerCase().includes(priceSearch.toLowerCase()))
+                        : marketPrices;
+                      
+                      return filtered.length === 0 ? (
+                        <tr><td colSpan={4} className="px-8 py-12 text-center text-gray-300 font-bold italic">No crops match your search.</td></tr>
+                      ) : filtered.map((price: any) => (
+                        <tr key={price.id} className="hover:bg-gray-50/30 transition-colors group">
+                          <td className="px-8 py-5">
+                            <div className="flex items-center gap-3">
+                              <div className="w-9 h-9 rounded-xl bg-[#22FF88]/10 flex items-center justify-center text-[#0A0A0A] font-black">
+                                {price.cropName[0]}
+                              </div>
+                              <div className="font-black text-[#0A0A0A]">{price.cropName}</div>
+                            </div>
+                          </td>
+                          <td className="px-8 py-5">
+                            <span className="px-4 py-2 bg-green-50 text-green-600 rounded-xl font-black text-lg">
+                              ₹{price.price.toLocaleString()}
+                            </span>
+                            <span className="ml-2 text-[9px] font-bold text-gray-400 uppercase">/{price.unit || 'Quintal'}</span>
+                          </td>
+                          <td className="px-8 py-5">
+                            <div className="text-xs font-bold text-gray-400">
+                              {new Date(price.date).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
+                            </div>
+                            <div className="text-[9px] font-bold text-gray-300 uppercase">
+                              {new Date(price.date).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
+                            </div>
+                          </td>
+                          <td className="px-8 py-5 text-right">
+                            <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <button 
+                                onClick={() => startEditPrice(price)}
+                                className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all"
+                                title="Edit price"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </button>
+                              <button 
+                                onClick={() => handleDeletePrice(price.id)}
+                                className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                                title="Delete price"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ));
+                    })()}
                   </tbody>
                 </table>
               </div>
@@ -952,37 +1079,91 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {/* Market Price Modal */}
+        {/* Market Price Modal - Redesigned with edit/create + more fields */}
         {showPriceModal && (
           <div className="fixed inset-0 bg-[#0A0A0A]/90 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
-            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-[2.5rem] shadow-2xl p-10 w-full max-w-md relative">
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-[2.5rem] shadow-2xl p-10 w-full max-w-lg relative">
               <button onClick={() => setShowPriceModal(false)} className="absolute top-8 right-8 text-gray-300 hover:text-[#0A0A0A] transition-colors"><X className="w-6 h-6"/></button>
-              <h3 className="text-3xl font-black text-[#0A0A0A] mb-8 tracking-tighter">Update Market Pricing</h3>
+              <h3 className="text-3xl font-black text-[#0A0A0A] mb-2 tracking-tighter">
+                {editingPrice ? 'Update Price' : 'Add Market Price'}
+              </h3>
+              <p className="text-gray-400 mb-8 font-medium">
+                {editingPrice ? 'Update crop pricing information' : 'Register a new crop price for the market dashboard'}
+              </p>
+              
               <form onSubmit={handleAddPrice} className="space-y-6">
-                <div>
-                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Crop Specification</label>
-                  <input
-                    type="text"
-                    value={newPrice.cropName}
-                    onChange={(e) => setNewPrice({ ...newPrice, cropName: e.target.value })}
-                    className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-[#22FF88]/10 focus:border-[#22FF88] font-bold"
-                    placeholder="e.g., Paddy (Grade A)"
-                    required
-                  />
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="col-span-2">
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Crop Name</label>
+                    <input
+                      type="text"
+                      value={newPrice.cropName}
+                      onChange={(e) => setNewPrice({ ...newPrice, cropName: e.target.value })}
+                      className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-[#22FF88]/10 focus:border-[#22FF88] font-bold"
+                      placeholder="e.g., Paddy (Grade A)"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Price (₹)</label>
+                    <input
+                      type="number"
+                      value={newPrice.price}
+                      onChange={(e) => setNewPrice({ ...newPrice, price: e.target.value })}
+                      className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-[#22FF88]/10 focus:border-[#22FF88] font-bold"
+                      placeholder="2203"
+                      min="0"
+                      step="0.01"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Unit</label>
+                    <select
+                      value={newPrice.unit}
+                      onChange={(e) => setNewPrice({ ...newPrice, unit: e.target.value })}
+                      className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-[#22FF88]/10 focus:border-[#22FF88] font-bold"
+                    >
+                      <option value="Quintal">Quintal</option>
+                      <option value="Kg">Kg</option>
+                      <option value="Ton">Ton</option>
+                      <option value="Bag">Bag</option>
+                    </select>
+                  </div>
+                  <div className="col-span-2">
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">District</label>
+                    <select
+                      value={newPrice.district}
+                      onChange={(e) => setNewPrice({ ...newPrice, district: e.target.value })}
+                      className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-[#22FF88]/10 focus:border-[#22FF88] font-bold"
+                    >
+                      <option value="Rajanna Sircilla">Rajanna Sircilla</option>
+                      <option value="Karimnagar">Karimnagar</option>
+                      <option value="Jagtial">Jagtial</option>
+                      <option value="Peddapalli">Peddapalli</option>
+                      <option value="Warangal">Warangal</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Price Index (₹)</label>
-                  <input
-                    type="number"
-                    value={newPrice.price}
-                    onChange={(e) => setNewPrice({ ...newPrice, price: e.target.value })}
-                    className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-[#22FF88]/10 focus:border-[#22FF88] font-bold"
-                    placeholder="2203"
-                    required
-                  />
+
+                <div className="p-4 bg-[#22FF88]/5 rounded-2xl border border-[#22FF88]/10">
+                  <div className="flex items-center gap-2 text-[10px] font-black text-[#22FF88] uppercase tracking-widest mb-1">
+                    <IndianRupee className="w-3 h-3" />
+                    Market Info
+                  </div>
+                  <p className="text-xs font-medium text-gray-400">
+                    {editingPrice 
+                      ? 'Saving will update the price and refresh the timestamp with current date.'
+                      : 'New prices will appear immediately on the admin dashboard and public market prices widget.'}
+                  </p>
                 </div>
-                <button type="submit" className="w-full py-5 bg-[#22FF88] text-[#0A0A0A] rounded-[1.5rem] font-black uppercase tracking-widest hover:scale-[1.02] transition-all shadow-xl shadow-[#22FF88]/20 mt-4">
-                  Broadcast New Price
+
+                <button 
+                  type="submit" 
+                  className="w-full py-5 bg-[#22FF88] text-[#0A0A0A] rounded-[1.5rem] font-black uppercase tracking-widest hover:scale-[1.02] transition-all shadow-xl shadow-[#22FF88]/20"
+                >
+                  {editingPrice ? 'Save Changes' : 'Publish Price'}
                 </button>
               </form>
             </motion.div>

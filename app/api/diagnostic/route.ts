@@ -1,15 +1,31 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-export async function GET() {
+export async function GET(request: Request) {
+  const requestUrl = new URL(request.url);
+  const deployedHost = requestUrl.host;
+  const deployedOrigin = requestUrl.origin;
+  const configuredAuthUrl = process.env.AUTH_URL || 'not set';
+  
+  const authUrlMismatch = configuredAuthUrl !== 'not set' && 
+    new URL(configuredAuthUrl).host !== deployedHost;
+
   const status: any = {
     timestamp: new Date().toISOString(),
     database: 'unknown',
     adminUser: 'unknown',
+    // Host detection - crucial for deployment debugging
+    deployedHost,
+    deployedOrigin,
     env: {
       hasAuthSecret: !!process.env.AUTH_SECRET,
+      authSecretLength: process.env.AUTH_SECRET?.length || 0,
       hasAuthUrl: !!process.env.AUTH_URL,
-      authUrl: process.env.AUTH_URL || 'not set',
+      authUrl: configuredAuthUrl,
+      authUrlMismatch,
+      authUrlWarning: authUrlMismatch 
+        ? `MISMATCH: AUTH_URL is "${configuredAuthUrl}" but this server is running on "${deployedOrigin}". Update AUTH_URL to "${deployedOrigin}".`
+        : undefined,
       hasDatabaseUrl: !!process.env.DATABASE_URL,
       hasDirectUrl: !!process.env.DIRECT_URL,
       nodeEnv: process.env.NODE_ENV,

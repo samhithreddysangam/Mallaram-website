@@ -179,13 +179,24 @@ export default function LoginPage() {
               
               {showDebug && (
                 <div className="mt-4 p-4 bg-gray-50 rounded-xl text-left text-[10px] font-mono space-y-2 border border-gray-200">
-                  <p className="text-primary font-bold">Technical Help:</p>
-                  <p>Status: {String(status)}</p>
+                  <p className="text-primary font-bold">Deployment Diagnostics:</p>
+                  <p>Session: {String(status)}</p>
                   <p>Role: {String((session as any)?.user?.role || 'None')}</p>
                   <p>Locale: {String(locale)}</p>
+                  <p>Host: {typeof window !== 'undefined' ? window.location.host : 'SSR'}</p>
+                  <p>AUTH_URL: {typeof window !== 'undefined' ? (window.location.origin !== 'http://localhost:3000' ? '⚠️ Check config' : '✓ Local') : 'SSR'}</p>
+                  
+                  <div className="pt-3 space-y-2">
+                    <p className="text-primary font-bold">Common Fixes:</p>
+                    <p className="text-gray-500">1. Ensure AUTH_URL points to your production domain</p>
+                    <p className="text-gray-500">2. Ensure AUTH_SECRET is set (run: npx auth secret)</p>
+                    <p className="text-gray-500">3. Verify admin user exists in production DB</p>
+                    <p className="text-gray-500">4. Check <a href="/api/diagnostic" target="_blank" className="text-primary underline font-bold">/api/diagnostic</a> for config status</p>
+                  </div>
+                  
                   <div className="pt-2 flex gap-2">
-                    <a href="/api/diagnostic" target="_blank" className="px-2 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100 no-underline">Check My Account</a>
-                    <button type="button" onClick={() => window.location.reload()} className="px-2 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100">Reload Page</button>
+                    <a href="/api/diagnostic" target="_blank" className="px-3 py-1.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 no-underline font-bold">Run Diagnostics</a>
+                    <button type="button" onClick={() => window.location.reload()} className="px-3 py-1.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 font-bold">Reload Page</button>
                   </div>
                 </div>
               )}
