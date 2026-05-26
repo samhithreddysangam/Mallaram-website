@@ -6,7 +6,7 @@ import { Locale, getDictionary } from '@/lib/i18n';
 import Navigation from '@/components/Navigation/Navigation';
 import Footer from '@/components/Footer/Footer';
 import { motion } from 'framer-motion';
-import { Search, Database, Upload, Check, X, IndianRupee, Plus, Bell, MapPin, Calendar, Clock, Trash2, ExternalLink, Edit } from 'lucide-react';
+import { Search, Database, Upload, Check, X, IndianRupee, Plus, Bell, MapPin, Calendar, Clock, Trash2, ExternalLink, Edit, Image, Landmark, DollarSign, Tag } from 'lucide-react';
 import { WeatherWidget } from '@/components/Agriculture/AgriWidgets';
 
 export default function AdminDashboard() {
@@ -22,6 +22,18 @@ export default function AdminDashboard() {
   const [showPriceModal, setShowPriceModal] = useState(false);
   const [showSlotModal, setShowSlotModal] = useState(false);
   const [showSchemeModal, setShowSchemeModal] = useState(false);
+  
+  // Gallery
+  const [galleryImages, setGalleryImages] = useState<any[]>([]);
+  const [showGalleryModal, setShowGalleryModal] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [galleryForm, setGalleryForm] = useState({ alt: '', description: '', file: null as File | null });
+  
+  // Fund Usage
+  const [fundRecords, setFundRecords] = useState<any[]>([]);
+  const [showFundModal, setShowFundModal] = useState(false);
+  const [editingFund, setEditingFund] = useState<string | null>(null);
+  const [newFund, setNewFund] = useState({ label: '', amount: '', description: '', date: new Date().toISOString().split('T')[0], category: '' });
   
   // Form States
   const [newPrice, setNewPrice] = useState({ cropName: '', price: '', unit: 'Quintal' });
@@ -74,6 +86,26 @@ export default function AdminDashboard() {
     }
   };
 
+  const fetchGallery = async () => {
+    try {
+      const res = await fetch('/api/gallery');
+      const data = await res.json();
+      setGalleryImages(data);
+    } catch (error) {
+      console.error('Failed to fetch gallery:', error);
+    }
+  };
+
+  const fetchFundUsage = async () => {
+    try {
+      const res = await fetch('/api/fund-usage');
+      const data = await res.json();
+      setFundRecords(data);
+    } catch (error) {
+      console.error('Failed to fetch fund usage:', error);
+    }
+  };
+
   const fetchSchemes = async () => {
     try {
       const res = await fetch('/api/schemes');
@@ -91,7 +123,9 @@ export default function AdminDashboard() {
       fetchBookings(),
       fetchMarketPrices(),
       fetchSlots(),
-      fetchSchemes()
+      fetchSchemes(),
+      fetchGallery(),
+      fetchFundUsage()
     ]);
     setLoading(false);
   };
@@ -172,6 +206,89 @@ export default function AdminDashboard() {
     } catch (error) {
       console.error('Failed to delete scheme:', error);
     }
+  };
+
+  const handleGalleryUpload = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!galleryForm.file) return;
+    
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', galleryForm.file);
+      formData.append('alt', galleryForm.alt || 'Mallaram Gallery');
+      formData.append('description', galleryForm.description || '');
+
+      const res = await fetch('/api/gallery', {
+        method: 'POST',
+        body: formData,
+      });
+      if (res.ok) {
+        setShowGalleryModal(false);
+        setGalleryForm({ alt: '', description: '', file: null });
+        fetchGallery();
+      }
+    } catch (error) {
+      console.error('Failed to upload image:', error);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleDeleteGalleryImage = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this image?')) return;
+    try {
+      const res = await fetch(`/api/gallery?id=${id}`, { method: 'DELETE' });
+      if (res.ok) fetchGallery();
+    } catch (error) {
+      console.error('Failed to delete image:', error);
+    }
+  };
+
+  const handleAddFund = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const method = editingFund ? 'PUT' : 'POST';
+      const body = editingFund 
+        ? { id: editingFund, ...newFund }
+        : newFund;
+      
+      const res = await fetch('/api/fund-usage', {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (res.ok) {
+        setShowFundModal(false);
+        setNewFund({ label: '', amount: '', description: '', date: new Date().toISOString().split('T')[0], category: '' });
+        setEditingFund(null);
+        fetchFundUsage();
+      }
+    } catch (error) {
+      console.error('Failed to save fund record:', error);
+    }
+  };
+
+  const handleDeleteFund = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this fund record?')) return;
+    try {
+      const res = await fetch(`/api/fund-usage?id=${id}`, { method: 'DELETE' });
+      if (res.ok) fetchFundUsage();
+    } catch (error) {
+      console.error('Failed to delete fund record:', error);
+    }
+  };
+
+  const startEditFund = (record: any) => {
+    setNewFund({
+      label: record.label,
+      amount: record.amount.toString(),
+      description: record.description || '',
+      date: new Date(record.date).toISOString().split('T')[0],
+      category: record.category || '',
+    });
+    setEditingFund(record.id);
+    setShowFundModal(true);
   };
 
   const startEditScheme = (scheme: any) => {
@@ -453,6 +570,179 @@ export default function AdminDashboard() {
           </div>
         </div>
 
+        {/* Gallery Management Section */}
+        <div className="mb-12">
+          <div className="bg-white rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 p-8 overflow-hidden">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+              <div>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-green-50 flex items-center justify-center">
+                    <Image className="w-5 h-5 text-[#15803d]" />
+                  </div>
+                  <h3 className="text-2xl font-black text-[#0A0A0A] tracking-tighter">Gallery Manager</h3>
+                </div>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-2 ml-[52px]">Upload & manage village photos</p>
+              </div>
+              <button 
+                onClick={() => setShowGalleryModal(true)}
+                className="px-6 py-3 bg-[#15803d] text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all flex items-center gap-2 shadow-xl shadow-[#15803d]/20"
+              >
+                <Upload className="w-4 h-4" />
+                Upload Photo
+              </button>
+            </div>
+
+            {galleryImages.length === 0 ? (
+              <div className="text-center py-16 text-gray-300 font-bold italic">
+                No photos uploaded yet. Click "Upload Photo" to add village photos.
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                {galleryImages.map((img) => (
+                  <div key={img.id} className="relative group aspect-[4/5] rounded-2xl overflow-hidden bg-gray-50 border border-gray-100">
+                    <img 
+                      src={img.url} 
+                      alt={img.alt || 'Gallery'} 
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300" />
+                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button 
+                        onClick={() => handleDeleteGalleryImage(img.id)}
+                        className="p-2 bg-white/90 backdrop-blur-sm rounded-xl text-red-600 hover:bg-red-50 transition-all shadow-lg"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                    <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
+                      <p className="text-white text-[10px] font-bold truncate">{img.alt || 'Mallaram Gallery'}</p>
+                      <p className="text-white/60 text-[8px]">{new Date(img.createdAt).toLocaleDateString()}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Fund Usage Management Section */}
+        <div className="mb-12">
+          <div className="bg-white rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 p-8 overflow-hidden">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+              <div>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-amber-50 flex items-center justify-center">
+                    <Landmark className="w-5 h-5 text-amber-600" />
+                  </div>
+                  <h3 className="text-2xl font-black text-[#0A0A0A] tracking-tighter">Fund Usage Tracker</h3>
+                </div>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-2 ml-[52px]">Record village fund expenditures with labels</p>
+              </div>
+              <button 
+                onClick={() => {
+                  setEditingFund(null);
+                  setNewFund({ label: '', amount: '', description: '', date: new Date().toISOString().split('T')[0], category: '' });
+                  setShowFundModal(true);
+                }}
+                className="px-6 py-3 bg-amber-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all flex items-center gap-2 shadow-xl shadow-amber-600/20"
+              >
+                <Plus className="w-4 h-4" />
+                Add Fund Entry
+              </button>
+            </div>
+
+            {fundRecords.length === 0 ? (
+              <div className="text-center py-16 text-gray-300 font-bold italic">
+                No fund usage records yet. Click "Add Fund Entry" to track village expenditures.
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="bg-amber-50/50 text-[10px] text-gray-400 font-black uppercase tracking-widest">
+                      <th className="px-6 py-4">Label / Purpose</th>
+                      <th className="px-6 py-4">Category</th>
+                      <th className="px-6 py-4">Amount</th>
+                      <th className="px-6 py-4">Date</th>
+                      <th className="px-6 py-4">Description</th>
+                      <th className="px-6 py-4 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50">
+                    {fundRecords.map((record) => (
+                      <tr key={record.id} className="hover:bg-amber-50/20 transition-colors group">
+                        <td className="px-6 py-4 font-black text-[#0A0A0A]">{record.label}</td>
+                        <td className="px-6 py-4">
+                          {record.category ? (
+                            <span className="px-3 py-1 bg-amber-100 text-amber-700 rounded-lg text-[9px] font-black uppercase tracking-widest">
+                              {record.category}
+                            </span>
+                          ) : (
+                            <span className="text-gray-300 text-[10px] font-bold">—</span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="font-black text-lg text-[#0A0A0A]">
+                            ₹{record.amount.toLocaleString()}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="text-xs font-bold text-gray-500">
+                            {new Date(record.date).toLocaleDateString()}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="text-xs font-medium text-gray-400 line-clamp-1">
+                            {record.description || '—'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button 
+                              onClick={() => startEditFund(record)}
+                              className="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </button>
+                            <button 
+                              onClick={() => handleDeleteFund(record.id)}
+                              className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {/* Summary Cards */}
+            {fundRecords.length > 0 && (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-8 pt-8 border-t border-gray-100">
+                <div className="p-6 rounded-2xl bg-amber-50 border border-amber-100">
+                  <div className="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-2">Total Recorded</div>
+                  <div className="text-2xl font-black text-[#0A0A0A]">
+                    ₹{fundRecords.reduce((sum: number, r: any) => sum + r.amount, 0).toLocaleString()}
+                  </div>
+                </div>
+                <div className="p-6 rounded-2xl bg-green-50 border border-green-100">
+                  <div className="text-[10px] font-black text-green-600 uppercase tracking-widest mb-2">Total Entries</div>
+                  <div className="text-2xl font-black text-[#0A0A0A]">{fundRecords.length}</div>
+                </div>
+                <div className="p-6 rounded-2xl bg-blue-50 border border-blue-100">
+                  <div className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-2">Categories</div>
+                  <div className="text-2xl font-black text-[#0A0A0A]">
+                    {new Set(fundRecords.map((r: any) => r.category).filter(Boolean)).size}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* Main Booking Table */}
         <div className="bg-white rounded-[3rem] shadow-2xl shadow-gray-200/50 border border-gray-100 overflow-hidden">
           <div className="p-8 lg:p-10 border-b border-gray-50 flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -717,6 +1007,140 @@ export default function AdminDashboard() {
           </div>
         )}
       </div>
+
+        {/* Gallery Upload Modal */}
+        {showGalleryModal && (
+          <div className="fixed inset-0 bg-[#0A0A0A]/90 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-[2.5rem] shadow-2xl p-10 w-full max-w-md relative">
+              <button onClick={() => setShowGalleryModal(false)} className="absolute top-8 right-8 text-gray-300 hover:text-[#0A0A0A] transition-colors"><X className="w-6 h-6"/></button>
+              <h3 className="text-3xl font-black text-[#0A0A0A] mb-2 tracking-tighter">Upload Gallery Photo</h3>
+              <p className="text-gray-400 mb-8 font-medium">Add a new photo to the village gallery</p>
+              
+              <form onSubmit={handleGalleryUpload} className="space-y-6">
+                <div>
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Photo File</label>
+                  <div className="relative">
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,image/gif"
+                      onChange={(e) => setGalleryForm({ ...galleryForm, file: e.target.files?.[0] || null })}
+                      className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-[#15803d]/10 focus:border-[#15803d] font-bold file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-[#15803d]/10 file:text-[#15803d] file:font-black file:text-[10px] file:uppercase file:tracking-widest hover:file:bg-[#15803d]/20"
+                      required
+                    />
+                  </div>
+                  <p className="text-[10px] text-gray-400 font-medium mt-2">JPEG, PNG, WebP, or GIF. Max 10MB.</p>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Alt Text / Label</label>
+                  <input
+                    type="text"
+                    value={galleryForm.alt}
+                    onChange={(e) => setGalleryForm({ ...galleryForm, alt: e.target.value })}
+                    className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-[#15803d]/10 focus:border-[#15803d] font-bold"
+                    placeholder="e.g., Mallaram Temple Festival 2026"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Short Description</label>
+                  <textarea
+                    value={galleryForm.description}
+                    onChange={(e) => setGalleryForm({ ...galleryForm, description: e.target.value })}
+                    className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-[#15803d]/10 focus:border-[#15803d] font-bold min-h-[80px]"
+                    placeholder="What is this photo about?"
+                  />
+                </div>
+                <button 
+                  type="submit" 
+                  disabled={uploading || !galleryForm.file}
+                  className="w-full py-5 bg-[#15803d] text-white rounded-[1.5rem] font-black uppercase tracking-widest hover:scale-[1.02] transition-all shadow-xl shadow-[#15803d]/20 disabled:opacity-50 disabled:cursor-not-allowed mt-4"
+                >
+                  {uploading ? 'Uploading...' : 'Upload to Gallery'}
+                </button>
+              </form>
+            </motion.div>
+          </div>
+        )}
+
+        {/* Fund Usage Modal */}
+        {showFundModal && (
+          <div className="fixed inset-0 bg-[#0A0A0A]/90 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-[2.5rem] shadow-2xl p-10 w-full max-w-md relative">
+              <button onClick={() => setShowFundModal(false)} className="absolute top-8 right-8 text-gray-300 hover:text-[#0A0A0A] transition-colors"><X className="w-6 h-6"/></button>
+              <h3 className="text-3xl font-black text-[#0A0A0A] mb-2 tracking-tighter">
+                {editingFund ? 'Update Fund Entry' : 'Add Fund Usage'}
+              </h3>
+              <p className="text-gray-400 mb-8 font-medium">Record how village funds were used</p>
+              
+              <form onSubmit={handleAddFund} className="space-y-6">
+                <div>
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Label / Purpose</label>
+                  <input
+                    type="text"
+                    value={newFund.label}
+                    onChange={(e) => setNewFund({ ...newFund, label: e.target.value })}
+                    className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 font-bold"
+                    placeholder="e.g., CC Road Construction Ward 3"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Amount (₹)</label>
+                  <input
+                    type="number"
+                    value={newFund.amount}
+                    onChange={(e) => setNewFund({ ...newFund, amount: e.target.value })}
+                    className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 font-bold"
+                    placeholder="1250000"
+                    min="0"
+                    required
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Date</label>
+                    <input
+                      type="date"
+                      value={newFund.date}
+                      onChange={(e) => setNewFund({ ...newFund, date: e.target.value })}
+                      className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 font-bold"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Category</label>
+                    <select
+                      value={newFund.category}
+                      onChange={(e) => setNewFund({ ...newFund, category: e.target.value })}
+                      className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 font-bold"
+                    >
+                      <option value="">Select category</option>
+                      <option value="Infrastructure">Infrastructure</option>
+                      <option value="Education">Education</option>
+                      <option value="Healthcare">Healthcare</option>
+                      <option value="Agriculture">Agriculture</option>
+                      <option value="Sanitation">Sanitation</option>
+                      <option value="Water">Water</option>
+                      <option value="Electricity">Electricity</option>
+                      <option value="Emergency">Emergency</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Full Description</label>
+                  <textarea
+                    value={newFund.description}
+                    onChange={(e) => setNewFund({ ...newFund, description: e.target.value })}
+                    className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 font-bold min-h-[100px]"
+                    placeholder="Detailed description of how the funds were used..."
+                  />
+                </div>
+                <button type="submit" className="w-full py-5 bg-amber-600 text-white rounded-[1.5rem] font-black uppercase tracking-widest hover:scale-[1.02] transition-all shadow-xl shadow-amber-600/20 mt-4">
+                  {editingFund ? 'Save Changes' : 'Record Fund Usage'}
+                </button>
+              </form>
+            </motion.div>
+          </div>
+        )}
 
       <Footer locale={locale} />
     </main>

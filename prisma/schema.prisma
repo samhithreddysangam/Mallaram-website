@@ -94,3 +94,22 @@ model Scheme {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }
+
+model GalleryImage {
+  id            String    @id @default(cuid())
+  url           String
+  alt           String?
+  description   String?
+  createdAt     DateTime  @default(now())
+}
+
+model FundUsage {
+  id            String    @id @default(cuid())
+  label         String
+  amount        Float
+  description   String?
+  date          DateTime  @default(now())
+  category      String?   // e.g., Infrastructure, Education, Healthcare
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
