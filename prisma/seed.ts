@@ -141,6 +141,54 @@ async function main() {
     });
   }
 
+  // Create village officials
+  console.log('Seeding village officials...');
+  const officials = [
+    {
+      name: 'Shri Aadi Srinivas',
+      title: 'Hon\'ble MLA, Vemulawada',
+      description: 'Serving the constituency with dedication and commitment to public welfare and development.',
+      order: 1,
+      active: true,
+    },
+    {
+      name: 'Smt Garima Agarwal, IAS',
+      title: 'Hon\'ble Collector, Rajanna Sircilla District',
+      description: 'Leading district administration with a vision for inclusive growth and good governance.',
+      order: 2,
+      active: true,
+    },
+    {
+      name: 'Sangam Arpitha Reddy',
+      title: 'Sarpanch, Mallaram Gram Panchayat',
+      description: 'Leading the village towards digital transformation and sustainable development with community participation.',
+      order: 3,
+      active: true,
+    },
+    {
+      name: 'Shri A. Revanth Reddy',
+      title: 'Hon\'ble Chief Minister, Telangana',
+      description: 'Under the leadership of Revanth Reddy, our village has taken a crucial step towards transparent and accountable governance through Digital Telangana.',
+      order: 4,
+      active: true,
+    },
+    {
+      name: 'Smt D. Anasuya Seethakka (Dansari Anasuya)',
+      title: 'Minister of PR & RD',
+      description: 'Working tirelessly for rural development and empowerment of Panchayati Raj institutions across Telangana.',
+      order: 5,
+      active: true,
+    },
+  ];
+
+  // Clear existing officials to ensure correct order on re-seed
+  await prisma.villageOfficial.deleteMany({});
+
+  for (const official of officials) {
+    await prisma.villageOfficial.create({ data: official });
+  }
+  console.log(`Seeded ${officials.length} village official(s).`);
+
   // Create sample fund usage records
   console.log('Seeding fund usage records...');
   const fundRecords = [
