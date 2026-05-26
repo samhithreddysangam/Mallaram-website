@@ -6,7 +6,7 @@ import { Locale, getDictionary } from '@/lib/i18n';
 import Navigation from '@/components/Navigation/Navigation';
 import Footer from '@/components/Footer/Footer';
 import { motion } from 'framer-motion';
-import { Search, Database, Upload, Check, X, IndianRupee, Plus, Bell, MapPin, Calendar, Clock, Trash2, ExternalLink, Edit, Image, Landmark, DollarSign, Tag } from 'lucide-react';
+import { Search, Database, Upload, Check, X, IndianRupee, Plus, Bell, MapPin, Calendar, Clock, Trash2, ExternalLink, Edit, Image, Landmark, DollarSign, Tag, Activity, Droplets } from 'lucide-react';
 import { WeatherWidget } from '@/components/Agriculture/AgriWidgets';
 
 export default function AdminDashboard() {
@@ -38,6 +38,24 @@ export default function AdminDashboard() {
   // Market Prices editing
   const [editingPrice, setEditingPrice] = useState<string | null>(null);
   const [priceSearch, setPriceSearch] = useState('');
+  
+  // Village Metrics
+  const [villageMetrics, setVillageMetrics] = useState<any[]>([]);
+  const [showVillageMetricModal, setShowVillageMetricModal] = useState(false);
+  const [editingVillageMetric, setEditingVillageMetric] = useState<string | null>(null);
+  const [newVillageMetric, setNewVillageMetric] = useState({ label: '', value: '', status: 'Active', icon: 'Activity', color: 'text-green-500', bg: 'bg-green-500/10', order: '0' });
+  
+  // Village Performance
+  const [villagePerformance, setVillagePerformance] = useState<any[]>([]);
+  const [showVillagePerfModal, setShowVillagePerfModal] = useState(false);
+  const [editingVillagePerf, setEditingVillagePerf] = useState<string | null>(null);
+  const [newVillagePerf, setNewVillagePerf] = useState({ label: '', value: '', percentage: '85', order: '0' });
+  
+  // Water Sources
+  const [waterSources, setWaterSources] = useState<any[]>([]);
+  const [showWaterSourceModal, setShowWaterSourceModal] = useState(false);
+  const [editingWaterSource, setEditingWaterSource] = useState<string | null>(null);
+  const [newWaterSource, setNewWaterSource] = useState({ label: '', level: '50', status: 'Normal', icon: 'Droplets', order: '0' });
   
   // Form States
   const [newPrice, setNewPrice] = useState({ cropName: '', price: '', unit: 'Quintal', district: 'Rajanna Sircilla' });
@@ -120,6 +138,36 @@ export default function AdminDashboard() {
     }
   };
 
+  const fetchVillageMetrics = async () => {
+    try {
+      const res = await fetch('/api/village-metrics');
+      const data = await res.json();
+      setVillageMetrics(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error('Failed to fetch village metrics:', error);
+    }
+  };
+
+  const fetchVillagePerformance = async () => {
+    try {
+      const res = await fetch('/api/village-performance');
+      const data = await res.json();
+      setVillagePerformance(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error('Failed to fetch village performance:', error);
+    }
+  };
+
+  const fetchWaterSources = async () => {
+    try {
+      const res = await fetch('/api/water-sources');
+      const data = await res.json();
+      setWaterSources(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error('Failed to fetch water sources:', error);
+    }
+  };
+
   const fetchData = async () => {
     // loading is true by default, so we don't need to set it here
     // unless we want to show loading on subsequent refreshes
@@ -129,7 +177,10 @@ export default function AdminDashboard() {
       fetchSlots(),
       fetchSchemes(),
       fetchGallery(),
-      fetchFundUsage()
+      fetchFundUsage(),
+      fetchVillageMetrics(),
+      fetchVillagePerformance(),
+      fetchWaterSources()
     ]);
     setLoading(false);
   };
@@ -336,6 +387,142 @@ export default function AdminDashboard() {
     } catch (error) {
       console.error('Failed to delete slot:', error);
     }
+  };
+
+  // Village Metric CRUD
+  const handleAddVillageMetric = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const method = editingVillageMetric ? 'PUT' : 'POST';
+      const url = editingVillageMetric ? `/api/village-metrics?id=${editingVillageMetric}` : '/api/village-metrics';
+      const body = { ...newVillageMetric, order: parseInt(newVillageMetric.order) || 0 };
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (res.ok) {
+        setShowVillageMetricModal(false);
+        setNewVillageMetric({ label: '', value: '', status: 'Active', icon: 'Activity', color: 'text-green-500', bg: 'bg-green-500/10', order: '0' });
+        setEditingVillageMetric(null);
+        fetchVillageMetrics();
+      }
+    } catch (error) {
+      console.error('Failed to save village metric:', error);
+    }
+  };
+
+  const handleDeleteVillageMetric = async (id: string) => {
+    if (!confirm('Delete this metric from the Village Overview section?')) return;
+    try {
+      const res = await fetch(`/api/village-metrics?id=${id}`, { method: 'DELETE' });
+      if (res.ok) fetchVillageMetrics();
+    } catch (error) {
+      console.error('Failed to delete village metric:', error);
+    }
+  };
+
+  const startEditVillageMetric = (metric: any) => {
+    setNewVillageMetric({
+      label: metric.label,
+      value: metric.value,
+      status: metric.status || 'Active',
+      icon: metric.icon || 'Activity',
+      color: metric.color || 'text-green-500',
+      bg: metric.bg || 'bg-green-500/10',
+      order: metric.order?.toString() || '0',
+    });
+    setEditingVillageMetric(metric.id);
+    setShowVillageMetricModal(true);
+  };
+
+  // Village Performance CRUD
+  const handleAddVillagePerf = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const method = editingVillagePerf ? 'PUT' : 'POST';
+      const url = editingVillagePerf ? `/api/village-performance?id=${editingVillagePerf}` : '/api/village-performance';
+      const body = { ...newVillagePerf, percentage: parseInt(newVillagePerf.percentage) || 85, order: parseInt(newVillagePerf.order) || 0 };
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (res.ok) {
+        setShowVillagePerfModal(false);
+        setNewVillagePerf({ label: '', value: '', percentage: '85', order: '0' });
+        setEditingVillagePerf(null);
+        fetchVillagePerformance();
+      }
+    } catch (error) {
+      console.error('Failed to save village performance:', error);
+    }
+  };
+
+  const handleDeleteVillagePerf = async (id: string) => {
+    if (!confirm('Delete this performance metric?')) return;
+    try {
+      const res = await fetch(`/api/village-performance?id=${id}`, { method: 'DELETE' });
+      if (res.ok) fetchVillagePerformance();
+    } catch (error) {
+      console.error('Failed to delete village performance:', error);
+    }
+  };
+
+  const startEditVillagePerf = (record: any) => {
+    setNewVillagePerf({
+      label: record.label,
+      value: record.value,
+      percentage: record.percentage?.toString() || '85',
+      order: record.order?.toString() || '0',
+    });
+    setEditingVillagePerf(record.id);
+    setShowVillagePerfModal(true);
+  };
+
+  // Water Source CRUD
+  const handleAddWaterSource = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const method = editingWaterSource ? 'PUT' : 'POST';
+      const url = editingWaterSource ? `/api/water-sources?id=${editingWaterSource}` : '/api/water-sources';
+      const body = { ...newWaterSource, level: parseInt(newWaterSource.level) || 50, order: parseInt(newWaterSource.order) || 0 };
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (res.ok) {
+        setShowWaterSourceModal(false);
+        setNewWaterSource({ label: '', level: '50', status: 'Normal', icon: 'Droplets', order: '0' });
+        setEditingWaterSource(null);
+        fetchWaterSources();
+      }
+    } catch (error) {
+      console.error('Failed to save water source:', error);
+    }
+  };
+
+  const handleDeleteWaterSource = async (id: string) => {
+    if (!confirm('Delete this water source?')) return;
+    try {
+      const res = await fetch(`/api/water-sources?id=${id}`, { method: 'DELETE' });
+      if (res.ok) fetchWaterSources();
+    } catch (error) {
+      console.error('Failed to delete water source:', error);
+    }
+  };
+
+  const startEditWaterSource = (source: any) => {
+    setNewWaterSource({
+      label: source.label,
+      level: source.level?.toString() || '50',
+      status: source.status || 'Normal',
+      icon: source.icon || 'Droplets',
+      order: source.order?.toString() || '0',
+    });
+    setEditingWaterSource(source.id);
+    setShowWaterSourceModal(true);
   };
 
   return (
@@ -562,6 +749,221 @@ export default function AdminDashboard() {
                 <p className="text-xs font-medium text-gray-300">Optimal moisture conditions for paddy collection today.</p>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Village Metrics Management Section */}
+        <div className="mb-12">
+          <div className="bg-white rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 p-8">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+              <div>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-green-50 flex items-center justify-center">
+                    <Activity className="w-5 h-5 text-green-600" />
+                  </div>
+                  <h3 className="text-2xl font-black text-[#0A0A0A] tracking-tighter">Village Overview — Metrics</h3>
+                </div>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-2 ml-[52px]">Manage service metrics shown in the Village Overview section</p>
+              </div>
+              <button 
+                onClick={() => {
+                  setEditingVillageMetric(null);
+                  setNewVillageMetric({ label: '', value: '', status: 'Active', icon: 'Activity', color: 'text-green-500', bg: 'bg-green-500/10', order: '0' });
+                  setShowVillageMetricModal(true);
+                }}
+                className="px-6 py-3 bg-green-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all flex items-center gap-2 shadow-xl shadow-green-600/20"
+              >
+                <Plus className="w-4 h-4" />
+                Add Metric
+              </button>
+            </div>
+
+            {villageMetrics.length === 0 ? (
+              <div className="text-center py-16 text-gray-300 font-bold italic">
+                No metrics configured. Click "Add Metric" to show data in the Village Overview section.
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="bg-green-50/50 text-[10px] text-gray-400 font-black uppercase tracking-widest">
+                      <th className="px-6 py-4">Label</th>
+                      <th className="px-6 py-4">Value</th>
+                      <th className="px-6 py-4">Status</th>
+                      <th className="px-6 py-4">Order</th>
+                      <th className="px-6 py-4 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50">
+                    {villageMetrics.map((metric) => (
+                      <tr key={metric.id} className="hover:bg-green-50/20 transition-colors group">
+                        <td className="px-6 py-4 font-black text-[#0A0A0A]">{metric.label}</td>
+                        <td className="px-6 py-4">
+                          <span className="px-3 py-1 bg-green-50 text-green-600 rounded-lg font-black">{metric.value}</span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="text-xs font-bold text-gray-500">{metric.status}</span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="text-xs font-bold text-gray-400">#{metric.order}</span>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button 
+                              onClick={() => startEditVillageMetric(metric)}
+                              className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </button>
+                            <button 
+                              onClick={() => handleDeleteVillageMetric(metric.id)}
+                              className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Village Performance Management Section */}
+        <div className="mb-12">
+          <div className="bg-white rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 p-8">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+              <div>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-blue-50 flex items-center justify-center">
+                    <Activity className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <h3 className="text-2xl font-black text-[#0A0A0A] tracking-tighter">Village Performance Summary</h3>
+                </div>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-2 ml-[52px]">Manage performance bars shown in the Village Overview section</p>
+              </div>
+              <button 
+                onClick={() => {
+                  setEditingVillagePerf(null);
+                  setNewVillagePerf({ label: '', value: '', percentage: '85', order: '0' });
+                  setShowVillagePerfModal(true);
+                }}
+                className="px-6 py-3 bg-blue-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all flex items-center gap-2 shadow-xl shadow-blue-600/20"
+              >
+                <Plus className="w-4 h-4" />
+                Add Metric
+              </button>
+            </div>
+
+            {villagePerformance.length === 0 ? (
+              <div className="text-center py-16 text-gray-300 font-bold italic">
+                No performance metrics configured. Click "Add Metric" to show performance bars.
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {villagePerformance.map((record) => (
+                  <div key={record.id} className="p-6 rounded-2xl bg-gray-50 border border-gray-100 group hover:border-blue-200 transition-all">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex-1">
+                        <div className="flex justify-between text-xs font-black uppercase tracking-widest mb-2">
+                          <span className="text-gray-500">{record.label}</span>
+                          <span className="text-blue-600">{record.value}</span>
+                        </div>
+                        <div className="h-2.5 bg-gray-200 rounded-full overflow-hidden">
+                          <div className="h-full bg-blue-600 rounded-full" style={{ width: `${record.percentage}%` }} />
+                        </div>
+                        <span className="text-[10px] font-bold text-gray-400 mt-1 block">{record.percentage}%</span>
+                      </div>
+                      <div className="flex gap-2 ml-6 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button 
+                          onClick={() => startEditVillagePerf(record)}
+                          className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        <button 
+                          onClick={() => handleDeleteVillagePerf(record.id)}
+                          className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Water Sources Management Section */}
+        <div className="mb-12">
+          <div className="bg-white rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 p-8">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+              <div>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-sky-50 flex items-center justify-center">
+                    <Droplets className="w-5 h-5 text-sky-600" />
+                  </div>
+                  <h3 className="text-2xl font-black text-[#0A0A0A] tracking-tighter">Water Supply — Sources</h3>
+                </div>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-2 ml-[52px]">Manage water sources shown in the Water Supply section</p>
+              </div>
+              <button 
+                onClick={() => {
+                  setEditingWaterSource(null);
+                  setNewWaterSource({ label: '', level: '50', status: 'Normal', icon: 'Droplets', order: '0' });
+                  setShowWaterSourceModal(true);
+                }}
+                className="px-6 py-3 bg-sky-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all flex items-center gap-2 shadow-xl shadow-sky-600/20"
+              >
+                <Plus className="w-4 h-4" />
+                Add Source
+              </button>
+            </div>
+
+            {waterSources.length === 0 ? (
+              <div className="text-center py-16 text-gray-300 font-bold italic">
+                No water sources configured. Click "Add Source" to show data in the Water Supply section.
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {waterSources.map((source) => (
+                  <div key={source.id} className="p-6 rounded-2xl bg-sky-50 border border-sky-100 group hover:border-sky-300 transition-all relative">
+                    <div className="flex justify-between items-start mb-3">
+                      <div className="w-10 h-10 rounded-xl bg-sky-100 flex items-center justify-center text-sky-600">
+                        <Droplets className="w-5 h-5" />
+                      </div>
+                      <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button 
+                          onClick={() => startEditWaterSource(source)}
+                          className="p-1.5 text-gray-400 hover:text-sky-600 hover:bg-sky-100 rounded-lg transition-all"
+                        >
+                          <Edit className="w-3.5 h-3.5" />
+                        </button>
+                        <button 
+                          onClick={() => handleDeleteWaterSource(source.id)}
+                          className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                    <h4 className="font-black text-[#0A0A0A] mb-1">{source.label}</h4>
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="flex-1 h-2 bg-sky-200 rounded-full overflow-hidden">
+                        <div className="h-full bg-sky-500 rounded-full" style={{ width: `${source.level}%` }} />
+                      </div>
+                      <span className="text-sm font-black text-sky-600">{source.level}%</span>
+                    </div>
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{source.status}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
@@ -1348,6 +1750,267 @@ export default function AdminDashboard() {
                 </div>
                 <button type="submit" className="w-full py-5 bg-amber-600 text-white rounded-[1.5rem] font-black uppercase tracking-widest hover:scale-[1.02] transition-all shadow-xl shadow-amber-600/20 mt-4">
                   {editingFund ? 'Save Changes' : 'Record Fund Usage'}
+                </button>
+              </form>
+            </motion.div>
+          </div>
+        )}
+
+        {/* Village Metric Modal */}
+        {showVillageMetricModal && (
+          <div className="fixed inset-0 bg-[#0A0A0A]/90 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-[2.5rem] shadow-2xl p-10 w-full max-w-lg relative">
+              <button onClick={() => setShowVillageMetricModal(false)} className="absolute top-8 right-8 text-gray-300 hover:text-[#0A0A0A] transition-colors"><X className="w-6 h-6"/></button>
+              <h3 className="text-3xl font-black text-[#0A0A0A] mb-2 tracking-tighter">
+                {editingVillageMetric ? 'Update Metric' : 'Add Village Metric'}
+              </h3>
+              <p className="text-gray-400 mb-8 font-medium">Configure a service metric for the Village Overview section</p>
+              
+              <form onSubmit={handleAddVillageMetric} className="space-y-6">
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="col-span-2">
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Label</label>
+                    <input
+                      type="text"
+                      value={newVillageMetric.label}
+                      onChange={(e) => setNewVillageMetric({ ...newVillageMetric, label: e.target.value })}
+                      className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-green-500/10 focus:border-green-500 font-bold"
+                      placeholder="e.g., Street Lights"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Value</label>
+                    <input
+                      type="text"
+                      value={newVillageMetric.value}
+                      onChange={(e) => setNewVillageMetric({ ...newVillageMetric, value: e.target.value })}
+                      className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-green-500/10 focus:border-green-500 font-bold"
+                      placeholder="e.g., 142/145"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Status</label>
+                    <input
+                      type="text"
+                      value={newVillageMetric.status}
+                      onChange={(e) => setNewVillageMetric({ ...newVillageMetric, status: e.target.value })}
+                      className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-green-500/10 focus:border-green-500 font-bold"
+                      placeholder="e.g., Working Well"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Icon</label>
+                    <select
+                      value={newVillageMetric.icon}
+                      onChange={(e) => setNewVillageMetric({ ...newVillageMetric, icon: e.target.value })}
+                      className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-green-500/10 focus:border-green-500 font-bold"
+                    >
+                      <option value="Activity">Activity</option>
+                      <option value="Lightbulb">Lightbulb</option>
+                      <option value="Video">Video</option>
+                      <option value="Recycle">Recycle</option>
+                      <option value="Zap">Zap</option>
+                      <option value="Leaf">Leaf</option>
+                      <option value="Droplets">Droplets</option>
+                      <option value="Shield">Shield</option>
+                      <option value="Wifi">Wifi</option>
+                      <option value="TreePine">TreePine</option>
+                      <option value="Building2">Building2</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Color Class</label>
+                    <select
+                      value={newVillageMetric.color}
+                      onChange={(e) => setNewVillageMetric({ ...newVillageMetric, color: e.target.value })}
+                      className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-green-500/10 focus:border-green-500 font-bold"
+                    >
+                      <option value="text-green-500">Green</option>
+                      <option value="text-amber-500">Amber</option>
+                      <option value="text-blue-500">Blue</option>
+                      <option value="text-red-500">Red</option>
+                      <option value="text-purple-500">Purple</option>
+                      <option value="text-sky-500">Sky</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Bg Class</label>
+                    <select
+                      value={newVillageMetric.bg}
+                      onChange={(e) => setNewVillageMetric({ ...newVillageMetric, bg: e.target.value })}
+                      className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-green-500/10 focus:border-green-500 font-bold"
+                    >
+                      <option value="bg-green-500/10">Green</option>
+                      <option value="bg-amber-500/10">Amber</option>
+                      <option value="bg-blue-500/10">Blue</option>
+                      <option value="bg-red-500/10">Red</option>
+                      <option value="bg-purple-500/10">Purple</option>
+                      <option value="bg-sky-500/10">Sky</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Order</label>
+                    <input
+                      type="number"
+                      value={newVillageMetric.order}
+                      onChange={(e) => setNewVillageMetric({ ...newVillageMetric, order: e.target.value })}
+                      className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-green-500/10 focus:border-green-500 font-bold"
+                      placeholder="0"
+                    />
+                  </div>
+                </div>
+                <button type="submit" className="w-full py-5 bg-green-600 text-white rounded-[1.5rem] font-black uppercase tracking-widest hover:scale-[1.02] transition-all shadow-xl shadow-green-600/20 mt-4">
+                  {editingVillageMetric ? 'Save Changes' : 'Add Metric'}
+                </button>
+              </form>
+            </motion.div>
+          </div>
+        )}
+
+        {/* Village Performance Modal */}
+        {showVillagePerfModal && (
+          <div className="fixed inset-0 bg-[#0A0A0A]/90 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-[2.5rem] shadow-2xl p-10 w-full max-w-lg relative">
+              <button onClick={() => setShowVillagePerfModal(false)} className="absolute top-8 right-8 text-gray-300 hover:text-[#0A0A0A] transition-colors"><X className="w-6 h-6"/></button>
+              <h3 className="text-3xl font-black text-[#0A0A0A] mb-2 tracking-tighter">
+                {editingVillagePerf ? 'Update Performance' : 'Add Performance Metric'}
+              </h3>
+              <p className="text-gray-400 mb-8 font-medium">Configure a performance bar for the Village Performance Summary</p>
+              
+              <form onSubmit={handleAddVillagePerf} className="space-y-6">
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="col-span-2">
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Label</label>
+                    <input
+                      type="text"
+                      value={newVillagePerf.label}
+                      onChange={(e) => setNewVillagePerf({ ...newVillagePerf, label: e.target.value })}
+                      className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 font-bold"
+                      placeholder="e.g., Energy Usage"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Value</label>
+                    <input
+                      type="text"
+                      value={newVillagePerf.value}
+                      onChange={(e) => setNewVillagePerf({ ...newVillagePerf, value: e.target.value })}
+                      className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 font-bold"
+                      placeholder="e.g., 12% Reduction"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Percentage (0-100)</label>
+                    <input
+                      type="number"
+                      value={newVillagePerf.percentage}
+                      onChange={(e) => setNewVillagePerf({ ...newVillagePerf, percentage: e.target.value })}
+                      className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 font-bold"
+                      placeholder="85"
+                      min="0"
+                      max="100"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Order</label>
+                    <input
+                      type="number"
+                      value={newVillagePerf.order}
+                      onChange={(e) => setNewVillagePerf({ ...newVillagePerf, order: e.target.value })}
+                      className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 font-bold"
+                      placeholder="0"
+                    />
+                  </div>
+                </div>
+                <button type="submit" className="w-full py-5 bg-blue-600 text-white rounded-[1.5rem] font-black uppercase tracking-widest hover:scale-[1.02] transition-all shadow-xl shadow-blue-600/20 mt-4">
+                  {editingVillagePerf ? 'Save Changes' : 'Add Metric'}
+                </button>
+              </form>
+            </motion.div>
+          </div>
+        )}
+
+        {/* Water Source Modal */}
+        {showWaterSourceModal && (
+          <div className="fixed inset-0 bg-[#0A0A0A]/90 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-[2.5rem] shadow-2xl p-10 w-full max-w-lg relative">
+              <button onClick={() => setShowWaterSourceModal(false)} className="absolute top-8 right-8 text-gray-300 hover:text-[#0A0A0A] transition-colors"><X className="w-6 h-6"/></button>
+              <h3 className="text-3xl font-black text-[#0A0A0A] mb-2 tracking-tighter">
+                {editingWaterSource ? 'Update Water Source' : 'Add Water Source'}
+              </h3>
+              <p className="text-gray-400 mb-8 font-medium">Configure a water source for the Water Supply section</p>
+              
+              <form onSubmit={handleAddWaterSource} className="space-y-6">
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="col-span-2">
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Label</label>
+                    <input
+                      type="text"
+                      value={newWaterSource.label}
+                      onChange={(e) => setNewWaterSource({ ...newWaterSource, label: e.target.value })}
+                      className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-sky-500/10 focus:border-sky-500 font-bold"
+                      placeholder="e.g., Main Reservoir"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Level (0-100)</label>
+                    <input
+                      type="number"
+                      value={newWaterSource.level}
+                      onChange={(e) => setNewWaterSource({ ...newWaterSource, level: e.target.value })}
+                      className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-sky-500/10 focus:border-sky-500 font-bold"
+                      placeholder="50"
+                      min="0"
+                      max="100"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Status</label>
+                    <select
+                      value={newWaterSource.status}
+                      onChange={(e) => setNewWaterSource({ ...newWaterSource, status: e.target.value })}
+                      className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-sky-500/10 focus:border-sky-500 font-bold"
+                    >
+                      <option value="Stable">Stable</option>
+                      <option value="Normal">Normal</option>
+                      <option value="High">High</option>
+                      <option value="Low">Low</option>
+                      <option value="Critical">Critical</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Icon</label>
+                    <select
+                      value={newWaterSource.icon}
+                      onChange={(e) => setNewWaterSource({ ...newWaterSource, icon: e.target.value })}
+                      className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-sky-500/10 focus:border-sky-500 font-bold"
+                    >
+                      <option value="Droplets">Droplets</option>
+                      <option value="Droplet">Droplet</option>
+                      <option value="Waves">Waves</option>
+                      <option value="Target">Target</option>
+                      <option value="Thermometer">Thermometer</option>
+                      <option value="Gauge">Gauge</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Order</label>
+                    <input
+                      type="number"
+                      value={newWaterSource.order}
+                      onChange={(e) => setNewWaterSource({ ...newWaterSource, order: e.target.value })}
+                      className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-sky-500/10 focus:border-sky-500 font-bold"
+                      placeholder="0"
+                    />
+                  </div>
+                </div>
+                <button type="submit" className="w-full py-5 bg-sky-600 text-white rounded-[1.5rem] font-black uppercase tracking-widest hover:scale-[1.02] transition-all shadow-xl shadow-sky-600/20 mt-4">
+                  {editingWaterSource ? 'Save Changes' : 'Add Source'}
                 </button>
               </form>
             </motion.div>

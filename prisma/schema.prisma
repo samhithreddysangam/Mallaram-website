@@ -113,3 +113,37 @@ model FundUsage {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }
+
+model VillageMetric {
+  id            String    @id @default(cuid())
+  label         String    // e.g., "Street Lights", "CCTV Network"
+  value         String    // e.g., "142/145", "12 Active"
+  status        String    // e.g., "Working Well", "All Safe"
+  icon          String    // icon name: Lightbulb, Video, Recycle, Zap, Activity
+  color         String    // text color class: text-amber-500
+  bg            String    // bg color class: bg-amber-500/10
+  order         Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model VillagePerformance {
+  id            String    @id @default(cuid())
+  label         String    // e.g., "Energy Usage"
+  value         String    // e.g., "12% Reduction"
+  percentage    Int       @default(85) // bar width percentage
+  order         Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model WaterSource {
+  id            String    @id @default(cuid())
+  label         String    // e.g., "Main Reservoir"
+  level         Int       @default(50) // percentage 0-100
+  status        String    // e.g., "Stable", "Normal", "Low"
+  icon          String    // icon name: Waves, Droplets, Droplet
+  order         Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
