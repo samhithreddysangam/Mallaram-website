@@ -1,9 +1,31 @@
 import NextAuth from 'next-auth';
 import { authConfig } from './auth.config';
 import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 import { locales, defaultLocale } from '@/lib/i18n';
 
 const { auth } = NextAuth(authConfig);
+
+/**
+ * Safely create a redirect URL that always uses the real request origin,
+ * never localhost in production.
+ */
+function safeRedirect(path: string, req: NextRequest): NextResponse {
+  const url = new URL(path, req.url);
+
+  // Safety guard: if somehow the redirect URL resolved to localhost in production,
+  // rewrite it to use the actual request host instead.
+  if (
+    process.env.NODE_ENV === 'production' &&
+    (url.hostname === 'localhost' || url.hostname === '127.0.0.1')
+  ) {
+    url.protocol = req.nextUrl.protocol || 'https:';
+    url.hostname = req.nextUrl.hostname;
+    url.port = req.nextUrl.port || '';
+  }
+
+  return NextResponse.redirect(url);
+}
 
 export default auth((req) => {
   const { nextUrl } = req;
@@ -21,9 +43,7 @@ export default auth((req) => {
     if (pathname.startsWith('/api') || pathname.startsWith('/_next')) {
       return NextResponse.next();
     }
-    return NextResponse.redirect(
-      new URL(`/${locale}${pathname}`, req.url)
-    );
+    return safeRedirect(`/${locale}${pathname}`, req);
   }
 
   // 2. Handle Authentication & Authorization
@@ -41,22 +61,22 @@ export default auth((req) => {
   // Protect all dashboard routes
   if (isOnDashboard) {
     if (!isLoggedIn) {
-      return NextResponse.redirect(new URL(`/${locale}/login`, nextUrl));
+      return safeRedirect(`/${locale}/login`, req);
     }
     
     // Specifically protect ADMIN dashboard
     if (isOnAdminDashboard && userRole !== 'ADMIN') {
       console.log('Middleware: Redirecting non-admin away from admin dashboard');
-      return NextResponse.redirect(new URL(`/${locale}/ikp-booking`, nextUrl));
+      return safeRedirect(`/${locale}/ikp-booking`, req);
     }
   }
 
   // Redirect to appropriate dashboard if logged in and trying to access login page
   if (isOnLogin && isLoggedIn && userRole) {
     if (userRole === 'ADMIN') {
-      return NextResponse.redirect(new URL(`/${locale}/dashboard/admin`, nextUrl));
+      return safeRedirect(`/${locale}/dashboard/admin`, req);
     }
-    return NextResponse.redirect(new URL(`/${locale}/ikp-booking`, nextUrl));
+    return safeRedirect(`/${locale}/ikp-booking`, req);
   }
 
   return NextResponse.next();
@@ -68,3 +88,4 @@ export const config = {
     '/((?!api|_next|favicon.ico|icon.jpg|icon.png|apple-icon.png|locales|images|assets).*)',
   ],
 };
+
