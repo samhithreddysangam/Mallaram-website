@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import { Locale, getDictionary } from '@/lib/i18n';
 import Navigation from '@/components/Navigation/Navigation';
 import Footer from '@/components/Footer/Footer';
@@ -76,6 +76,21 @@ export default function AdminDashboard() {
   const [showEventModal, setShowEventModal] = useState(false);
   const [editingEvent, setEditingEvent] = useState<string | null>(null);
   const [newEvent, setNewEvent] = useState({ title: '', description: '', imageUrl: '', date: '', category: 'local', order: '0' });
+  
+  // Welcome Animation
+  const searchParams = useSearchParams();
+  const justLoggedIn = searchParams.get('welcome') === 'true';
+  const [showWelcome, setShowWelcome] = useState(justLoggedIn);
+  
+  useEffect(() => {
+    if (justLoggedIn) {
+      const timer = setTimeout(() => {
+        setShowWelcome(false);
+        window.history.replaceState({}, '', window.location.pathname);
+      }, 4500);
+      return () => clearTimeout(timer);
+    }
+  }, [justLoggedIn]);
   
   // Form States
   const [newPrice, setNewPrice] = useState({ cropName: '', price: '', unit: 'Quintal', district: 'Rajanna Sircilla' });
@@ -754,6 +769,69 @@ export default function AdminDashboard() {
 
   return (
     <main className="min-h-screen bg-gray-50 font-sans">
+      {/* Welcome Animation Overlay */}
+      {showWelcome && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-[999] bg-[#0A0A0A]/95 backdrop-blur-xl flex items-center justify-center"
+        >
+          <div className="text-center max-w-2xl px-8">
+            <motion.div
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+              className="w-20 h-20 mx-auto mb-8 rounded-3xl bg-gradient-to-br from-[#22FF88] to-[#15803d] flex items-center justify-center shadow-2xl shadow-[#22FF88]/20"
+            >
+              <span className="text-3xl">🌿</span>
+            </motion.div>
+
+            <motion.h1
+              initial={{ y: 40, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.5, duration: 0.8, ease: 'easeOut' }}
+              className="text-5xl md:text-7xl font-black text-white tracking-tighter mb-4"
+            >
+              WELCOME
+            </motion.h1>
+
+            <motion.p
+              initial={{ y: 30, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.9, duration: 0.8, ease: 'easeOut' }}
+              className="text-xl md:text-2xl text-gray-300 font-bold mb-2"
+            >
+              to mallaram grama panchayath
+            </motion.p>
+
+            <motion.p
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 1.3, duration: 0.8, ease: 'easeOut' }}
+              className="text-base md:text-lg text-[#22FF88] font-semibold"
+            >
+              A digital village lead by sarpanch Sangam Arpitha Reddy
+            </motion.p>
+
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 2.5, duration: 0.5 }}
+              className="mt-12 text-xs text-gray-500 font-medium"
+            >
+              ✦ Loading dashboard ✦
+            </motion.p>
+          </div>
+
+          <motion.div
+            initial={{ width: '0%' }}
+            animate={{ width: '100%' }}
+            transition={{ delay: 0.3, duration: 4, ease: 'easeInOut' }}
+            className="absolute bottom-0 left-0 h-1 bg-gradient-to-r from-[#22FF88] to-[#15803d]"
+          />
+        </motion.div>
+      )}
       <Navigation locale={locale} />
       
       <div className="pt-48 lg:pt-60 max-w-7xl mx-auto px-4 pb-20">

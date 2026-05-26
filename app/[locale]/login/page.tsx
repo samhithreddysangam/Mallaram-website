@@ -100,7 +100,7 @@ function LoginForm() {
       } else {
         // Successful login, direct user to dashboard immediately
         const userRole = (session?.user as any)?.role;
-        const targetPath = userRole === 'ADMIN' ? `/${locale}/dashboard/admin` : `/${locale}/ikp-booking`;
+        const targetPath = userRole === 'ADMIN' ? `/${locale}/dashboard/admin?welcome=true` : `/${locale}/ikp-booking?welcome=true`;
         router.replace(targetPath);
         // Fallback hard refresh to ensure session state updates
         setTimeout(() => {
