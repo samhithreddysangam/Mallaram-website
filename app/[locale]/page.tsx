@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import Navigation from '@/components/Navigation/Navigation';
-import OfficialsSection from '@/components/Navigation/OfficialsSection';
+import MainHeader from '@/components/Navigation/MainHeader';
 import Hero from '@/components/Hero/Hero';
 import Stats from '@/components/Stats/Stats';
 import About from '@/components/About/About';
@@ -85,7 +85,7 @@ export default async function LocalePage({ params }: { params: Promise<{ locale:
       <Suspense fallback={<div className="h-16 bg-cream" />}>
         <Navigation locale={currentLocale} />
       </Suspense>
-      <OfficialsSection locale={currentLocale} />
+      <MainHeader locale={currentLocale} />
       <Hero locale={currentLocale} />
       <Stats locale={currentLocale} />
       <SmartCommandCenter locale={currentLocale} />

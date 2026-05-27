@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { Locale } from '@/lib/i18n';
 import { Users } from 'lucide-react';
 
-interface NavigationProps {
+interface MainHeaderProps {
   locale: Locale;
 }
 
@@ -27,7 +27,7 @@ function OfficialImage({ official }: { official: VillageOfficial }) {
       viewport={{ once: true }}
       className="flex flex-col items-center gap-4 group px-2"
     >
-      <div className="w-16 h-16 md:w-24 md:h-24 aspect-square rounded-[2rem] bg-white p-1 shadow-[0_8px_32px_rgba(0,0,0,0.05)] border border-gray-100 flex items-center justify-center overflow-hidden transform group-hover:scale-105 group-hover:border-[#15803d]/40 transition-all duration-500">
+      <div className="w-16 h-16 md:w-24 md:h-24 aspect-square rounded-[2rem] shadow-[0_8px_32px_rgba(0,0,0,0.05)] border border-gray-100 flex items-center justify-center overflow-hidden transform group-hover:scale-105 group-hover:border-[#15803d]/40 transition-all duration-500">
         {official.imageUrl ? (
           <img 
             src={official.imageUrl} 
@@ -52,7 +52,7 @@ function OfficialImage({ official }: { official: VillageOfficial }) {
   );
 }
 
-export default function OfficialsSection({ locale }: NavigationProps) {
+export default function MainHeader({ locale }: MainHeaderProps) {
   const [officials, setOfficials] = useState<VillageOfficial[]>([]);
   const [loading, setLoading] = useState(true);
 
