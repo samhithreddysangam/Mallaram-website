@@ -1,25 +1,62 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Sun, Cloud, TrendingUp, TrendingDown, Info } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Sun, Cloud, TrendingUp, TrendingDown, Info, BrainCircuit, Leaf, Lightbulb, AlertTriangle, Droplets, Wind, ChevronRight } from 'lucide-react';
+
+const advisoryIcons: Record<string, React.ElementType> = {
+  '🌱': Leaf,
+  '☀️': Sun,
+  '🌧️': Droplets,
+  '💧': Droplets,
+  '💨': Wind,
+  '🌡️': Sun,
+  '🧪': Lightbulb,
+  '🐛': AlertTriangle,
+  '✅': Leaf,
+  '📋': Lightbulb,
+  '🌾': Leaf,
+  '🌦️': Cloud,
+  '⚠️': AlertTriangle,
+};
 
 export function WeatherWidget() {
   const [weather, setWeather] = useState<any>(null);
+  const [advisory, setAdvisory] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [showAdvisory, setShowAdvisory] = useState(false);
 
   useEffect(() => {
-    fetch('/api/weather')
-      .then(res => res.json())
-      .then(data => {
-        if (data && !data.error) {
-          setWeather(data);
+    const fetchAll = async () => {
+      try {
+        // Fetch both weather and advisory in parallel
+        const [weatherRes, advisoryRes] = await Promise.all([
+          fetch('/api/weather'),
+          fetch('/api/weather/advisory'),
+        ]);
+        
+        const weatherData = await weatherRes.json();
+        const advisoryData = await advisoryRes.json();
+        
+        if (weatherData && !weatherData.error) {
+          setWeather(weatherData);
         }
+        if (advisoryData && advisoryData.advisory) {
+          setAdvisory(advisoryData.advisory);
+        }
+      } catch (e) {
+        console.error('Failed to fetch weather data', e);
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+    fetchAll();
   }, []);
 
   if (loading) return <div className="animate-pulse bg-white/50 h-40 rounded-3xl" />;
+
+  const primaryAdvisory = advisory?.primary;
+  const AdIcon = primaryAdvisory ? advisoryIcons[primaryAdvisory.icon] || Leaf : Leaf;
 
   return (
     <div className="bg-gradient-to-br from-blue-500 to-blue-700 rounded-3xl p-6 text-white shadow-lg relative overflow-hidden">
@@ -48,6 +85,59 @@ export function WeatherWidget() {
             <div className="font-bold">{weather?.rainChance || '0'}%</div>
           </div>
         </div>
+
+        {/* AI Advisory Button */}
+        {primaryAdvisory && (
+          <div className="mt-4">
+            <button
+              onClick={() => setShowAdvisory(!showAdvisory)}
+              className="w-full p-3 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 flex items-center gap-3 hover:bg-white/20 transition-all text-left"
+            >
+              <div className="p-1.5 rounded-lg bg-amber-400/20 text-amber-300">
+                <BrainCircuit className="w-4 h-4" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-[10px] font-black text-amber-200 uppercase tracking-widest mb-0.5">AI Farming Advice</div>
+                <div className="text-sm font-bold text-white truncate">{primaryAdvisory.title}</div>
+              </div>
+              <ChevronRight className={`w-4 h-4 text-blue-200 transition-transform ${showAdvisory ? 'rotate-90' : ''}`} />
+            </button>
+
+            {/* Expandable Advisory Detail */}
+            <AnimatePresence>
+              {showAdvisory && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="overflow-hidden"
+                >
+                  <div className="mt-3 p-4 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 space-y-3">
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 rounded-lg bg-amber-400/20 text-amber-300">
+                        <AdIcon className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <div className="text-xs font-bold text-white">{primaryAdvisory.title}</div>
+                        <div className="text-[10px] text-blue-200 font-medium">{primaryAdvisory.action}</div>
+                      </div>
+                    </div>
+                    <p className="text-sm text-blue-100 leading-relaxed">
+                      {primaryAdvisory.description}
+                    </p>
+                    {primaryAdvisory.urgency === 'high' && (
+                      <div className="flex items-center gap-1.5 text-[10px] font-bold text-red-300 uppercase tracking-widest">
+                        <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
+                        High Priority Advisory
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        )}
 
         {weather?.alerts && weather.alerts.length > 0 && (
           <div className="mt-4 p-3 bg-red-500/30 backdrop-blur-md rounded-xl border border-red-400/30 flex items-center gap-2">

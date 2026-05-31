@@ -1,19 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-
-const MALLARAM_LAT = 18.3962;
-const MALLARAM_LON = 78.8242;
-
-function getWeatherCondition(code: number): string {
-  if (code === 0) return 'Clear';
-  if (code <= 3) return 'Partly Cloudy';
-  if (code === 45 || code === 48) return 'Foggy';
-  if (code >= 51 && code <= 55) return 'Drizzle';
-  if (code >= 61 && code <= 65) return 'Rainy';
-  if (code >= 80 && code <= 82) return 'Showers';
-  if (code >= 95) return 'Thunderstorm';
-  return 'Cloudy';
-}
+import { MALLARAM_LAT, MALLARAM_LON, getWeatherCondition } from '@/lib/weather';
 
 export async function GET() {
   try {
