@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Trophy } from 'lucide-react';
 import { HiOutlineMail, HiOutlinePhone, HiOutlineLocationMarker } from 'react-icons/hi';
 import { FaInstagram, FaFacebook, FaTwitter, FaLinkedin } from 'react-icons/fa';
 import { Locale, getDictionary, getTranslations } from '@/lib/i18n';
@@ -125,16 +125,20 @@ export default function Footer({ locale }: FooterProps) {
          {/* Developer Credit */}
           <div className="text-right">
             <p className="text-[9px] font-bold text-[#0A0A0A]/20 uppercase tracking-widest leading-relaxed">
+              <Trophy className="w-3.5 h-3.5 inline-block -mt-0.5 mr-1.5 text-[#D4A017]" />
               India's 1st Digital Village<br />
-              <span className="text-[#15803d]/40">Digitised by </span>
-              <a href="https://codebuff.in" target="_blank" rel="noopener noreferrer" className="text-[#15803d]/50 hover:text-[#15803d] transition-colors">
+              <span className="text-[#15803d]/70 font-black">Digitised by </span>
+              <a href="https://samhith-portfolio.vercel.app/" target="_blank" rel="noopener noreferrer" className="text-[#15803d] hover:text-[#0A0A0A] transition-colors font-black">
                 Samhithreddy Sangam
               </a>
-              <span className="text-[#0A0A0A]/20"> — </span>
-              <span className="text-[#0A0A0A]/20">Son of Sarpanch, Mallaram</span>
+              <span className="text-[#0A0A0A]/30"> — </span>
+              <span className="text-[#0A0A0A]/30">Son of Sarpanch, Mallaram</span>
             </p>
             <p className="text-[8px] font-bold text-[#0A0A0A]/10 uppercase tracking-widest mt-1">
-              Powered by Codebuff Digital Solutions
+              Powered by{" "}
+              <a href="https://next360.in/" target="_blank" rel="noopener noreferrer" className="text-[#15803d]/40 hover:text-[#15803d] transition-colors">
+                next360
+              </a>
             </p>
           </div>
         </div>
