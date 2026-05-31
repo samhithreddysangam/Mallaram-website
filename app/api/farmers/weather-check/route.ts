@@ -11,6 +11,15 @@ const WEATHER_THRESHOLDS = {
   coldWave: { temp: 10, label: 'Cold Wave' },
 };
 
+interface FarmerInfo {
+  id: string;
+  name: string;
+  phone: string;
+  village: string;
+  crops: string | null;
+  language: string;
+}
+
 interface WeatherAlert {
   type: string;
   severity: 'high' | 'medium' | 'low';
@@ -20,6 +29,7 @@ interface WeatherAlert {
   messageTe: string;
   affectedFarmers: number;
   farmerIds: string[];
+  affectedFarmersDetails: FarmerInfo[];
 }
 
 export async function GET() {
@@ -27,7 +37,7 @@ export async function GET() {
     // 1. Fetch current weather from Open-Meteo
     const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${MALLARAM_LAT}&longitude=${MALLARAM_LON}&current=temperature_2m,relative_humidity_2m,precipitation,weather_code,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max&timezone=auto&forecast_days=3`;
 
-    const res = await fetch(weatherUrl, { next: { revalidate: 300 } });
+    const res = await fetch(weatherUrl, { cache: 'no-store' });
     if (!res.ok) {
       throw new Error(`Weather API returned ${res.status}`);
     }
@@ -63,6 +73,7 @@ export async function GET() {
         messageTe: `ఉష్ణోగ్రత ${Math.round(currentTemp)}°C. పంటలను వేడి నుండి రక్షించండి — ఉదయం లేదా సాయంత్రం నీరు పెట్టండి. మధ్యాహ్నం 12-4 గంటల మధ్య పొలంలో పని చేయకండి.`,
         affectedFarmers: 0,
         farmerIds: [],
+        affectedFarmersDetails: [],
       });
     }
 
@@ -76,6 +87,7 @@ export async function GET() {
         messageTe: `భారీ వర్షం అంచనా — ${Math.round(currentPrecip || tomorrowPrecip)}mm. కోసిన పంటలను భద్రపరచండి, పల్లపు ప్రాంతాలకు దూరంగా ఉండండి, మీ పొలంలో నీటి డ్రైనేజీ తనిఖీ చేయండి.`,
         affectedFarmers: 0,
         farmerIds: [],
+        affectedFarmersDetails: [],
       });
     }
 
@@ -89,6 +101,7 @@ export async function GET() {
         messageTe: `గాలి వేగం ${Math.round(windSpeed)} km/h. తాటాకు/టిన్ కప్పులు మరియు పంటలను భద్రపరచండి. ఈ రోజు పురుగు మందులు పిచికారీ చేయకండి.`,
         affectedFarmers: 0,
         farmerIds: [],
+        affectedFarmersDetails: [],
       });
     }
 
@@ -102,6 +115,7 @@ export async function GET() {
         messageTe: `ఉరుములతో కూడిన తుఫాను! వెంటనే ఆశ్రయం పొందండి. చెట్ల కింద లేదా పొలంలో లోహ పరికరాల దగ్గర నిలబడకండి.`,
         affectedFarmers: 0,
         farmerIds: [],
+        affectedFarmersDetails: [],
       });
     }
 
@@ -115,6 +129,7 @@ export async function GET() {
         messageTe: `ఉష్ణోగ్రత ${Math.round(currentTemp)}°Cకి పడిపోతోంది. సున్నితమైన పంటలను కవర్లతో రక్షించండి. పశువులను ఆశ్రయంలో ఉంచండి.`,
         affectedFarmers: 0,
         farmerIds: [],
+        affectedFarmersDetails: [],
       });
     }
 
@@ -155,6 +170,14 @@ export async function GET() {
 
         alert.affectedFarmers = relevantFarmers.length;
         alert.farmerIds = relevantFarmers.map(f => f.id);
+        alert.affectedFarmersDetails = relevantFarmers.map(f => ({
+          id: f.id,
+          name: f.name,
+          phone: f.phone,
+          village: f.village,
+          crops: f.crops,
+          language: f.language,
+        }));
       }
     }
 

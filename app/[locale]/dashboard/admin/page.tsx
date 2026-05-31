@@ -7,7 +7,7 @@ import Navigation from '@/components/Navigation/Navigation';
 import Footer from '@/components/Footer/Footer';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { Search, Database, Upload, Check, X, IndianRupee, Plus, Bell, MapPin, Calendar, CalendarDays, Clock, Trash2, ExternalLink, Edit, Image, Landmark, DollarSign, Tag, Activity, Droplets, Shield, BarChart3, Leaf, Cloud, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { Search, Database, Upload, Check, X, IndianRupee, Plus, Bell, MapPin, Calendar, CalendarDays, Clock, Trash2, ExternalLink, Edit, Image, Landmark, DollarSign, Tag, Activity, Droplets, Shield, BarChart3, Leaf, Cloud, AlertTriangle, CheckCircle2, Copy, Phone } from 'lucide-react';
 import { WeatherWidget } from '@/components/Agriculture/AgriWidgets';
 
 export default function AdminDashboard() {
@@ -2137,18 +2137,96 @@ export default function AdminDashboard() {
                           alert.severity === 'high' ? 'bg-red-50 border-red-100' : 'bg-amber-50 border-amber-100'
                         }`}
                       >
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className={`text-[10px] font-black uppercase tracking-widest ${
-                            alert.severity === 'high' ? 'text-red-600' : 'text-amber-600'
-                          }`}>
-                            {alert.severity.toUpperCase()}
-                          </span>
-                          <span className="px-2 py-0.5 rounded-full bg-[#15803d]/10 text-[#15803d] text-[8px] font-black">
-                            {alert.affectedFarmers} farmers
-                          </span>
+                        <div className="flex items-center justify-between mb-1">
+                          <div className="flex items-center gap-2">
+                            <span className={`text-[10px] font-black uppercase tracking-widest ${
+                              alert.severity === 'high' ? 'text-red-600' : 'text-amber-600'
+                            }`}>
+                              {alert.severity.toUpperCase()}
+                            </span>
+                            <span className="px-2 py-0.5 rounded-full bg-[#15803d]/10 text-[#15803d] text-[8px] font-black">
+                              {alert.affectedFarmers} farmers
+                            </span>
+                          </div>
+                          {alert.affectedFarmersDetails?.length > 0 && (
+                            <button
+                              onClick={() => {
+                                const phones = alert.affectedFarmersDetails.map((f: any) => f.phone).join(', ');
+                                navigator.clipboard.writeText(phones);
+                                alert(`Copied ${alert.affectedFarmersDetails.length} phone numbers!`);
+                              }}
+                              className="px-2 py-1 rounded-lg bg-white/80 hover:bg-white text-[9px] font-black uppercase tracking-widest text-gray-500 hover:text-[#0A0A0A] transition-all border border-gray-200"
+                              title="Copy all phone numbers for manual broadcast"
+                            >
+                              Copy Phones
+                            </button>
+                          )}
                         </div>
                         <h5 className="text-sm font-black text-[#0A0A0A] mb-1">{alert.titleEn}</h5>
-                        <p className="text-[10px] text-gray-500 font-medium">{alert.messageEn}</p>
+                        <p className="text-[10px] text-gray-500 font-medium mb-3">{alert.messageEn}</p>
+
+                        {alert.affectedFarmersDetails?.length > 0 && (
+                          <div className="space-y-1">
+                            <div className="text-[8px] font-black text-gray-400 uppercase tracking-widest mb-1">Affected Farmers for Broadcast</div>
+                            {alert.affectedFarmersDetails.map((farmer: any) => (
+                              <div key={farmer.id} className="flex items-center justify-between py-1.5 px-2.5 rounded-lg bg-white/60 hover:bg-white transition-all group/farmer">
+                                <div className="flex items-center gap-2 min-w-0">
+                                  <span className="text-xs font-bold text-[#0A0A0A] truncate">{farmer.name}</span>
+                                  <span className="text-[9px] text-gray-400 font-medium">{farmer.village}</span>
+                                  {farmer.crops && (
+                                    <span className="text-[8px] text-gray-400">{farmer.crops}</span>
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-1.5 flex-shrink-0">
+                                  <span className="text-xs font-mono font-bold text-[#0A0A0A]">{farmer.phone}</span>
+                                  <button
+                                    onClick={() => {
+                                      navigator.clipboard.writeText(farmer.phone);
+                                      alert(`Copied ${farmer.phone}`);
+                                    }}
+                                    className="p-1 rounded-md text-gray-300 hover:text-gray-600 hover:bg-gray-100 opacity-0 group-hover/farmer:opacity-100 transition-all"
+                                    title="Copy phone number"
+                                  >
+                                    <Copy className="w-3 h-3" />
+                                  </button>
+                                  <a
+                                    href={`tel:${farmer.phone}`}
+                                    className="p-1 rounded-md text-gray-300 hover:text-green-600 hover:bg-green-50 opacity-0 group-hover/farmer:opacity-100 transition-all"
+                                    title="Call farmer"
+                                  >
+                                    <Phone className="w-3 h-3" />
+                                  </a>
+                                </div>
+                              </div>
+                            ))}
+                            <div className="flex items-center gap-2 pt-2 mt-1 border-t border-white/60">
+                              <button
+                                onClick={() => {
+                                  const text = `ALERT: ${alert.titleEn.replace(/[^a-zA-Z0-9 ]/g, '').trim()}
+
+${alert.messageEn}
+
+- Mallaram Gram Panchayat`;
+                                  navigator.clipboard.writeText(text);
+                                  const phones = alert.affectedFarmersDetails.map((f: any) => f.phone).join(', ');
+                                  alert(`Message template copied!
+
+Share it along with these numbers:
+${phones}`);
+                                }}
+                                className="px-3 py-1.5 bg-[#0A0A0A] text-white rounded-lg text-[8px] font-black uppercase tracking-widest hover:scale-105 transition-all flex items-center gap-1.5"
+                              >
+                                <Copy className="w-3 h-3" />
+                                Copy Alert + Phones
+                              </button>
+                              {alert.affectedFarmersDetails.length > 0 && (
+                                <span className="text-[8px] text-gray-400 font-medium">
+                                  {alert.affectedFarmersDetails.filter((f: any) => f.language === 'te').length} Telugu &middot; {alert.affectedFarmersDetails.filter((f: any) => f.language !== 'te').length} English
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
