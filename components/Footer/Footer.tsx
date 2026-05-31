@@ -122,7 +122,21 @@ export default function Footer({ locale }: FooterProps) {
               </div>
            </div>
 
-
+         {/* Developer Credit */}
+          <div className="text-right">
+            <p className="text-[9px] font-bold text-[#0A0A0A]/20 uppercase tracking-widest leading-relaxed">
+              India's 1st Digital Village<br />
+              <span className="text-[#15803d]/40">Digitised by </span>
+              <a href="https://codebuff.in" target="_blank" rel="noopener noreferrer" className="text-[#15803d]/50 hover:text-[#15803d] transition-colors">
+                Samhithreddy Sangam
+              </a>
+              <span className="text-[#0A0A0A]/20"> — </span>
+              <span className="text-[#0A0A0A]/20">Son of Sarpanch, Mallaram</span>
+            </p>
+            <p className="text-[8px] font-bold text-[#0A0A0A]/10 uppercase tracking-widest mt-1">
+              Powered by Codebuff Digital Solutions
+            </p>
+          </div>
         </div>
       </div>
     </footer>

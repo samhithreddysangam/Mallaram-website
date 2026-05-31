@@ -115,12 +115,33 @@ export async function GET(request: Request) {
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([month, amount]) => ({ month, amount }));
 
+    // 6. Recent beneficiaries (last 20 with names)
+    const recentBeneficiaries = await prisma.beneficiary.findMany({
+      take: 20,
+      orderBy: { createdAt: 'desc' },
+      include: {
+        scheme: {
+          select: { title: true },
+        },
+      },
+    });
+
+    const recentBeneficiariesData = recentBeneficiaries.map(b => ({
+      id: b.id,
+      name: b.name,
+      benefitAmount: b.benefitAmount,
+      village: b.village,
+      schemeName: b.scheme?.title || 'Unknown Scheme',
+      benefitDate: b.benefitDate,
+    }));
+
     return NextResponse.json({
       schemeWiseDistribution,
       monthWiseGrowth,
       approvedVsPending,
       villageWiseDistribution,
       welfareAmountTrends,
+      recentBeneficiaries: recentBeneficiariesData,
     });
   } catch (error) {
     console.error('Failed to fetch analytics:', error);

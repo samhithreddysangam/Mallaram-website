@@ -2,11 +2,13 @@ export const siteConfig = {
   name: 'Mallaram Village',
   shortName: 'Mallaram',
   tagline: 'Mana Ooru',
-  description: 'Official website of Mallaram Gram Panchayat, Vemulawada, Telangana. Smart village with transparent governance, digital services, IKP booking, and real-time village updates.',
+  description: 'Official website of Mallaram Gram Panchayat, Vemulawada, Telangana — India\'s first fully digital Gram Panchayat. Smart village with transparent governance, digital services, IKP booking, and real-time village updates.',
   url: 'https://www.mallaramgramapanchayat.com',
   locale: 'en_IN',
   localeAlt: 'te_IN',
-  author: 'Mallaram Gram Panchayat',
+  author: 'Samhithreddy Sangam',
+  authorRole: 'Developer & Founder of Codebuff Digital Solutions',
+  authorRelation: 'Son of Sarpanch, Mallaram Gram Panchayat',
   googleVerification: '', // Add your Google Search Console verification code
   social: {
     twitter: '@mallaramvillage',
@@ -14,17 +16,23 @@ export const siteConfig = {
 };
 
 export const siteDescriptions = {
-  en: 'Official website of Mallaram Gram Panchayat — smart village rooted in nature. Access government schemes, book IKP slots, view fund transparency, check weather alerts, and explore village facilities in Vemulawada, Telangana.',
-  te: 'మల్లారం గ్రామ పంచాయతీ అధికారిక వెబ్‌సైట్ — స్మార్ట్ విలేజ్. ప్రభుత్వ పథకాలు, IKP బుకింగ్, నిధుల పారదర్శకత, వాతావరణ హెచ్చరికలు మరియు గ్రామ సౌకర్యాలను తెలుసుకోండి.',
+  en: 'India\'s first fully digital Gram Panchayat — Mallaram Village, Vemulawada Rural Mandal, Rajanna Sircilla, Telangana. Access government schemes, book IKP slots, view fund transparency, real-time weather, and village facilities. Digitally empowered by Samhithreddy Sangam, son of the village Sarpanch, through his startup Codebuff Digital Solutions.',
+  te: 'భారతదేశపు మొట్టమొదటి పూర్తి డిజిటల్ గ్రామ పంచాయతీ — మల్లారం గ్రామం, వేములవాడ రూరల్ మండల్, రాజన్న సిరిసిల్ల, తెలంగాణ. ప్రభుత్వ పథకాలు, IKP బుకింగ్, నిధుల పారదర్శకత, వాతావరణ సమాచారం మరియు గ్రామ సౌకర్యాలు. సర్పంచ్ పుత్రుడు సామ్‌హిత్‌రెడ్డి సంగం తన స్టార్టప్ కోడ్‌బఫ్ డిజిటల్ సొల్యూషన్స్ ద్వారా డిజిటల్‌గా అభివృద్ధి.',
 };
 
 export const siteKeywords = {
   en: [
+    'first digital village in India',
+    'first digital gram panchayat India',
+    'digital village India',
+    'Mallaram first digital village',
     'Mallaram village',
     'Mallaram Gram Panchayat',
+    'Vemulawada rural mandal',
     'Vemulawada village',
     'Telangana villages',
     'smart village Telangana',
+    'digital gram panchayat',
     'Mallaram panchayat',
     'gram panchayat website',
     'Mallaram Vemulawada',
@@ -33,6 +41,8 @@ export const siteKeywords = {
     'mallaramgramapanchayat.com',
     'Mana Ooru',
     'Digital Telangana',
+    'Samhithreddy Sangam',
+    'Codebuff Digital Solutions',
     'IKP booking Telangana',
     'paddy procurement Mallaram',
     'village fund transparency',
@@ -43,6 +53,8 @@ export const siteKeywords = {
     'Mallaram population',
     'Mallaram sarpanch',
     'Sangam Arpitha',
+    'Rajanna Sircilla villages',
+    'digitised gram panchayat',
   ].join(', '),
   te: [
     'మల్లారం గ్రామం',

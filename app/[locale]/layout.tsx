@@ -138,11 +138,62 @@ function generateJsonLd(locale: Locale) {
     ],
   };
 
+  // Person schema for the developer who built this digital village platform
+  const developer = {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    '@id': `${baseUrl}/#developer`,
+    name: 'Samhithreddy Sangam',
+    alternateName: 'Samhith Reddy Sangam',
+    description: 'Developer of India\'s first fully digital Gram Panchayat website for Mallaram Village, Vemulawada, Telangana. Son of the village Sarpanch and founder of Codebuff Digital Solutions.',
+    affiliation: {
+      '@type': 'Organization',
+      name: 'Codebuff Digital Solutions',
+      description: 'Startup building digital solutions for rural governance in Telangana',
+    },
+    parent: {
+      '@type': 'Person',
+      name: 'Sangam Arpitha',
+      description: 'Sarpanch of Mallaram Gram Panchayat',
+      sameAs: 'https://www.mallaramgramapanchayat.com/te',
+    },
+    knowsAbout: ['Web Development', 'Digital Governance', 'Telangana Rural Development', 'Gram Panchayat Digitization'],
+    contributesTo: {
+      '@type': 'Project',
+      name: 'Mallaram Digital Village',
+      description: 'India\'s first fully digitized Gram Panchayat platform',
+    },
+  };
+
+  // WebApplication schema for the village portal
+  const webApp = {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    '@id': `${baseUrl}/#webapp`,
+    name: 'Mallaram Gram Panchayat Portal',
+    alternateName: 'మల్లారం గ్రామ పంచాయతీ పోర్టల్',
+    description: 'India\'s first fully digital Gram Panchayat portal. Built for transparent governance, scheme tracking, IKP booking, and real-time village updates.',
+    url: baseUrl,
+    applicationCategory: 'GovernmentApplication',
+    operatingSystem: 'Web',
+    browserRequirements: 'Requires JavaScript',
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'INR' },
+    author: { '@id': `${baseUrl}/#developer` },
+    publisher: { '@id': `${baseUrl}/#organization` },
+    about: {
+      '@type': 'Article',
+      name: 'India\'s First Digital Village',
+      description: 'Mallaram in Vemulawada Rural Mandal becomes India\'s first fully digital Gram Panchayat',
+    },
+  };
+
   return `
 ${JSON.stringify(organization, null, 2)}
 ${JSON.stringify(website, null, 2)}
 ${JSON.stringify(localBusiness, null, 2)}
 ${JSON.stringify(breadcrumbList, null, 2)}
+${JSON.stringify(developer, null, 2)}
+${JSON.stringify(webApp, null, 2)}
   `;
 }
 

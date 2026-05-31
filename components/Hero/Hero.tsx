@@ -77,8 +77,11 @@ export default function Hero({ locale }: HeroProps) {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 1, ease: "easeOut" }}
           >
+            <span className="inline-block px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-50 to-amber-100 text-amber-700 text-[10px] font-black uppercase tracking-[0.3em] mb-3 border border-amber-200 shadow-sm">
+              🏆 {locale === 'te' ? 'భారతదేశపు 1వ డిజిటల్ విలేజ్' : "India's 1st Digital Village"}
+            </span>
             <span className="inline-block px-4 py-1.5 rounded-full bg-[#15803d]/10 text-[#15803d] text-[10px] font-black uppercase tracking-[0.3em] mb-8 border border-[#15803d]/20">
-              Our Village
+              {locale === 'te' ? 'మా ఊరు' : 'Our Village'}
             </span>
             <h1 className="text-6xl md:text-9xl font-black text-[#0A0A0A] mb-8 tracking-tighter leading-[0.85] uppercase">
               {dictionary.hero.title.split(' ')[0]} <br />

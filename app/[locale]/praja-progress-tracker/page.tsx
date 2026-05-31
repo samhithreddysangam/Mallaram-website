@@ -62,6 +62,7 @@ interface AnalyticsData {
   approvedVsPending: { approved: number; pending: number; rejected: number };
   villageWiseDistribution: { name: string; beneficiaries: number; amount: number }[];
   welfareAmountTrends: { month: string; amount: number }[];
+  recentBeneficiaries: { id: string; name: string; benefitAmount: number; village: string; schemeName: string; benefitDate: string }[];
 }
 
 interface Scheme { id: string; title: string; type: string; }
@@ -773,6 +774,79 @@ export default function PrajaProgressTrackerPage() {
             </div>
           )}
         </div>
+
+              {/* Row 4: Recent Beneficiaries with Names */}
+              {analytics && analytics.recentBeneficiaries && analytics.recentBeneficiaries.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.5 }}
+                  className="p-8 md:p-10 bg-[#FAF9F6] rounded-[2.5rem] border border-gray-100 hover:border-[#15803d]/20 transition-all duration-500 shadow-sm"
+                >
+                  <div className="flex items-center gap-4 mb-8">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-[#15803d] flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                      <Users className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-black text-[#0A0A0A] uppercase tracking-tighter">Recent Beneficiaries</h3>
+                      <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mt-0.5">Verified welfare recipients of Mallaram</p>
+                    </div>
+                  </div>
+
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-gray-100">
+                          <th className="text-left py-4 px-3 text-[9px] font-black text-gray-400 uppercase tracking-[0.2em]">Beneficiary Name</th>
+                          <th className="text-left py-4 px-3 text-[9px] font-black text-gray-400 uppercase tracking-[0.2em]">Scheme</th>
+                          <th className="text-left py-4 px-3 text-[9px] font-black text-gray-400 uppercase tracking-[0.2em]">Village</th>
+                          <th className="text-right py-4 px-3 text-[9px] font-black text-gray-400 uppercase tracking-[0.2em]">Amount</th>
+                          <th className="text-right py-4 px-3 text-[9px] font-black text-gray-400 uppercase tracking-[0.2em]">Date</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {analytics.recentBeneficiaries.map((beneficiary, i) => (
+                          <motion.tr
+                            key={beneficiary.id}
+                            initial={{ opacity: 0, x: -10 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: i * 0.03 }}
+                            className="border-b border-gray-50 hover:bg-white/60 transition-colors group"
+                          >
+                            <td className="py-4 px-3">
+                              <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#15803d]/10 to-emerald-100 flex items-center justify-center text-[#15803d] font-black text-xs group-hover:scale-110 transition-transform">
+                                  {beneficiary.name.charAt(0).toUpperCase()}
+                                </div>
+                                <span className="font-bold text-sm text-[#0A0A0A]">{beneficiary.name}</span>
+                              </div>
+                            </td>
+                            <td className="py-4 px-3">
+                              <span className="text-xs font-medium text-gray-500">{beneficiary.schemeName}</span>
+                            </td>
+                            <td className="py-4 px-3">
+                              <div className="flex items-center gap-1.5">
+                                <MapPin className="w-3 h-3 text-gray-300" />
+                                <span className="text-xs font-medium text-gray-500">{beneficiary.village}</span>
+                              </div>
+                            </td>
+                            <td className="py-4 px-3 text-right">
+                              <span className="font-black text-emerald-600">₹{beneficiary.benefitAmount.toLocaleString('en-IN')}</span>
+                            </td>
+                            <td className="py-4 px-3 text-right">
+                              <span className="text-xs font-medium text-gray-400">
+                                {new Date(beneficiary.benefitDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                              </span>
+                            </td>
+                          </motion.tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </motion.div>
+              )}
       </section>
 
       {/* ═══════════════ VERIFICATION + TRANSPARENCY ═══════════════ */}

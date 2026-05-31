@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     template: `%s | ${siteConfig.name}`,
   },
   description: siteDescriptions.en,
-  keywords: 'Mallaram village, Mallaram Gram Panchayat, Vemulawada, Telangana villages, smart village, gram panchayat website, Mallaram Telangana, Mana Ooru, Digital Telangana, IKP booking',
+  keywords: 'first digital village in India, first digital gram panchayat India, digital village India, Mallaram first digital village, Mallaram village, Mallaram Gram Panchayat, Vemulawada rural mandal, Telangana villages, smart village Telangana, digital gram panchayat, Mallaram Vemulawada, Mana Ooru, Digital Telangana, Samhithreddy Sangam, Codebuff Digital Solutions',
   authors: [{ name: siteConfig.author }],
   creator: siteConfig.author,
   publisher: siteConfig.author,

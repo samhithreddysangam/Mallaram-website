@@ -81,6 +81,8 @@ export default function AdminDashboard() {
   // Village Events
   const [villageEvents, setVillageEvents] = useState<any[]>([]);
   const [showEventModal, setShowEventModal] = useState(false);
+  const [uploadingEvent, setUploadingEvent] = useState(false);
+  const [eventFile, setEventFile] = useState<File | null>(null);
   const [editingEvent, setEditingEvent] = useState<string | null>(null);
   const [newEvent, setNewEvent] = useState({ title: '', description: '', imageUrl: '', date: '', category: 'local', order: '0' });
 
@@ -89,6 +91,10 @@ export default function AdminDashboard() {
   const [weatherCheckResult, setWeatherCheckResult] = useState<any>(null);
   const [weatherCheckLoading, setWeatherCheckLoading] = useState(false);
   const [showWeatherCheck, setShowWeatherCheck] = useState(false);
+  
+  // Farmer Analytics
+  const [farmerAnalytics, setFarmerAnalytics] = useState<any>(null);
+  const [analyticsLoading, setAnalyticsLoading] = useState(true);
   
   // Welcome Animation (uses window.location to avoid Suspense boundary requirement)
   const [showWelcome, setShowWelcome] = useState(false);
@@ -274,6 +280,19 @@ export default function AdminDashboard() {
     }
   };
 
+  const fetchFarmerAnalytics = async () => {
+    setAnalyticsLoading(true);
+    try {
+      const res = await fetch('/api/farmers/analytics');
+      const data = await res.json();
+      setFarmerAnalytics(data);
+    } catch (error) {
+      console.error('Failed to fetch farmer analytics:', error);
+    } finally {
+      setAnalyticsLoading(false);
+    }
+  };
+
   const fetchLocalBodyMembers = async () => {
     try {
       const res = await fetch('/api/local-body');
@@ -325,6 +344,7 @@ export default function AdminDashboard() {
       fetchLocalBodyMembers(),
       fetchPrajaApplications(),
       fetchEnrolledFarmers(),
+      fetchFarmerAnalytics(),
     ]);
     setLoading(false);
   };
@@ -818,23 +838,48 @@ export default function AdminDashboard() {
   // Village Events CRUD
   const handleAddEvent = async (e: React.FormEvent) => {
     e.preventDefault();
+    setUploadingEvent(true);
     try {
       const method = editingEvent ? 'PUT' : 'POST';
       const url = editingEvent ? `/api/events?id=${editingEvent}` : '/api/events';
-      const body = { ...newEvent, order: parseInt(newEvent.order) || 0 };
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
+      
+      let res;
+      if (eventFile) {
+        // Use FormData when uploading an image
+        const formData = new FormData();
+        formData.append('title', newEvent.title);
+        formData.append('description', newEvent.description || '');
+        formData.append('date', newEvent.date);
+        formData.append('category', newEvent.category);
+        formData.append('order', newEvent.order || '0');
+        formData.append('image', eventFile);
+        
+        res = await fetch(url, { method, body: formData });
+      } else {
+        // Use JSON when no file
+        const body = { ...newEvent, order: parseInt(newEvent.order) || 0 };
+        res = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+      }
+      
       if (res.ok) {
         setShowEventModal(false);
         setNewEvent({ title: '', description: '', imageUrl: '', date: '', category: 'local', order: '0' });
         setEditingEvent(null);
+        setEventFile(null);
         fetchVillageEvents();
+      } else {
+        const errData = await res.json().catch(() => ({ error: 'Unknown error' }));
+        alert('Failed to save event: ' + (errData.error || res.status));
       }
     } catch (error) {
       console.error('Failed to save event:', error);
+      alert('Network error: Could not save event. Check console for details.');
+    } finally {
+      setUploadingEvent(false);
     }
   };
 
@@ -857,6 +902,7 @@ export default function AdminDashboard() {
       category: event.category || 'local',
       order: event.order?.toString() || '0',
     });
+    setEventFile(null);
     setEditingEvent(event.id);
     setShowEventModal(true);
   };
@@ -2090,6 +2136,141 @@ export default function AdminDashboard() {
                 {weatherCheckLoading ? 'Checking...' : 'Weather Check'}
               </button>
             </div>
+
+            {/* Farmer Analytics Dashboard */}
+            {analyticsLoading ? (
+              <div className="mb-8 p-8 rounded-3xl bg-gradient-to-br from-green-50 to-emerald-50 border border-green-100">
+                <div className="animate-pulse space-y-4">
+                  <div className="h-4 bg-green-200 rounded w-1/4"></div>
+                  <div className="grid grid-cols-4 gap-4">
+                    {[1,2,3,4].map(i => <div key={i} className="h-16 bg-green-200 rounded-2xl"></div>)}
+                  </div>
+                  <div className="h-24 bg-green-200 rounded-2xl"></div>
+                </div>
+              </div>
+            ) : farmerAnalytics && farmerAnalytics.total > 0 ? (
+              <div className="mb-8 p-8 rounded-3xl bg-gradient-to-br from-green-50 to-emerald-50 border border-green-100">
+                <div className="flex items-center gap-2 mb-6">
+                  <BarChart3 className="w-5 h-5 text-green-600" />
+                  <h4 className="text-lg font-black text-green-900">Registration Analytics</h4>
+                </div>
+
+                {/* KPI Row */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                  <div className="p-4 rounded-2xl bg-white/80 border border-green-100">
+                    <div className="text-[9px] font-black text-green-600 uppercase tracking-widest mb-1">Total Farmers</div>
+                    <div className="text-2xl font-black text-[#0A0A0A]">{farmerAnalytics.total}</div>
+                  </div>
+                  <div className="p-4 rounded-2xl bg-white/80 border border-green-100">
+                    <div className="text-[9px] font-black text-green-600 uppercase tracking-widest mb-1">Active</div>
+                    <div className="text-2xl font-black text-[#0A0A0A]">{farmerAnalytics.activeCount}</div>
+                  </div>
+                  <div className="p-4 rounded-2xl bg-white/80 border border-green-100">
+                    <div className="text-[9px] font-black text-green-600 uppercase tracking-widest mb-1">Alert Consent</div>
+                    <div className="text-2xl font-black text-[#0A0A0A]">{farmerAnalytics.consentAlerts}</div>
+                  </div>
+                  <div className="p-4 rounded-2xl bg-white/80 border border-green-100">
+                    <div className="text-[9px] font-black text-green-600 uppercase tracking-widest mb-1">Wards</div>
+                    <div className="text-2xl font-black text-[#0A0A0A]">{farmerAnalytics.wardDistribution?.length || 0}</div>
+                  </div>
+                </div>
+
+                {/* Charts Row */}
+                <div className="grid md:grid-cols-2 gap-6">
+                  {/* Monthly Registration Trend */}
+                  <div className="p-5 rounded-2xl bg-white/80 border border-green-100">
+                    <h5 className="text-[10px] font-black text-green-700 uppercase tracking-widest mb-4">Registration Trend (Monthly)</h5>
+                    <div className="space-y-2">
+                      {farmerAnalytics.monthlyTrend?.slice(-6).map((item: any) => {
+                        const maxCount = Math.max(...farmerAnalytics.monthlyTrend.map((t: any) => t.count));
+                        const pct = (item.count / maxCount) * 100;
+                        return (
+                          <div key={item.month} className="flex items-center gap-3">
+                            <span className="text-[9px] font-bold text-gray-500 w-16 shrink-0">{item.month}</span>
+                            <div className="flex-1 h-5 bg-green-100 rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-gradient-to-r from-green-400 to-emerald-500 rounded-full transition-all"
+                                style={{ width: `${pct}%` }}
+                              />
+                            </div>
+                            <span className="text-[10px] font-black text-green-700 w-6 text-right">{item.count}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Crop Distribution */}
+                  <div className="p-5 rounded-2xl bg-white/80 border border-green-100">
+                    <h5 className="text-[10px] font-black text-green-700 uppercase tracking-widest mb-4">Top Crops</h5>
+                    <div className="space-y-2">
+                      {farmerAnalytics.cropDistribution?.slice(0, 8).map((item: any) => {
+                        const maxCount = farmerAnalytics.cropDistribution[0]?.count || 1;
+                        const pct = (item.count / maxCount) * 100;
+                        return (
+                          <div key={item.crop} className="flex items-center gap-3">
+                            <span className="text-[10px] font-bold text-gray-700 capitalize w-24 truncate">{item.crop}</span>
+                            <div className="flex-1 h-5 bg-amber-100 rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full transition-all"
+                                style={{ width: `${pct}%` }}
+                              />
+                            </div>
+                            <span className="text-[10px] font-black text-amber-700 w-6 text-right">{item.count}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Language Preferences */}
+                  <div className="p-5 rounded-2xl bg-white/80 border border-green-100">
+                    <h5 className="text-[10px] font-black text-green-700 uppercase tracking-widest mb-4">Language Preferences</h5>
+                    <div className="space-y-2">
+                      {farmerAnalytics.languagePreferences?.map((item: any) => {
+                        const pct = (item.count / farmerAnalytics.total) * 100;
+                        const langName = item.lang === 'te' ? 'Telugu' : item.lang === 'en' ? 'English' : item.lang === 'hi' ? 'Hindi' : item.lang.toUpperCase();
+                        return (
+                          <div key={item.lang} className="flex items-center gap-3">
+                            <span className="text-[10px] font-bold text-gray-700 w-20">{langName}</span>
+                            <div className="flex-1 h-5 bg-blue-100 rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-gradient-to-r from-blue-400 to-indigo-500 rounded-full transition-all"
+                                style={{ width: `${pct}%` }}
+                              />
+                            </div>
+                            <span className="text-[10px] font-black text-blue-700 w-10 text-right">{item.count} ({Math.round(pct)}%)</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Ward Distribution */}
+                  <div className="p-5 rounded-2xl bg-white/80 border border-green-100">
+                    <h5 className="text-[10px] font-black text-green-700 uppercase tracking-widest mb-4">Ward Distribution</h5>
+                    <div className="space-y-2">
+                      {farmerAnalytics.wardDistribution?.slice(0, 8).map((item: any) => {
+                        const maxCount = farmerAnalytics.wardDistribution[0]?.count || 1;
+                        const pct = (item.count / maxCount) * 100;
+                        return (
+                          <div key={item.ward} className="flex items-center gap-3">
+                            <span className="text-[10px] font-bold text-gray-700 w-24 truncate">{item.ward}</span>
+                            <div className="flex-1 h-5 bg-purple-100 rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-gradient-to-r from-purple-400 to-violet-500 rounded-full transition-all"
+                                style={{ width: `${pct}%` }}
+                              />
+                            </div>
+                            <span className="text-[10px] font-black text-purple-700 w-6 text-right">{item.count}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : null}
 
             {/* Weather Check Result Panel */}
             {showWeatherCheck && weatherCheckResult && (
@@ -3348,7 +3529,7 @@ ${phones}`);
         {showEventModal && (
           <div className="fixed inset-0 bg-[#0A0A0A]/90 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
             <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-[2.5rem] shadow-2xl p-10 w-full max-w-lg relative">
-              <button onClick={() => setShowEventModal(false)} className="absolute top-8 right-8 text-gray-300 hover:text-[#0A0A0A] transition-colors"><X className="w-6 h-6"/></button>
+              <button onClick={() => { setShowEventModal(false); setEventFile(null); }} className="absolute top-8 right-8 text-gray-300 hover:text-[#0A0A0A] transition-colors"><X className="w-6 h-6"/></button>
               <h3 className="text-3xl font-black text-[#0A0A0A] mb-2 tracking-tighter">
                 {editingEvent ? 'Update Event' : 'Add Village Event'}
               </h3>
@@ -3385,6 +3566,7 @@ ${phones}`);
                       onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })}
                       className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 font-bold"
                       placeholder="e.g., 15 Oct 2025"
+                      required
                     />
                   </div>
                   <div>
@@ -3400,14 +3582,49 @@ ${phones}`);
                   </div>
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Image URL</label>
-                  <input
-                    type="url"
-                    value={newEvent.imageUrl}
-                    onChange={(e) => setNewEvent({ ...newEvent, imageUrl: e.target.value })}
-                    className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 font-bold"
-                    placeholder="https://example.com/event.jpg"
-                  />
+                  <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Event Photo</label>
+                  <div className="flex items-center gap-4">
+                    <label className="flex-1 cursor-pointer">
+                      <div className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl hover:border-purple-500/40 transition-colors font-bold text-gray-400 flex items-center gap-3">
+                        <Upload className="w-5 h-5 text-purple-500 shrink-0" />
+                        <span className="truncate">{eventFile ? eventFile.name : 'Choose an image...'}</span>
+                      </div>
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp,image/gif"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0] || null;
+                          setEventFile(file);
+                          if (file) {
+                            setNewEvent({ ...newEvent, imageUrl: '' });
+                          }
+                        }}
+                        className="hidden"
+                      />
+                    </label>
+                    {(eventFile || newEvent.imageUrl) && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEventFile(null);
+                          setNewEvent({ ...newEvent, imageUrl: '' });
+                        }}
+                        className="p-3 bg-red-50 text-red-500 rounded-xl hover:bg-red-100 transition-colors"
+                        title="Remove image"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                  {(eventFile || newEvent.imageUrl) && (
+                    <div className="mt-4 relative rounded-2xl overflow-hidden bg-gray-50 border border-gray-100">
+                      <img
+                        src={eventFile ? URL.createObjectURL(eventFile) : newEvent.imageUrl}
+                        alt="Event preview"
+                        className="w-full h-40 object-cover rounded-2xl"
+                      />
+                    </div>
+                  )}
                 </div>
                 <div>
                   <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Display Order</label>
@@ -3419,8 +3636,12 @@ ${phones}`);
                     placeholder="0"
                   />
                 </div>
-                <button type="submit" className="w-full py-5 bg-purple-600 text-white rounded-[1.5rem] font-black uppercase tracking-widest hover:scale-[1.02] transition-all shadow-xl shadow-purple-600/20 mt-4">
-                  {editingEvent ? 'Save Changes' : 'Add Event'}
+                <button
+                  type="submit"
+                  disabled={uploadingEvent}
+                  className="w-full py-5 bg-purple-600 text-white rounded-[1.5rem] font-black uppercase tracking-widest hover:scale-[1.02] transition-all shadow-xl shadow-purple-600/20 mt-4 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                >
+                  {uploadingEvent ? 'Uploading...' : (editingEvent ? 'Save Changes' : 'Add Event')}
                 </button>
               </form>
             </motion.div>
