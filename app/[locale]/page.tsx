@@ -10,6 +10,7 @@ import Events from '@/components/Events/Events';
 import CTA from '@/components/CTA/CTA';
 import Contact from '@/components/Contact/Contact';
 import Footer from '@/components/Footer/Footer';
+import LocalBodySection from '@/components/LocalBody/LocalBodySection';
 import SmartAgriculture from '@/components/SmartVillage/SmartAgriculture';
 import SmartCommandCenter from '@/components/SmartVillage/SmartCommandCenter';
 import WaterGovernance from '@/components/SmartVillage/WaterGovernance';
@@ -86,6 +87,7 @@ export default async function LocalePage({ params }: { params: Promise<{ locale:
         <Navigation locale={currentLocale} />
       </Suspense>
       <OfficialsSection locale={currentLocale} />
+      <LocalBodySection locale={currentLocale} />
       <Hero locale={currentLocale} />
       <Stats locale={currentLocale} />
       <SmartCommandCenter locale={currentLocale} />

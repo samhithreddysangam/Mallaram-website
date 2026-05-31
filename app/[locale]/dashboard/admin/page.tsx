@@ -71,6 +71,13 @@ export default function AdminDashboard() {
   const [uploadingOfficial, setUploadingOfficial] = useState(false);
   const [officialForm, setOfficialForm] = useState({ name: '', title: '', description: '', order: '0', file: null as File | null });
   
+  // Local Body Members
+  const [localBodyMembers, setLocalBodyMembers] = useState<any[]>([]);
+  const [showLocalBodyModal, setShowLocalBodyModal] = useState(false);
+  const [editingLocalBody, setEditingLocalBody] = useState<string | null>(null);
+  const [uploadingLocalBody, setUploadingLocalBody] = useState(false);
+  const [localBodyForm, setLocalBodyForm] = useState({ name: '', designation: '', description: '', category: 'ward_member', ward: '', order: '0', file: null as File | null });
+  
   // Village Events
   const [villageEvents, setVillageEvents] = useState<any[]>([]);
   const [showEventModal, setShowEventModal] = useState(false);
@@ -237,6 +244,16 @@ export default function AdminDashboard() {
     }
   };
 
+  const fetchLocalBodyMembers = async () => {
+    try {
+      const res = await fetch('/api/local-body');
+      const data = await res.json();
+      setLocalBodyMembers(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error('Failed to fetch local body members:', error);
+    }
+  };
+
   const fetchPrajaApplications = async () => {
     try {
       // Fetch stats from dedicated endpoint for accurate counts
@@ -275,6 +292,7 @@ export default function AdminDashboard() {
       fetchWaterSources(),
       fetchVillageOfficials(),
       fetchVillageEvents(),
+      fetchLocalBodyMembers(),
       fetchPrajaApplications(),
     ]);
     setLoading(false);
@@ -709,6 +727,63 @@ export default function AdminDashboard() {
     setShowOfficialModal(true);
   };
 
+  // Local Body Member CRUD
+  const handleAddLocalBody = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!localBodyForm.name || !localBodyForm.designation) return;
+    setUploadingLocalBody(true);
+    try {
+      const formData = new FormData();
+      formData.append('name', localBodyForm.name);
+      formData.append('designation', localBodyForm.designation);
+      formData.append('description', localBodyForm.description || '');
+      formData.append('category', localBodyForm.category);
+      formData.append('ward', localBodyForm.ward || '');
+      formData.append('order', localBodyForm.order || '0');
+      if (localBodyForm.file) {
+        formData.append('image', localBodyForm.file);
+      }
+
+      const method = editingLocalBody ? 'PUT' : 'POST';
+      const url = editingLocalBody ? `/api/local-body?id=${editingLocalBody}` : '/api/local-body';
+      const res = await fetch(url, { method, body: formData });
+      if (res.ok) {
+        setShowLocalBodyModal(false);
+        setLocalBodyForm({ name: '', designation: '', description: '', category: 'ward_member', ward: '', order: '0', file: null as File | null });
+        setEditingLocalBody(null);
+        fetchLocalBodyMembers();
+      }
+    } catch (error) {
+      console.error('Failed to save local body member:', error);
+    } finally {
+      setUploadingLocalBody(false);
+    }
+  };
+
+  const handleDeleteLocalBody = async (id: string) => {
+    if (!confirm('Delete this member from the Local Body section?')) return;
+    try {
+      const res = await fetch(`/api/local-body?id=${id}`, { method: 'DELETE' });
+      if (res.ok) fetchLocalBodyMembers();
+    } catch (error) {
+      console.error('Failed to delete local body member:', error);
+    }
+  };
+
+  const startEditLocalBody = (member: any) => {
+    setLocalBodyForm({
+      name: member.name,
+      designation: member.designation,
+      description: member.description || '',
+      category: member.category || 'ward_member',
+      ward: member.ward || '',
+      order: member.order?.toString() || '0',
+      file: null,
+    });
+    setEditingLocalBody(member.id);
+    setShowLocalBodyModal(true);
+  };
+
   // Village Events CRUD
   const handleAddEvent = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -925,6 +1000,7 @@ export default function AdminDashboard() {
             { id: 'performance', label: 'Performance', icon: '🏆' },
             { id: 'water', label: 'Water Supply', icon: '💧' },
             { id: 'officials', label: 'Officials', icon: '👤' },
+            { id: 'localbody', label: 'Local Body', icon: '🏘' },
             { id: 'events', label: 'Events', icon: '🎉' },
             { id: 'slots', label: 'IKP Slots', icon: '📅' },
             { id: 'schemes', label: 'Schemes', icon: '🔗' },
@@ -1426,7 +1502,7 @@ export default function AdminDashboard() {
                   <div className="w-10 h-10 rounded-2xl bg-[#15803d]/10 flex items-center justify-center">
                     <Shield className="w-5 h-5 text-[#15803d]" />
                   </div>
-                  <h3 className="text-2xl font-black text-[#0A0A0A] tracking-tighter">Village Administrators</h3>
+                  <h3 className="text-2xl font-black text-[#0A0A0A] tracking-tighter">Administrators</h3>
                 </div>
                 <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-2 ml-[52px]">Manage officials shown on the Village Administration page</p>
               </div>

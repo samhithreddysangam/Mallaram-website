@@ -214,6 +214,20 @@ model VillageEvent {
   updatedAt     DateTime  @updatedAt
 }
 
+model LocalBodyMember {
+  id            String    @id @default(cuid())
+  name          String
+  designation   String    // e.g., "Panchayat Secretary", "Ward Member - Ward 1"
+  imageUrl      String?
+  description   String?
+  category      String    @default("ward_member") // "secretary" or "ward_member"
+  ward          String?   // e.g., "Ward 1", "Ward 2", etc.
+  order         Int       @default(0)
+  active        Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
 model WaterSource {
   id            String    @id @default(cuid())
   label         String    // e.g., "Main Reservoir"
