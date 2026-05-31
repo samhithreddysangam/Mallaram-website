@@ -32,7 +32,7 @@ export default function GrievanceSystem({ locale }: GrievanceSystemProps) {
 
             <div className="flex flex-col gap-6">
               {[
-                { label: 'Problems Fixed', value: '428', icon: BarChart3 },
+                { label: 'Problems Fixed', value: '10', icon: BarChart3 },
                 { label: 'Average Fix Time', value: '3.2 Days', icon: MessageSquare },
               ].map((stat, i) => (
                 <div key={i} className="flex items-center gap-6 p-6 rounded-3xl bg-[#FAF9F6] border border-gray-100 group transition-all">
