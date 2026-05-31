@@ -30,10 +30,9 @@ export default function Navigation({ locale }: NavigationProps) {
     { key: 'governance', href: `/${locale}#command-center` },
     { key: 'about', href: `/${locale}#about` },
     { key: 'dashboard', href: `/${locale}/ikp-booking` },
-    { key: 'school', href: `/${locale}#admissions` },
     { key: 'schemes', href: `/${locale}/schemes` },
     { key: 'prajaTracker', href: `/${locale}/praja-progress-tracker` },
-    { key: 'facilities', href: `/${locale}#facilities` },
+    { key: 'school', href: `/${locale}#admissions` },
     { key: 'gallery', href: `/${locale}#gallery` },
     { key: 'events', href: `/${locale}#events` },
     { key: 'complaint', href: `/${locale}#complaint` },
@@ -58,7 +57,7 @@ export default function Navigation({ locale }: NavigationProps) {
           </div>
 
           {/* Nav Links (Desktop) */}
-          <div className="hidden xl:flex flex-1 justify-end items-center gap-0.5">              {navItems.slice(0, 5).map((item) => (
+          <div className="hidden xl:flex flex-1 justify-end items-center gap-0.5">              {navItems.slice(0, 4).map((item) => (
               <Link
                 key={item.key}
                 href={item.href}
@@ -91,7 +90,7 @@ export default function Navigation({ locale }: NavigationProps) {
           {/* RIGHT: Nav Links & Controls */}
           <div className="flex-1 flex justify-start items-center gap-3">
             <div className="hidden xl:flex items-center gap-0.5">
-              {navItems.slice(5, 10).map((item) => (
+              {navItems.slice(4, 9).map((item) => (
                 <Link
                   key={item.key}
                   href={item.href}
