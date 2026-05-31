@@ -30,14 +30,12 @@ function LoginForm() {
 
   const router = useRouter();
 
-  // Redirect if already logged in
+  // Redirect to login page so middleware checks JWT cookie and routes to correct dashboard
   useEffect(() => {
     if (status === 'authenticated') {
-      const userRole = (session?.user as any)?.role;
-      const targetPath = userRole === 'ADMIN' ? `/${locale}/dashboard/admin` : `/${locale}/ikp-booking`;
-      router.replace(targetPath);
+      window.location.href = `/${locale}/login`;
     }
-  }, [status, session, locale, router]);
+  }, [status, locale]);
 
   if (status === 'loading') {
     return (
@@ -98,14 +96,9 @@ function LoginForm() {
           setError(result.error);
         }
       } else {
-        // Successful login, direct user to dashboard immediately
-        const userRole = (session?.user as any)?.role;
-        const targetPath = userRole === 'ADMIN' ? `/${locale}/dashboard/admin?welcome=true` : `/${locale}/ikp-booking?welcome=true`;
-        router.replace(targetPath);
-        // Fallback hard refresh to ensure session state updates
-        setTimeout(() => {
-          window.location.href = targetPath;
-        }, 100);
+        // Successful login — redirect to login page so middleware handles role-based routing
+        // (Middleware checks the JWT cookie and redirects ADMIN→/dashboard/admin, SCHOOL/PRINCIPAL→/dashboard/school)
+        window.location.href = `/${locale}/login`;
       }
     } catch (err: any) {
       console.error('Login error:', err);

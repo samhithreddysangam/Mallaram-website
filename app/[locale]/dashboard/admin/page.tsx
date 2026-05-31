@@ -3020,7 +3020,7 @@ ${phones}`);
                       accept="image/jpeg,image/png,image/webp,image/gif"
                       onChange={(e) => setGalleryForm({ ...galleryForm, file: e.target.files?.[0] || null })}
                       className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-[#15803d]/10 focus:border-[#15803d] font-bold file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-[#15803d]/10 file:text-[#15803d] file:font-black file:text-[10px] file:uppercase file:tracking-widest hover:file:bg-[#15803d]/20"
-                      {!editingGallery && 'required'}
+                      required={!editingGallery}
                     />
                   </div>
                   <p className="text-[10px] text-gray-400 font-medium mt-2">JPEG, PNG, WebP, or GIF. Max 10MB.</p>

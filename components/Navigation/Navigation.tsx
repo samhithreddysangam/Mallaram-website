@@ -30,7 +30,7 @@ export default function Navigation({ locale }: NavigationProps) {
     { key: 'governance', href: `/${locale}#command-center` },
     { key: 'about', href: `/${locale}#about` },
     { key: 'dashboard', href: `/${locale}/ikp-booking` },
-    { key: 'admissions', href: `/${locale}#admissions` },
+    { key: 'school', href: `/${locale}#admissions` },
     { key: 'schemes', href: `/${locale}/schemes` },
     { key: 'prajaTracker', href: `/${locale}/praja-progress-tracker` },
     { key: 'facilities', href: `/${locale}#facilities` },
