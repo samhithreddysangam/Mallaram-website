@@ -228,6 +228,22 @@ model LocalBodyMember {
   updatedAt     DateTime  @updatedAt
 }
 
+model FarmerEnrollment {
+  id            String    @id @default(cuid())
+  name          String
+  phone         String    @unique
+  village       String    @default("Mallaram")
+  ward          String?
+  landArea      String?   // e.g., "5 acres"
+  crops         String?   // e.g., "Paddy, Cotton, Maize"
+  soilType      String?   // e.g., "Black soil", "Red soil"
+  language      String    @default("te") // "en" or "te"
+  consentAlerts Boolean   @default(true)
+  active        Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
 model WaterSource {
   id            String    @id @default(cuid())
   label         String    // e.g., "Main Reservoir"

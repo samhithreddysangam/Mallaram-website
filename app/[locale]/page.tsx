@@ -18,6 +18,7 @@ import TransparencyPortal from '@/components/SmartVillage/TransparencyPortal';
 import EmergencyAlerts from '@/components/SmartVillage/EmergencyAlerts';
 import GrievanceSystem from '@/components/SmartVillage/GrievanceSystem';
 import VillageMap from '@/components/SmartVillage/VillageMap';
+import FarmerEnrollment from '@/components/Farmers/FarmerEnrollment';
 import { locales, getDictionary, Locale } from '@/lib/i18n';
 import { siteConfig } from '@/lib/seo';
 import { notFound } from 'next/navigation';
@@ -92,6 +93,7 @@ export default async function LocalePage({ params }: { params: Promise<{ locale:
       <Stats locale={currentLocale} />
       <SmartCommandCenter locale={currentLocale} />
       <SmartAgriculture locale={currentLocale} />
+      <FarmerEnrollment locale={currentLocale} />
       <WaterGovernance locale={currentLocale} />
       <TransparencyPortal locale={currentLocale} />
       <EmergencyAlerts locale={currentLocale} />
