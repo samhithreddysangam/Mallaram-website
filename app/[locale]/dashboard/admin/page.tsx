@@ -28,6 +28,7 @@ export default function AdminDashboard() {
   // Gallery
   const [galleryImages, setGalleryImages] = useState<any[]>([]);
   const [showGalleryModal, setShowGalleryModal] = useState(false);
+  const [editingGallery, setEditingGallery] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [galleryForm, setGalleryForm] = useState({ alt: '', description: '', file: null as File | null });
   
@@ -457,30 +458,60 @@ export default function AdminDashboard() {
 
   const handleGalleryUpload = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!galleryForm.file) return;
     
     setUploading(true);
     try {
-      const formData = new FormData();
-      formData.append('file', galleryForm.file);
-      formData.append('alt', galleryForm.alt || 'Mallaram Gallery');
-      formData.append('description', galleryForm.description || '');
+      if (editingGallery) {
+        // Update existing — no file needed
+        const res = await fetch(`/api/gallery?id=${editingGallery}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            alt: galleryForm.alt || 'Mallaram Gallery',
+            description: galleryForm.description || '',
+          }),
+        });
+        if (res.ok) {
+          setShowGalleryModal(false);
+          setEditingGallery(null);
+          setGalleryForm({ alt: '', description: '', file: null });
+          fetchGallery();
+        }
+      } else {
+        // Upload new
+        if (!galleryForm.file) return;
+        const formData = new FormData();
+        formData.append('file', galleryForm.file);
+        formData.append('alt', galleryForm.alt || 'Mallaram Gallery');
+        formData.append('description', galleryForm.description || '');
 
-      const res = await fetch('/api/gallery', {
-        method: 'POST',
-        body: formData,
-      });
-      if (res.ok) {
-        setShowGalleryModal(false);
-        setGalleryForm({ alt: '', description: '', file: null });
-        fetchGallery();
+        const res = await fetch('/api/gallery', {
+          method: 'POST',
+          body: formData,
+        });
+        if (res.ok) {
+          setShowGalleryModal(false);
+          setGalleryForm({ alt: '', description: '', file: null });
+          fetchGallery();
+        }
       }
     } catch (error) {
-      console.error('Failed to upload image:', error);
+      console.error('Failed to save image:', error);
     } finally {
       setUploading(false);
     }
   };
+
+  const startEditGallery = (img: any) => {
+    setGalleryForm({
+      alt: img.alt || '',
+      description: img.description || '',
+      file: null,
+    });
+    setEditingGallery(img.id);
+    setShowGalleryModal(true);
+  };
+
 
   const handleDeleteGalleryImage = async (id: string) => {
     if (!confirm('Are you sure you want to delete this image?')) return;
@@ -1845,7 +1876,14 @@ export default function AdminDashboard() {
                       className="w-full h-full object-cover"
                     />
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300" />
-                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="absolute top-2 right-2 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button 
+                        onClick={() => startEditGallery(img)}
+                        className="p-2 bg-white/90 backdrop-blur-sm rounded-xl text-green-600 hover:bg-green-50 transition-all shadow-lg"
+                        title="Edit photo name"
+                      >
+                        <Edit className="w-3.5 h-3.5" />
+                      </button>
                       <button 
                         onClick={() => handleDeleteGalleryImage(img.id)}
                         className="p-2 bg-white/90 backdrop-blur-sm rounded-xl text-red-600 hover:bg-red-50 transition-all shadow-lg"
@@ -2970,8 +3008,8 @@ ${phones}`);
           <div className="fixed inset-0 bg-[#0A0A0A]/90 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
             <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-[2.5rem] shadow-2xl p-10 w-full max-w-md relative">
               <button onClick={() => setShowGalleryModal(false)} className="absolute top-8 right-8 text-gray-300 hover:text-[#0A0A0A] transition-colors"><X className="w-6 h-6"/></button>
-              <h3 className="text-3xl font-black text-[#0A0A0A] mb-2 tracking-tighter">Upload Gallery Photo</h3>
-              <p className="text-gray-400 mb-8 font-medium">Add a new photo to the village gallery</p>
+              {editingGallery ? <h3 className="text-3xl font-black text-[#0A0A0A] mb-2 tracking-tighter">Edit Photo Name</h3> : <h3 className="text-3xl font-black text-[#0A0A0A] mb-2 tracking-tighter">Upload Gallery Photo</h3>}
+              {editingGallery ? <p className="text-gray-400 mb-8 font-medium">Update the photo name and description</p> : <p className="text-gray-400 mb-8 font-medium">Add a new photo to the village gallery</p>}
               
               <form onSubmit={handleGalleryUpload} className="space-y-6">
                 <div>
@@ -2982,7 +3020,7 @@ ${phones}`);
                       accept="image/jpeg,image/png,image/webp,image/gif"
                       onChange={(e) => setGalleryForm({ ...galleryForm, file: e.target.files?.[0] || null })}
                       className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-[#15803d]/10 focus:border-[#15803d] font-bold file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-[#15803d]/10 file:text-[#15803d] file:font-black file:text-[10px] file:uppercase file:tracking-widest hover:file:bg-[#15803d]/20"
-                      required
+                      {!editingGallery && 'required'}
                     />
                   </div>
                   <p className="text-[10px] text-gray-400 font-medium mt-2">JPEG, PNG, WebP, or GIF. Max 10MB.</p>
@@ -3008,10 +3046,10 @@ ${phones}`);
                 </div>
                 <button 
                   type="submit" 
-                  disabled={uploading || !galleryForm.file}
+                  disabled={uploading || (!editingGallery && !galleryForm.file)}
                   className="w-full py-5 bg-[#15803d] text-white rounded-[1.5rem] font-black uppercase tracking-widest hover:scale-[1.02] transition-all shadow-xl shadow-[#15803d]/20 disabled:opacity-50 disabled:cursor-not-allowed mt-4"
                 >
-                  {uploading ? 'Uploading...' : 'Upload to Gallery'}
+                  {uploading ? 'Uploading...' : editingGallery ? 'Save Changes' : 'Upload to Gallery'}
                 </button>
               </form>
             </motion.div>

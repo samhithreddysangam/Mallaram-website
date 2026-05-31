@@ -70,6 +70,37 @@ export async function POST(request: Request) {
   }
 }
 
+export async function PUT(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+    const body = await request.json();
+    const { alt, description } = body;
+
+    if (!id) {
+      return NextResponse.json({ error: 'ID is required' }, { status: 400 });
+    }
+
+    const image = await prisma.galleryImage.findUnique({ where: { id } });
+    if (!image) {
+      return NextResponse.json({ error: 'Image not found' }, { status: 404 });
+    }
+
+    const updated = await prisma.galleryImage.update({
+      where: { id },
+      data: {
+        ...(alt !== undefined && { alt }),
+        ...(description !== undefined && { description }),
+      },
+    });
+
+    return NextResponse.json(updated);
+  } catch (error) {
+    console.error('Failed to update gallery image:', error);
+    return NextResponse.json({ error: 'Failed to update gallery image' }, { status: 500 });
+  }
+}
+
 export async function DELETE(request: Request) {
   try {
     const { searchParams } = new URL(request.url);

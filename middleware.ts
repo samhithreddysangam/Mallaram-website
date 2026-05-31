@@ -71,8 +71,8 @@ export default auth((req) => {
       return safeRedirect(`/${locale}/ikp-booking`, req);
     }
     
-    // Protect SCHOOL dashboard — only SCHOOL role can access
-    if (isOnSchoolDashboard && userRole !== 'SCHOOL') {
+    // Protect SCHOOL dashboard — only SCHOOL or PRINCIPAL role can access
+    if (isOnSchoolDashboard && userRole !== 'SCHOOL' && userRole !== 'PRINCIPAL') {
       console.log('Middleware: Redirecting non-school user away from school dashboard');
       return safeRedirect(`/${locale}/ikp-booking`, req);
     }
@@ -83,7 +83,7 @@ export default auth((req) => {
     if (userRole === 'ADMIN') {
       return safeRedirect(`/${locale}/dashboard/admin`, req);
     }
-    if (userRole === 'SCHOOL') {
+    if (userRole === 'SCHOOL' || userRole === 'PRINCIPAL') {
       return safeRedirect(`/${locale}/dashboard/school`, req);
     }
     return safeRedirect(`/${locale}/ikp-booking`, req);

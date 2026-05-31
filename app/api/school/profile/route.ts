@@ -10,17 +10,14 @@ export async function GET() {
     }
 
     const user = session.user as any;
-    const profile = await prisma.schoolProfile.findUnique({
-      where: { userId: user.id },
-      select: {
-        id: true,
-        schoolName: true,
-        address: true,
-        phone: true,
-        email: true,
-        userId: true,
-      },
-    });
+    const profile = user.role === 'PRINCIPAL'
+      ? await prisma.schoolProfile.findFirst({
+          select: { id: true, schoolName: true, address: true, phone: true, email: true, userId: true },
+        })
+      : await prisma.schoolProfile.findUnique({
+          where: { userId: user.id },
+          select: { id: true, schoolName: true, address: true, phone: true, email: true, userId: true },
+        });
 
     if (!profile) {
       return NextResponse.json({ error: 'School profile not found' }, { status: 404 });

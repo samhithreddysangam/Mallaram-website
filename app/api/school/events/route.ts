@@ -13,9 +13,9 @@ export async function GET(request: Request) {
     }
 
     const user = session.user as any;
-    const schoolProfile = await prisma.schoolProfile.findUnique({
-      where: { userId: user.id },
-    });
+    const schoolProfile = user.role === 'PRINCIPAL'
+      ? await prisma.schoolProfile.findFirst()
+      : await prisma.schoolProfile.findUnique({ where: { userId: user.id } });
 
     if (!schoolProfile) {
       return NextResponse.json({ error: 'School profile not found' }, { status: 404 });
@@ -41,13 +41,13 @@ export async function POST(request: Request) {
     }
 
     const user = session.user as any;
-    if (user.role !== 'SCHOOL') {
+    if (user.role !== 'SCHOOL' && user.role !== 'PRINCIPAL') {
       return NextResponse.json({ error: 'Only school users can submit events' }, { status: 403 });
     }
 
-    const schoolProfile = await prisma.schoolProfile.findUnique({
-      where: { userId: user.id },
-    });
+    const schoolProfile = user.role === 'PRINCIPAL'
+      ? await prisma.schoolProfile.findFirst()
+      : await prisma.schoolProfile.findUnique({ where: { userId: user.id } });
 
     if (!schoolProfile) {
       return NextResponse.json({ error: 'School profile not found' }, { status: 404 });

@@ -35,6 +35,22 @@ async function main() {
     },
   });
 
+  // Create Principal User for MPPS Mallaram
+  const principalUser = await prisma.user.upsert({
+    where: { email: 'principal@mallaram.in' },
+    update: {
+      password: 'principal123',
+      role: 'PRINCIPAL',
+    },
+    create: {
+      email: 'principal@mallaram.in',
+      name: 'School Principal MPPS Mallaram',
+      phone: '9989120935',
+      password: 'principal123',
+      role: 'PRINCIPAL',
+    },
+  });
+
   // Create School Profile
   await prisma.schoolProfile.upsert({
     where: { userId: schoolUser.id },
@@ -234,27 +250,7 @@ async function main() {
   }
   console.log(`Seeded ${officials.length} village official(s).`);
 
-  // Create sample fund usage records
-  console.log('Seeding fund usage records...');
-  const fundRecords = [
-    { label: 'CC Road Construction Ward 3', amount: 1250000, category: 'Infrastructure', description: 'Construction of cement concrete road in Ward 3 covering 500 meters with drainage.', date: new Date('2025-12-15') },
-    { label: 'School Toilet Renovation', amount: 350000, category: 'Education', description: 'Renovation of 4 toilet blocks at ZP High School including new tiles and plumbing.', date: new Date('2026-01-10') },
-    { label: 'Handpump Installation', amount: 85000, category: 'Water', description: 'Installation of 2 new handpumps in SC Colony for clean drinking water access.', date: new Date('2026-02-05') },
-    { label: 'Street Light Maintenance', amount: 120000, category: 'Electricity', description: 'Replacement of 25 LED street lights and 5 new pole installations in main road.', date: new Date('2026-02-20') },
-    { label: 'Village Library Setup', amount: 250000, category: 'Education', description: 'Setup of digital library with 10 computers, books, and furniture at community hall.', date: new Date('2026-03-01') },
-    { label: 'Drainage Cleaning - Pre Monsoon', amount: 75000, category: 'Sanitation', description: 'Pre-monsoon cleaning and desilting of all major drainage channels in the village.', date: new Date('2026-03-15') },
-    { label: 'Health Camp - Eye Checkup', amount: 45000, category: 'Healthcare', description: 'Free eye checkup camp organized in collaboration with district hospital. 200+ patients screened.', date: new Date('2026-04-01') },
-    { label: 'Community Borewell', amount: 180000, category: 'Water', description: 'Deep borewell drilling at community center for irrigation of village garden.', date: new Date('2026-04-10') },
-    { label: 'Flood Relief Distribution', amount: 95000, category: 'Emergency', description: 'Distribution of food kits and tarpaulins to 45 families affected by heavy rains.', date: new Date('2026-05-20') },
-    { label: 'Anganwadi Center Upgrades', amount: 165000, category: 'Infrastructure', description: 'Repair and upgrade of Anganwadi center with new tiles, furniture, toys, and cooking equipment.', date: new Date('2026-06-01') },
-  ];
-
-  // Clear existing records to avoid duplicates on re-run
-  await prisma.fundUsage.deleteMany({});
-
-  for (const record of fundRecords) {
-    await prisma.fundUsage.create({ data: record });
-  }
+  // Fund Usage — NOT auto-seeded; admin adds entries manually through the dashboard UI
 
   // Create gallery image records (placeholder paths — actual images should be uploaded via admin)
   console.log('Seeding gallery image records...');
@@ -295,17 +291,77 @@ async function main() {
           schoolId: schoolProfile.id,
         },
       });
+      await prisma.schoolAchievement.create({
+        data: {
+          title: 'Inter-School Sports Championship Winners',
+          description: 'Our students won 5 gold medals in the Mandal-level inter-school sports championship held at Vemulawada.',
+          status: 'APPROVED',
+          approvedAt: new Date(),
+          schoolId: schoolProfile.id,
+        },
+      });
+      await prisma.schoolAchievement.create({
+        data: {
+          title: 'Science Exhibition 1st Prize',
+          description: 'MPPS Mallaram won 1st prize for the best science project on solar-powered water conservation at the district science exhibition.',
+          status: 'APPROVED',
+          approvedAt: new Date(),
+          schoolId: schoolProfile.id,
+        },
+      });
+      await prisma.schoolAchievement.create({
+        data: {
+          title: 'Digital Literacy Initiative',
+          description: 'Successfully completed digital literacy training for 60 students with basic computer skills and typing proficiency.',
+          status: 'PENDING',
+          schoolId: schoolProfile.id,
+        },
+      });
       console.log('Seeded sample school achievements.');
+    }
+  }
+
+  // Create sample school events
+  const existingEvents = await prisma.schoolEvent.count();
+  if (existingEvents === 0) {
+    const schoolProfile = await prisma.schoolProfile.findFirst({
+      where: { userId: schoolUser.id },
+    });
+    if (schoolProfile) {
+      await prisma.schoolEvent.create({
+        data: {
+          title: 'Annual Day Celebration 2026',
+          description: 'Annual day celebration with cultural programs, prize distribution, and parent-teacher meet.',
+          date: 'April 15, 2026',
+          time: '10:00 AM',
+          status: 'APPROVED',
+          approvedAt: new Date(),
+          schoolId: schoolProfile.id,
+        },
+      });
+      await prisma.schoolEvent.create({
+        data: {
+          title: 'Parent-Teacher Meeting',
+          description: 'Quarterly parent-teacher meeting to discuss student progress and school development.',
+          date: 'March 28, 2026',
+          time: '11:00 AM',
+          status: 'APPROVED',
+          approvedAt: new Date(),
+          schoolId: schoolProfile.id,
+        },
+      });
+      console.log('Seeded sample school events.');
     }
   }
 
   console.log('\n✅ All seed data created successfully!');
   console.log(`  - Admin user: arpitha@mallaram.in / mallaram123`);
   console.log(`  - School user: mpps@mallaram.in / mpps123`);
+  console.log(`  - Principal user: principal@mallaram.in / principal123`);
   console.log(`  - IKP Slots: 7 days × 4 time slots = 28 slots`);
   console.log(`  - Crop Prices: 4 crops`);
   console.log(`  - Schemes: ${initialSchemes.length} government schemes`);
-  console.log(`  - Fund Usage: ${fundRecords.length} financial records`);
+  console.log(`  - Fund Usage: admin adds entries manually through dashboard`);
   console.log(`  - Gallery Images: ${galleryImages.length} records`);
   console.log(`  - School Profile: MPPS Mallaram`);
 }
