@@ -50,23 +50,24 @@ export default function Navigation({ locale }: NavigationProps) {
       <div className="max-w-7xl mx-auto px-4 md:px-6">
         <div className={`relative transition-all duration-500 bg-white/80 backdrop-blur-2xl border border-white/40 rounded-[2.5rem] px-6 md:px-10 flex items-center justify-between shadow-[0_20px_50px_rgba(0,0,0,0.1)] ${scrolled ? 'h-14 md:h-16' : 'h-16 md:h-20'}`}>
           
-          {/* LEFT: Village Name */}
-          <div className="hidden xl:flex flex-col items-start justify-center">
-            <span className="text-xs md:text-sm font-black text-[#0A0A0A] uppercase tracking-[0.1em] leading-none">{dictionary.hero.title}</span>
-            <span className="text-[8px] md:text-[9px] font-medium text-[#15803d] uppercase tracking-[0.2em] mt-0.5">{dictionary.hero.tagline}</span>
-          </div>
-
-          {/* Nav Links (Desktop) */}
-          <div className="hidden xl:flex flex-1 justify-end items-center gap-0.5">              {navItems.slice(0, 4).map((item) => (
-              <Link
-                key={item.key}
-                href={item.href}
-                className="text-[10px] font-black text-[#0A0A0A]/60 hover:text-[#15803d] uppercase tracking-[0.15em] px-3 py-2 transition-all relative group whitespace-nowrap"
-              >
-                {t(`nav.${item.key}`)}
-                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-[#15803d] transition-all group-hover:w-1/2"></span>
-              </Link>
-            ))}
+          {/* LEFT GROUP: Village Name + Left Nav Items */}
+          <div className="flex items-center gap-1">
+            <div className="hidden xl:flex flex-col items-start justify-center mr-4">
+              <span className="text-xs md:text-sm font-black text-[#0A0A0A] uppercase tracking-[0.1em] leading-none">{dictionary.hero.title}</span>
+              <span className="text-[8px] md:text-[9px] font-medium text-[#15803d] uppercase tracking-[0.2em] mt-0.5">{dictionary.hero.tagline}</span>
+            </div>
+            <div className="hidden xl:flex items-center gap-0.5">
+              {navItems.slice(0, 4).map((item) => (
+                <Link
+                  key={item.key}
+                  href={item.href}
+                  className="text-[10px] font-black text-[#0A0A0A]/60 hover:text-[#15803d] uppercase tracking-[0.15em] px-3 py-2 transition-all relative group whitespace-nowrap"
+                >
+                  {t(`nav.${item.key}`)}
+                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-[#15803d] transition-all group-hover:w-1/2"></span>
+                </Link>
+              ))}
+            </div>
           </div>
 
           {/* CENTER: BIG LOGO */}
@@ -87,9 +88,9 @@ export default function Navigation({ locale }: NavigationProps) {
             </Link>
           </div>
  
-          {/* RIGHT: Nav Links & Controls */}
-          <div className="flex-1 flex justify-start items-center gap-3">
-            <div className="hidden xl:flex items-center gap-0.5">
+          {/* RIGHT GROUP: Right Nav Items + Controls */}
+          <div className="flex items-center gap-1">
+            <div className="hidden xl:flex items-center gap-0.5 mr-4">
               {navItems.slice(4, 9).map((item) => (
                 <Link
                   key={item.key}
@@ -102,7 +103,7 @@ export default function Navigation({ locale }: NavigationProps) {
               ))}
             </div>
 
-            <div className="flex items-center gap-3 ml-auto">
+            <div className="flex items-center gap-3">
               <button
                 onClick={toggleLanguage}
                 className="hidden md:block px-5 py-2.5 text-[9px] font-black rounded-xl bg-[#15803d]/10 text-[#15803d] hover:bg-[#15803d] hover:text-white transition-all border border-[#15803d]/20 uppercase tracking-widest active:scale-95"
