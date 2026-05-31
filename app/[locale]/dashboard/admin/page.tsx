@@ -9,6 +9,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Search, Database, Upload, Check, X, IndianRupee, Plus, Bell, MapPin, Calendar, CalendarDays, Clock, Trash2, ExternalLink, Edit, Image, Landmark, DollarSign, Tag, Activity, Droplets, Shield, BarChart3, Leaf, Cloud, AlertTriangle, CheckCircle2, Copy, Phone } from 'lucide-react';
 import { WeatherWidget } from '@/components/Agriculture/AgriWidgets';
+import SchoolReviewPanel from '@/components/School/SchoolReviewPanel';
 
 export default function AdminDashboard() {
   const params = useParams();
@@ -1086,6 +1087,7 @@ export default function AdminDashboard() {
             { id: 'funds', label: 'Fund Usage', icon: '💰' },
             { id: 'allocations', label: 'Allocations', icon: '💵' },
             { id: 'bookings', label: 'Bookings', icon: '📋' },
+            { id: 'school', label: 'School', icon: '🏫' },
           ].map((tab) => (
             tab.id === 'praja' ? (
               <Link
@@ -2724,6 +2726,33 @@ ${phones}`);
           </div>
         </div>
         </div> {/* end section-bookings */}
+
+        {/* School Management Section */}
+        <div id="section-school" className="mb-12 scroll-mt-48">
+          <div className="bg-white rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 p-8">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+              <div>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-amber-50 flex items-center justify-center">
+                    <span className="text-xl">🏫</span>
+                  </div>
+                  <h3 className="text-2xl font-black text-[#0A0A0A] tracking-tighter">School — MPPS Mallaram</h3>
+                </div>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-2 ml-[52px]">Review & approve school achievements & events submitted via the school dashboard</p>
+              </div>
+              <a
+                href={`/${locale}/dashboard/school`}
+                target="_blank"
+                className="px-6 py-3 bg-[#15803d] text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all flex items-center gap-2 shadow-xl shadow-[#15803d]/20"
+              >
+                <ExternalLink className="w-4 h-4" />
+                School Dashboard
+              </a>
+            </div>
+
+            <SchoolReviewPanel />
+          </div>
+        </div>
 
         {/* Slot Creation Modal */}
         {showSlotModal && (

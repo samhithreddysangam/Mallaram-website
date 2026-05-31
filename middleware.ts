@@ -50,6 +50,7 @@ export default auth((req) => {
   const locale = pathname.split('/')[1] || defaultLocale;
   const isOnDashboard = pathname.includes('/dashboard');
   const isOnAdminDashboard = pathname.includes('/dashboard/admin');
+  const isOnSchoolDashboard = pathname.includes('/dashboard/school');
   const isOnLogin = pathname.includes('/login');
   
   // Extract user info from the session
@@ -69,12 +70,21 @@ export default auth((req) => {
       console.log('Middleware: Redirecting non-admin away from admin dashboard');
       return safeRedirect(`/${locale}/ikp-booking`, req);
     }
+    
+    // Protect SCHOOL dashboard — only SCHOOL role can access
+    if (isOnSchoolDashboard && userRole !== 'SCHOOL') {
+      console.log('Middleware: Redirecting non-school user away from school dashboard');
+      return safeRedirect(`/${locale}/ikp-booking`, req);
+    }
   }
 
   // Redirect to appropriate dashboard if logged in and trying to access login page
   if (isOnLogin && isLoggedIn && userRole) {
     if (userRole === 'ADMIN') {
       return safeRedirect(`/${locale}/dashboard/admin`, req);
+    }
+    if (userRole === 'SCHOOL') {
+      return safeRedirect(`/${locale}/dashboard/school`, req);
     }
     return safeRedirect(`/${locale}/ikp-booking`, req);
   }

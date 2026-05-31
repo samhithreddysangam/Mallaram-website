@@ -18,6 +18,8 @@ import TransparencyPortal from '@/components/SmartVillage/TransparencyPortal';
 import EmergencyAlerts from '@/components/SmartVillage/EmergencyAlerts';
 import GrievanceSystem from '@/components/SmartVillage/GrievanceSystem';
 import VillageMap from '@/components/SmartVillage/VillageMap';
+import SchoolSection from '@/components/School/SchoolSection';
+import AdmissionForm from '@/components/School/AdmissionForm';
 import FarmerEnrollment from '@/components/Farmers/FarmerEnrollment';
 import { locales, getDictionary, Locale } from '@/lib/i18n';
 import { siteConfig } from '@/lib/seo';
@@ -99,6 +101,8 @@ export default async function LocalePage({ params }: { params: Promise<{ locale:
       <EmergencyAlerts locale={currentLocale} />
       <GrievanceSystem locale={currentLocale} />
       <VillageMap locale={currentLocale} />
+      <SchoolSection locale={currentLocale} />
+      <AdmissionForm locale={currentLocale} />
       <About locale={currentLocale} />
       <Facilities locale={currentLocale} />
       <Gallery locale={currentLocale} />

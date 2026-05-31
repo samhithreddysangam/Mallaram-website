@@ -7,7 +7,7 @@ async function main() {
   const admin = await prisma.user.upsert({
     where: { email: 'arpitha@mallaram.in' },
     update: {
-      password: 'mallaram123', // Update password if user exists
+      password: 'mallaram123',
       role: 'ADMIN',
     },
     create: {
@@ -16,6 +16,40 @@ async function main() {
       phone: '9989120933',
       password: 'mallaram123',
       role: 'ADMIN',
+    },
+  });
+
+  // Create School User for MPPS Mallaram
+  const schoolUser = await prisma.user.upsert({
+    where: { email: 'mpps@mallaram.in' },
+    update: {
+      password: 'mpps123',
+      role: 'SCHOOL',
+    },
+    create: {
+      email: 'mpps@mallaram.in',
+      name: 'MPPS Mallaram',
+      phone: '9989120934',
+      password: 'mpps123',
+      role: 'SCHOOL',
+    },
+  });
+
+  // Create School Profile
+  await prisma.schoolProfile.upsert({
+    where: { userId: schoolUser.id },
+    update: {
+      schoolName: 'MPPS Mallaram',
+      address: 'Mallaram Village, Vemulavada Rural Mandal, Rajanna Sircilla District',
+      phone: '9989120934',
+      email: 'mpps@mallaram.in',
+    },
+    create: {
+      userId: schoolUser.id,
+      schoolName: 'MPPS Mallaram',
+      address: 'Mallaram Village, Vemulavada Rural Mandal, Rajanna Sircilla District',
+      phone: '9989120934',
+      email: 'mpps@mallaram.in',
     },
   });
 
@@ -132,13 +166,19 @@ async function main() {
     }
   ];
 
-  // Clear existing schemes to avoid duplicates with old labels
-  await prisma.scheme.deleteMany({});
-
+  // Upsert schemes to avoid foreign key conflicts with beneficiaries
   for (const scheme of initialSchemes) {
-    await prisma.scheme.create({
-      data: scheme,
-    });
+    const existing = await prisma.scheme.findFirst({ where: { title: scheme.title } });
+    if (existing) {
+      await prisma.scheme.update({
+        where: { id: existing.id },
+        data: scheme,
+      });
+    } else {
+      await prisma.scheme.create({
+        data: scheme,
+      });
+    }
   }
 
   // Create village officials
@@ -206,7 +246,7 @@ async function main() {
     { label: 'Health Camp - Eye Checkup', amount: 45000, category: 'Healthcare', description: 'Free eye checkup camp organized in collaboration with district hospital. 200+ patients screened.', date: new Date('2026-04-01') },
     { label: 'Community Borewell', amount: 180000, category: 'Water', description: 'Deep borewell drilling at community center for irrigation of village garden.', date: new Date('2026-04-10') },
     { label: 'Flood Relief Distribution', amount: 95000, category: 'Emergency', description: 'Distribution of food kits and tarpaulins to 45 families affected by heavy rains.', date: new Date('2026-05-20') },
-    { label: 'Anganwadi Center Upgrades', amount: 165000, category: 'Infrastructure', description: 'Repair and upgrade of Anganwadi center with new furniture, toys, and cooking equipment.', date: new Date('2026-06-01') },
+    { label: 'Anganwadi Center Upgrades', amount: 165000, category: 'Infrastructure', description: 'Repair and upgrade of Anganwadi center with new tiles, furniture, toys, and cooking equipment.', date: new Date('2026-06-01') },
   ];
 
   // Clear existing records to avoid duplicates on re-run
@@ -239,13 +279,35 @@ async function main() {
     console.log(`Gallery already has ${existingGalleryCount} records. Skipping gallery seed.`);
   }
 
+  // Create sample school achievements
+  const existingAchievements = await prisma.schoolAchievement.count();
+  if (existingAchievements === 0) {
+    const schoolProfile = await prisma.schoolProfile.findFirst({
+      where: { userId: schoolUser.id },
+    });
+    if (schoolProfile) {
+      await prisma.schoolAchievement.create({
+        data: {
+          title: '100% Pass Percentage in 5th Class',
+          description: 'All students of MPPS Mallaram passed the 5th class final examinations with flying colours. Proud moment for the village!',
+          status: 'APPROVED',
+          approvedAt: new Date(),
+          schoolId: schoolProfile.id,
+        },
+      });
+      console.log('Seeded sample school achievements.');
+    }
+  }
+
   console.log('\n✅ All seed data created successfully!');
-  console.log(`  - Admin user: arpitha@mallaram.in`);
+  console.log(`  - Admin user: arpitha@mallaram.in / mallaram123`);
+  console.log(`  - School user: mpps@mallaram.in / mpps123`);
   console.log(`  - IKP Slots: 7 days × 4 time slots = 28 slots`);
   console.log(`  - Crop Prices: 4 crops`);
   console.log(`  - Schemes: ${initialSchemes.length} government schemes`);
   console.log(`  - Fund Usage: ${fundRecords.length} financial records`);
   console.log(`  - Gallery Images: ${galleryImages.length} records`);
+  console.log(`  - School Profile: MPPS Mallaram`);
 }
 
 main()

@@ -14,11 +14,12 @@ model User {
   email         String?   @unique
   phone         String?   @unique
   password      String
-  role          String    @default("FARMER") // ADMIN, FARMER
+  role          String    @default("FARMER") // ADMIN, FARMER, SCHOOL
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   bookings      Booking[]
   complaints    Complaint[]
+  schoolProfile SchoolProfile?
 }
 
 model Slot {
@@ -242,6 +243,72 @@ model FarmerEnrollment {
   active        Boolean   @default(true)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+}
+
+model SchoolProfile {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  user            User      @relation(fields: [userId], references: [id])
+  schoolName      String    @default("MPPS Mallaram")
+  address         String?
+  phone           String?
+  email           String?
+  establishedYear String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  achievements    SchoolAchievement[]
+  events          SchoolEvent[]
+  admissions      SchoolAdmission[]
+}
+
+model SchoolAchievement {
+  id            String    @id @default(cuid())
+  title         String
+  description   String?
+  imageUrl      String?
+  status        String    @default("PENDING") // PENDING, APPROVED, REJECTED
+  schoolId      String
+  school        SchoolProfile @relation(fields: [schoolId], references: [id])
+  submittedAt   DateTime  @default(now())
+  approvedAt    DateTime?
+  reviewedBy    String?   // Admin user id who reviewed
+  rejectionReason String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model SchoolEvent {
+  id            String    @id @default(cuid())
+  title         String
+  description   String?
+  date          String    // e.g., "July 15, 2025"
+  time          String?   // e.g., "10:00 AM"
+  imageUrl      String?
+  status        String    @default("PENDING") // PENDING, APPROVED, REJECTED
+  schoolId      String
+  school        SchoolProfile @relation(fields: [schoolId], references: [id])
+  submittedAt   DateTime  @default(now())
+  approvedAt    DateTime?
+  reviewedBy    String?
+  rejectionReason String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model SchoolAdmission {
+  id              String    @id @default(cuid())
+  studentName     String
+  classApplying   String    // e.g., "1st Class", "Anganwadi"
+  parentName      String
+  phone           String
+  address         String?
+  previousSchool  String?
+  status          String    @default("PENDING") // PENDING, APPROVED, REJECTED
+  schoolId        String
+  school          SchoolProfile @relation(fields: [schoolId], references: [id])
+  submittedAt     DateTime  @default(now())
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 }
 
 model WaterSource {
