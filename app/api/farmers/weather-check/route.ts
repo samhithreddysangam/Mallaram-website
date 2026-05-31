@@ -25,7 +25,7 @@ interface WeatherAlert {
 export async function GET() {
   try {
     // 1. Fetch current weather from Open-Meteo
-    const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${MALLARAM_LAT}&longitude=${MALLARAM_LON}&current=temperature_2m,precipitation,weather_code,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max&timezone=auto&forecast_days=3`;
+    const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${MALLARAM_LAT}&longitude=${MALLARAM_LON}&current=temperature_2m,relative_humidity_2m,precipitation,weather_code,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max&timezone=auto&forecast_days=3`;
 
     const res = await fetch(weatherUrl, { next: { revalidate: 300 } });
     if (!res.ok) {

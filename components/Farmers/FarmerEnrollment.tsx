@@ -362,7 +362,7 @@ export default function FarmerEnrollment({ locale }: FarmerEnrollmentProps) {
                       <button
                         key={lang.value}
                         type="button"
-                        onClick={() => setFormData(prev => ({ ...prev, language: lang.value }))}
+                        onClick={() => setFormData(prev => ({ ...prev, language: lang.value as Locale }))}
                         className={`flex-1 px-5 py-4 rounded-2xl text-sm font-black transition-all ${
                           formData.language === lang.value
                             ? 'bg-[#15803d] text-white shadow-lg'

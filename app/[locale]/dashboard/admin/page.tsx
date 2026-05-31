@@ -7,7 +7,7 @@ import Navigation from '@/components/Navigation/Navigation';
 import Footer from '@/components/Footer/Footer';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { Search, Database, Upload, Check, X, IndianRupee, Plus, Bell, MapPin, Calendar, CalendarDays, Clock, Trash2, ExternalLink, Edit, Image, Landmark, DollarSign, Tag, Activity, Droplets, Shield, BarChart3 } from 'lucide-react';
+import { Search, Database, Upload, Check, X, IndianRupee, Plus, Bell, MapPin, Calendar, CalendarDays, Clock, Trash2, ExternalLink, Edit, Image, Landmark, DollarSign, Tag, Activity, Droplets, Shield, BarChart3, Leaf, Cloud, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { WeatherWidget } from '@/components/Agriculture/AgriWidgets';
 
 export default function AdminDashboard() {
@@ -83,6 +83,12 @@ export default function AdminDashboard() {
   const [showEventModal, setShowEventModal] = useState(false);
   const [editingEvent, setEditingEvent] = useState<string | null>(null);
   const [newEvent, setNewEvent] = useState({ title: '', description: '', imageUrl: '', date: '', category: 'local', order: '0' });
+
+  // Farmer Enrollments
+  const [enrolledFarmers, setEnrolledFarmers] = useState<any[]>([]);
+  const [weatherCheckResult, setWeatherCheckResult] = useState<any>(null);
+  const [weatherCheckLoading, setWeatherCheckLoading] = useState(false);
+  const [showWeatherCheck, setShowWeatherCheck] = useState(false);
   
   // Welcome Animation (uses window.location to avoid Suspense boundary requirement)
   const [showWelcome, setShowWelcome] = useState(false);
@@ -244,6 +250,30 @@ export default function AdminDashboard() {
     }
   };
 
+  const fetchEnrolledFarmers = async () => {
+    try {
+      const res = await fetch('/api/farmers');
+      const data = await res.json();
+      setEnrolledFarmers(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error('Failed to fetch enrolled farmers:', error);
+    }
+  };
+
+  const runWeatherCheck = async () => {
+    setWeatherCheckLoading(true);
+    try {
+      const res = await fetch('/api/farmers/weather-check');
+      const data = await res.json();
+      setWeatherCheckResult(data);
+      setShowWeatherCheck(true);
+    } catch (error) {
+      console.error('Failed to run weather check:', error);
+    } finally {
+      setWeatherCheckLoading(false);
+    }
+  };
+
   const fetchLocalBodyMembers = async () => {
     try {
       const res = await fetch('/api/local-body');
@@ -294,6 +324,7 @@ export default function AdminDashboard() {
       fetchVillageEvents(),
       fetchLocalBodyMembers(),
       fetchPrajaApplications(),
+      fetchEnrolledFarmers(),
     ]);
     setLoading(false);
   };
@@ -1001,6 +1032,7 @@ export default function AdminDashboard() {
             { id: 'water', label: 'Water Supply', icon: '💧' },
             { id: 'officials', label: 'Officials', icon: '👤' },
             { id: 'localbody', label: 'Local Body', icon: '🏘' },
+            { id: 'farmers', label: 'Farmers', icon: '👨‍🌾' },
             { id: 'events', label: 'Events', icon: '🎉' },
             { id: 'slots', label: 'IKP Slots', icon: '📅' },
             { id: 'schemes', label: 'Schemes', icon: '🔗' },
@@ -2032,6 +2064,220 @@ export default function AdminDashboard() {
                   </table>
                 </div>
               </>
+            )}
+          </div>
+        </div>
+
+        {/* Farmer Enrollments Management Section */}
+        <div id="section-farmers" className="mb-12 scroll-mt-48">
+          <div className="bg-white rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 p-8">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+              <div>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-amber-50 flex items-center justify-center">
+                    <Leaf className="w-5 h-5 text-amber-600" />
+                  </div>
+                  <h3 className="text-2xl font-black text-[#0A0A0A] tracking-tighter">Farmer Enrollments</h3>
+                </div>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-2 ml-[52px]">Manage registered farmers & send weather alerts</p>
+              </div>
+              <button
+                onClick={runWeatherCheck}
+                disabled={weatherCheckLoading}
+                className="px-6 py-3 bg-amber-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all flex items-center gap-2 shadow-xl shadow-amber-600/20 disabled:opacity-50"
+              >
+                <Cloud className="w-4 h-4" />
+                {weatherCheckLoading ? 'Checking...' : 'Weather Check'}
+              </button>
+            </div>
+
+            {/* Weather Check Result Panel */}
+            {showWeatherCheck && weatherCheckResult && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-8 p-6 rounded-3xl border"
+                style={{
+                  borderColor: weatherCheckResult.hasActiveAlerts ? '#fecaca' : '#bbf7d0',
+                  backgroundColor: weatherCheckResult.hasActiveAlerts ? '#fef2f2' : '#f0fdf4',
+                }}
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    {weatherCheckResult.hasActiveAlerts ? (
+                      <AlertTriangle className="w-5 h-5 text-red-500" />
+                    ) : (
+                      <CheckCircle2 className="w-5 h-5 text-[#15803d]" />
+                    )}
+                    <div>
+                      <div className="text-sm font-black text-[#0A0A0A]">
+                        {weatherCheckResult.hasActiveAlerts
+                          ? `${weatherCheckResult.totalAlerts} Active Weather Alert(s)`
+                          : 'No Active Weather Alerts'}
+                      </div>
+                      <div className="text-[10px] text-gray-500 font-medium">
+                        {weatherCheckResult.totalAffectedFarmers} farmer(s) may be affected
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setShowWeatherCheck(false)}
+                    className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {weatherCheckResult.alerts?.length > 0 && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {weatherCheckResult.alerts.map((alert: any, i: number) => (
+                      <div
+                        key={i}
+                        className={`p-4 rounded-2xl border ${
+                          alert.severity === 'high' ? 'bg-red-50 border-red-100' : 'bg-amber-50 border-amber-100'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className={`text-[10px] font-black uppercase tracking-widest ${
+                            alert.severity === 'high' ? 'text-red-600' : 'text-amber-600'
+                          }`}>
+                            {alert.severity.toUpperCase()}
+                          </span>
+                          <span className="px-2 py-0.5 rounded-full bg-[#15803d]/10 text-[#15803d] text-[8px] font-black">
+                            {alert.affectedFarmers} farmers
+                          </span>
+                        </div>
+                        <h5 className="text-sm font-black text-[#0A0A0A] mb-1">{alert.titleEn}</h5>
+                        <p className="text-[10px] text-gray-500 font-medium">{alert.messageEn}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div className="mt-4 flex items-center gap-3 text-[10px] text-gray-400 font-medium">
+                  <span>{weatherCheckResult.current.temp}°C</span>
+                  <span>·</span>
+                  <span>{weatherCheckResult.current.condition}</span>
+                  <span>·</span>
+                  <span>💧 {weatherCheckResult.current.humidity}%</span>
+                  <span className="ml-auto">
+                    Updated: {new Date(weatherCheckResult.timestamp).toLocaleTimeString()}
+                  </span>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Farmers Table */}
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="bg-amber-50/50 text-[10px] text-gray-400 font-black uppercase tracking-widest">
+                    <th className="px-6 py-4">Name</th>
+                    <th className="px-6 py-4">Phone</th>
+                    <th className="px-6 py-4">Village / Ward</th>
+                    <th className="px-6 py-4">Land</th>
+                    <th className="px-6 py-4">Crops</th>
+                    <th className="px-6 py-4">Lang</th>
+                    <th className="px-6 py-4">Alerts</th>
+                    <th className="px-6 py-4">Enrolled</th>
+                    <th className="px-6 py-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {enrolledFarmers.length === 0 ? (
+                    <tr>
+                      <td colSpan={9} className="px-6 py-16 text-center text-gray-300 font-bold italic">
+                        No farmers enrolled yet. The enrollment form is on the home page.
+                      </td>
+                    </tr>
+                  ) : enrolledFarmers.map((farmer) => (
+                    <tr key={farmer.id} className="hover:bg-amber-50/20 transition-colors group">
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600 font-black text-sm">
+                            {farmer.name[0]}
+                          </div>
+                          <span className="font-black text-[#0A0A0A]">{farmer.name}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-sm font-bold text-gray-600">{farmer.phone}</span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="text-xs font-bold text-gray-600">{farmer.village}</div>
+                        {farmer.ward && <div className="text-[9px] text-gray-400 font-medium">Ward {farmer.ward}</div>}
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-xs font-bold text-gray-500">{farmer.landArea || '—'}</span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex flex-wrap gap-1">
+                          {farmer.crops ? farmer.crops.split(', ').slice(0, 2).map((crop: string, i: number) => (
+                            <span key={i} className="px-2 py-0.5 rounded-md bg-green-50 text-green-700 text-[8px] font-black uppercase tracking-widest">
+                              {crop}
+                            </span>
+                          )) : (
+                            <span className="text-gray-300 text-[10px]">—</span>
+                          )}
+                          {farmer.crops?.split(', ').length > 2 && (
+                            <span className="text-[8px] text-gray-400 font-bold">+{farmer.crops.split(', ').length - 2}</span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-[10px] font-black">{farmer.language === 'te' ? 'తె' : 'EN'}</span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[8px] font-black uppercase tracking-widest ${
+                          farmer.consentAlerts ? 'bg-green-100 text-[#15803d]' : 'bg-gray-100 text-gray-400'
+                        }`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${farmer.consentAlerts ? 'bg-[#15803d]' : 'bg-gray-400'}`} />
+                          {farmer.consentAlerts ? 'ON' : 'OFF'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-[10px] font-bold text-gray-400">
+                          {new Date(farmer.createdAt).toLocaleDateString()}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <button
+                          onClick={() => {
+                            if (!confirm(`Remove ${farmer.name} from enrollment?`)) return;
+                            fetch(`/api/farmers?id=${farmer.id}`, { method: 'DELETE' })
+                              .then(res => { if (res.ok) fetchEnrolledFarmers(); });
+                          }}
+                          className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Summary stats */}
+            {enrolledFarmers.length > 0 && (
+              <div className="grid grid-cols-3 gap-4 mt-8 pt-8 border-t border-gray-100">
+                <div className="p-5 rounded-2xl bg-amber-50 border border-amber-100">
+                  <div className="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-1">Total Farmers</div>
+                  <div className="text-2xl font-black text-[#0A0A0A]">{enrolledFarmers.length}</div>
+                </div>
+                <div className="p-5 rounded-2xl bg-green-50 border border-green-100">
+                  <div className="text-[10px] font-black text-green-600 uppercase tracking-widest mb-1">Alert Consent</div>
+                  <div className="text-2xl font-black text-[#0A0A0A]">
+                    {enrolledFarmers.filter(f => f.consentAlerts).length}
+                  </div>
+                </div>
+                <div className="p-5 rounded-2xl bg-blue-50 border border-blue-100">
+                  <div className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-1">With Crops</div>
+                  <div className="text-2xl font-black text-[#0A0A0A]">
+                    {enrolledFarmers.filter(f => f.crops && f.crops.length > 0).length}
+                  </div>
+                </div>
+              </div>
             )}
           </div>
         </div>
