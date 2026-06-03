@@ -38,67 +38,87 @@ export async function POST() {
       } as AnalysisResult, { status: 200 });
     }
 
-    const prompt = `You are an expert rural development analyst for India. Analyze the following aspects about Grama Panchayaths in India and provide a comprehensive, structured analysis.
+    const prompt = `You are an expert rural development analyst for India. Analyze Grama Panchayaths in India.
 
-Context: Mallaram Grama Panchayath is in Rajanna Sircilla district, Telangana. It has digital initiatives like online booking, farmer enrollment, weather alerts, government scheme tracking, and school management.
+Context: Mallaram Grama Panchayath is in Rajanna Sircilla district, Telangana. It has digital initiatives like online booking, farmer enrollment, weather alerts, scheme tracking, and school management.
 
-Please provide analysis on:
+Provide:
+1. Innovations across India that Mallaram could learn from (include specific state examples)
+2. Recommendations for Mallaram (digital governance, waste, water, agriculture, education, healthcare)
+3. Award programs Mallaram is positioned for
+4. New schemes Mallaram could implement
 
-1. **Innovations across India**: What innovative works have other Grama Panchayaths in India done that Mallaram could learn from? Include specific examples from states like Kerala, Karnataka, Maharashtra, Tamil Nadu, Rajasthan, etc.
-
-2. **Recommendations for Mallaram**: Specific, actionable recommendations for Mallaram's betterment across areas like: digital governance, waste management, water conservation, agriculture, education, healthcare, women empowerment, and infrastructure.
-
-3. **Award-Winning Programs**: What awards are available for Grama Panchayaths (e.g., Gram Urja Awards, Swachh Survekshan, National Panchayat Awards, etc.)? Which ones is Mallaram best positioned to win given its digital infrastructure?
-
-4. **Scheme Implementation**: Suggest innovative schemes Mallaram could implement that would benefit villagers, with details on target groups and expected outcomes.
-
-Format your response as valid JSON with this exact structure (no markdown, no code fences, just raw JSON):
+Respond ONLY with valid JSON (no markdown, no code fences):
 {
-  "innovations": [
-    { "title": "Innovation name", "description": "What they did", "location": "State/Village", "impact": "Measurable outcome" }
-  ],
-  "recommendations": [
-    { "area": "Focus area", "suggestion": "Specific recommendation", "priority": "high|medium|low", "expectedImpact": "What it would achieve" }
-  ],
-  "awardPrograms": [
-    { "programName": "Award name", "description": "What it's for", "eligibility": "Who can apply", "likelihood": "High/Medium/Low for Mallaram" }
-  ],
-  "schemeSuggestions": [
-    { "title": "Scheme name", "description": "What it does", "targetGroup": "Who benefits", "expectedOutcome": "Expected results" }
-  ],
-  "summary": "A 2-3 paragraph executive summary of the most important findings for Mallaram"
+  "innovations": [{ "title": "", "description": "", "location": "", "impact": "" }],
+  "recommendations": [{ "area": "", "suggestion": "", "priority": "high|medium|low", "expectedImpact": "" }],
+  "awardPrograms": [{ "programName": "", "description": "", "eligibility": "", "likelihood": "High|Medium|Low" }],
+  "schemeSuggestions": [{ "title": "", "description": "", "targetGroup": "", "expectedOutcome": "" }],
+  "summary": "2-3 paragraph executive summary"
 }
 
-Provide at least 5 innovations, 8 recommendations (mix of priorities), 5 award programs, and 5 scheme suggestions. Be specific, data-driven, and actionable. Include real examples from actual Indian villages.`;
+Provide at least 3 innovations, 5 recommendations, 3 awards, and 3 scheme suggestions. Be specific and actionable.`;
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          { role: 'system', content: 'You are an expert rural development analyst for India. You respond only with valid JSON. No markdown, no code fences, just raw JSON.' },
-          { role: 'user', content: prompt }
-        ],
-        temperature: 0.7,
-        max_tokens: 4000,
-      }),
-    });
+    const callOpenAI = async (retries = 3): Promise<Response> => {
+      for (let attempt = 1; attempt <= retries; attempt++) {
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`,
+          },
+          body: JSON.stringify({
+            model: 'gpt-4o-mini',
+            messages: [
+              { role: 'system', content: 'You are an expert rural development analyst for India. Respond only with valid JSON.' },
+              { role: 'user', content: prompt }
+            ],
+            temperature: 0.7,
+            max_tokens: 2000,
+          }),
+          signal: AbortSignal.timeout(25000),
+        });
+
+        if (response.status === 429 && attempt < retries) {
+          // Rate limited - wait with exponential backoff
+          const delay = Math.pow(2, attempt) * 1000;
+          console.log(`OpenAI rate limited, retrying in ${delay}ms (attempt ${attempt}/${retries})`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+          continue;
+        }
+
+        return response;
+      }
+
+      // All retries exhausted - throw
+      throw new Error('Rate limit exceeded after retries');
+    };
+
+    const response = await callOpenAI(3);
 
     if (!response.ok) {
       const errorText = await response.text();
       console.error('OpenAI API error:', response.status, errorText);
+      
+      let errorMsg = `AI service error: ${response.status}.`;
+      if (response.status === 429) {
+        errorMsg = 'OpenAI rate limit exceeded. This is common for new/free accounts. Options: (1) Add billing at platform.openai.com/settings/organization/billing to increase limits, or (2) Wait a minute and try again. The system will auto-retry 3 times.';
+      } else if (response.status === 401) {
+        errorMsg = 'Invalid OpenAI API key. Please check your key at platform.openai.com/api-keys.';
+      } else if (response.status === 402) {
+        errorMsg = 'OpenAI account has insufficient credits. Add billing at platform.openai.com/settings/organization/billing.';
+      } else if (response.status === 500) {
+        errorMsg = 'OpenAI server error. Please try again in a few minutes.';
+      }
+      
       return NextResponse.json({
         success: false,
-        error: `AI service error: ${response.status}. Please check your API key and try again.`,
+        error: errorMsg,
         innovations: [],
         recommendations: [],
         awardPrograms: [],
         schemeSuggestions: [],
-        summary: 'AI analysis failed due to a service error.'
+        summary: 'AI analysis failed due to a service error. ' + errorMsg
       } as AnalysisResult, { status: 200 });
     }
 
