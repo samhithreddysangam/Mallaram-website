@@ -13,14 +13,10 @@ export default function SchoolReviewPanel() {
   const fetchPendingItems = async () => {
     setLoading(true);
     try {
-      const [achRes, evtRes] = await Promise.all([
-        fetch('/api/school/public-achievements?pending=true'),
-        fetch('/api/school/public-events?pending=true'),
-      ]);
-      const achData = await achRes.json();
-      const evtData = await evtRes.json();
-      setPendingAchievements(Array.isArray(achData) ? achData : []);
-      setPendingEvents(Array.isArray(evtData) ? evtData : []);
+      const res = await fetch('/api/admin/school-review');
+      const data = await res.json();
+      setPendingAchievements(Array.isArray(data.pendingAchievements) ? data.pendingAchievements : []);
+      setPendingEvents(Array.isArray(data.pendingEvents) ? data.pendingEvents : []);
     } catch (error) {
       console.error('Failed to fetch pending school items:', error);
     } finally {
@@ -32,7 +28,7 @@ export default function SchoolReviewPanel() {
     fetchPendingItems();
   }, []);
 
-  const handleReview = async (type: 'achievement' | 'event', id: string, action: 'APPROVED' | 'REJECTED') => {
+  const handleReview = async (type: 'achievement' | 'event', id: string, action: 'approve' | 'reject') => {
     setActionLoading(`${type}-${id}`);
     try {
       const res = await fetch(`/api/admin/school-review`, {
@@ -129,7 +125,7 @@ export default function SchoolReviewPanel() {
                       </div>
                       <div className="flex gap-2 flex-shrink-0">
                         <button
-                          onClick={() => handleReview('achievement', ach.id, 'APPROVED')}
+                          onClick={() => handleReview('achievement', ach.id, 'approve')}
                           disabled={actionLoading === `achievement-${ach.id}`}
                           className="p-2.5 bg-green-100 text-green-600 rounded-xl hover:bg-green-200 transition-all disabled:opacity-50"
                           title="Approve"
@@ -137,7 +133,7 @@ export default function SchoolReviewPanel() {
                           <Check className="w-4 h-4" />
                         </button>
                         <button
-                          onClick={() => handleReview('achievement', ach.id, 'REJECTED')}
+                          onClick={() => handleReview('achievement', ach.id, 'reject')}
                           disabled={actionLoading === `achievement-${ach.id}`}
                           className="p-2.5 bg-red-100 text-red-600 rounded-xl hover:bg-red-200 transition-all disabled:opacity-50"
                           title="Reject"
@@ -191,7 +187,7 @@ export default function SchoolReviewPanel() {
                       </div>
                       <div className="flex gap-2 flex-shrink-0">
                         <button
-                          onClick={() => handleReview('event', evt.id, 'APPROVED')}
+                          onClick={() => handleReview('event', evt.id, 'approve')}
                           disabled={actionLoading === `event-${evt.id}`}
                           className="p-2.5 bg-green-100 text-green-600 rounded-xl hover:bg-green-200 transition-all disabled:opacity-50"
                           title="Approve"
@@ -199,7 +195,7 @@ export default function SchoolReviewPanel() {
                           <Check className="w-4 h-4" />
                         </button>
                         <button
-                          onClick={() => handleReview('event', evt.id, 'REJECTED')}
+                          onClick={() => handleReview('event', evt.id, 'reject')}
                           disabled={actionLoading === `event-${evt.id}`}
                           className="p-2.5 bg-red-100 text-red-600 rounded-xl hover:bg-red-200 transition-all disabled:opacity-50"
                           title="Reject"
