@@ -128,6 +128,8 @@ export default function AdminDashboard() {
   // Scheme Review
   const [pendingSchemes, setPendingSchemes] = useState<any[]>([]);
   const [schemeReviewLoading, setSchemeReviewLoading] = useState<string | null>(null);
+  const [scanningSchemes, setScanningSchemes] = useState(false);
+  const [scanResult, setScanResult] = useState<{newSchemes: number; errors: string[]; scanned: string[]; timestamp: string} | null>(null);
   
   // Praja Tracker
   const [prajaApplications, setPrajaApplications] = useState<any[]>([]);
@@ -241,6 +243,27 @@ export default function AdminDashboard() {
       console.error('Failed to review scheme:', error);
     } finally {
       setSchemeReviewLoading(null);
+    }
+  };
+
+  const scanGovernmentPortals = async () => {
+    setScanningSchemes(true);
+    setScanResult(null);
+    try {
+      const res = await fetch('/api/cron/check-schemes?admin=true');
+      const data = await res.json();
+      setScanResult(data);
+      if (res.ok && data.newSchemes > 0) {
+        fetchSchemes();
+      }
+      if (!res.ok) {
+        alert('Scan failed: ' + (data.error || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('Failed to scan portals:', error);
+      alert('Network error during scan. Check console.');
+    } finally {
+      setScanningSchemes(false);
     }
   };
 
@@ -1831,6 +1854,37 @@ export default function AdminDashboard() {
             </div>
 
             {/* Pending Schemes Review */}
+            {scanResult && (
+              <div className={`mb-6 p-5 rounded-2xl ${scanResult.newSchemes > 0 ? 'bg-green-50 border border-green-200' : 'bg-gray-50 border border-gray-200'}`}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Database className={`w-5 h-5 ${scanResult.newSchemes > 0 ? 'text-green-600' : 'text-gray-400'}`} />
+                    <div>
+                      <p className="text-sm font-black text-[#0A0A0A]">
+                        {scanResult.newSchemes > 0
+                          ? `Found ${scanResult.newSchemes} new scheme(s)!`
+                          : 'No new schemes found'}
+                      </p>
+                      <p className="text-[10px] font-bold text-gray-500">
+                        {`Scanned: ${scanResult.scanned.join(', ') || 'None'} | ${new Date(scanResult.timestamp).toLocaleString()}`}
+                      </p>
+                      {scanResult.errors.length > 0 && (
+                        <p className="text-[9px] text-amber-600 font-medium mt-1">
+                          {`Errors: ${scanResult.errors.join('; ')}`}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setScanResult(null)}
+                    className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-lg transition-all"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )}
+
             {pendingSchemes.length > 0 && (
               <div className="mb-8 p-6 rounded-2xl bg-amber-50 border border-amber-200">
                 <div className="flex items-center gap-2 mb-4">

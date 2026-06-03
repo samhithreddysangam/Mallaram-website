@@ -2,91 +2,90 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/auth';
 
-/**
- * GET /api/cron/check-schemes
- * 
- * Can be called:
- * 1. By a cron service (e.g., cron-job.org) daily
- * 2. Manually by admin via the "Scan Government Portals" button
- * 3. With ?admin=true to check auth (manual trigger from admin panel)
- * 4. Without auth check for cron jobs (set CRON_SECRET env var)
- */
-export async function GET(request: Request) {
-  // Allow either admin auth OR cron secret
+const schemeKeywords = ['yojana', 'scheme', 'pension', 'bima', 'swasthya', 'gram', 'gramin', 'kisan', 'krishi', 'awas', 'shiksha', 'education', 'health', 'agriculture', 'rural', 'urban', 'welfare', 'subsidy', 'nidhi', 'bandhu', 'suraksha', 'jeevan', 'jal', 'sinchayee', 'fasal', 'bhima', 'shakti', 'uyojana'];
+
+async function checkAuth(request: Request): Promise<boolean> {
   const { searchParams } = new URL(request.url);
   const cronSecret = searchParams.get('secret');
   const isAdminTrigger = searchParams.get('admin') === 'true';
   
-  let authorized = false;
-  
-  // Check cron secret
   if (process.env.CRON_SECRET && cronSecret === process.env.CRON_SECRET) {
-    authorized = true;
+    return true;
   }
   
-  // Check admin auth (for manual trigger)
-  if (isAdminTrigger && !authorized) {
+  if (isAdminTrigger) {
     try {
       const session = await auth();
       if (session?.user) {
         const user = session.user as any;
-        if (user.role === 'ADMIN') {
-          authorized = true;
-        }
+        if (user.role === 'ADMIN') return true;
       }
-    } catch { /* ignore auth errors for cron */ }
+    } catch { /* ignore */ }
   }
+  return false;
+}
 
-  if (!authorized) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  const results = {
-    scanned: [] as string[],
+async function runCheck() {
+  const results: {
+    scanned: string[];
+    newSchemes: number;
+    errors: string[];
+    timestamp: string;
+  } = {
+    scanned: [],
     newSchemes: 0,
-    errors: [] as string[],
+    errors: [],
     timestamp: new Date().toISOString(),
   };
 
-  // --- Source 1: data.gov.in API (if configured) ---
-  const dataGovApiKey = process.env.DATA_GOV_IN_API_KEY;
-  if (dataGovApiKey) {
+  const allTitles = new Set(
+    (await prisma.scheme.findMany({ select: { title: true } })).map(s => s.title.toLowerCase())
+  );
+
+  const isDuplicate = (title: string) => {
+    const lower = title.toLowerCase();
+    return [...allTitles].some(t => t.includes(lower.substring(0, 30)) || lower.includes(t.substring(0, 30)));
+  };
+
+  // --- Source 1: data.gov.in (if configured) ---
+  if (process.env.DATA_GOV_IN_API_KEY) {
     try {
       results.scanned.push('data.gov.in');
-      // Search for scheme-related datasets
-      const searchRes = await fetch(
-        `https://api.data.gov.in/resource-list?api-key=${dataGovApiKey}&format=json&limit=50&q=scheme`,
-        { signal: AbortSignal.timeout(10000) }
-      );
+      // Search for scheme-related datasets with multiple queries for better coverage
+      const queries = ['scheme', 'yojana', 'government+welfare', 'rural+development'];
       
-      if (searchRes.ok) {
-        const data = await searchRes.json();
-        const records = data?.records || [];
+      for (const query of queries) {
+        const searchRes = await fetch(
+          `https://api.data.gov.in/resource-list?api-key=${process.env.DATA_GOV_IN_API_KEY}&format=json&limit=25&q=${query}`,
+          { signal: AbortSignal.timeout(8000) }
+        );
         
-        for (const record of records) {
-          const title = record.title || record.name || '';
-          if (!title) continue;
-
-          // Skip if already exists
-          const existing = await prisma.scheme.findFirst({
-            where: { title: { contains: title.substring(0, 50) } },
-          });
-          if (existing) continue;
-
-          // Create as PENDING
-          const description = record.description || record.notes || '';
-          const link = record.url || record.download_url || `https://data.gov.in`;
+        if (searchRes.ok) {
+          const data = await searchRes.json();
+          const records = data?.records || [];
           
-          await prisma.scheme.create({
-            data: {
-              title: title.substring(0, 200),
-              link: link,
-              description: description.substring(0, 500),
-              source: 'CENTRAL',
-              status: 'PENDING',
-            },
-          });
-          results.newSchemes++;
+          for (const record of records) {
+            const title = (record.title || record.name || '').trim();
+            if (!title || title.length < 5) continue;
+            if (isDuplicate(title)) continue;
+
+            // Only create if title contains scheme-related keywords
+            const lowerTitle = title.toLowerCase();
+            const isRelevant = schemeKeywords.some(kw => lowerTitle.includes(kw));
+            if (!isRelevant) continue;
+
+            await prisma.scheme.create({
+              data: {
+                title: title.substring(0, 200),
+                link: record.url || record.download_url || `https://data.gov.in`,
+                description: (record.description || record.notes || '').substring(0, 500),
+                source: 'CENTRAL',
+                status: 'PENDING',
+              },
+            });
+            allTitles.add(title.toLowerCase());
+            results.newSchemes++;
+          }
         }
       }
     } catch (e: any) {
@@ -94,48 +93,74 @@ export async function GET(request: Request) {
     }
   }
 
-  // --- Source 2: myScheme.gov.in homepage scrape ---
+  // --- Source 2: myScheme.gov.in ---
   try {
     results.scanned.push('myScheme.gov.in');
     const homeRes = await fetch('https://www.myscheme.gov.in/', {
       signal: AbortSignal.timeout(10000),
-      headers: { 'User-Agent': 'Mallaram-Scheme-Checker/1.0' },
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; MallaramBot/1.0)' },
     });
     
     if (homeRes.ok) {
       const html = await homeRes.text();
       
-      // Look for scheme names in the HTML
-      // myScheme shows schemes as links/cards with scheme names
-      const schemeMatches = html.matchAll(
-        /<[^>]+class="[^"]*scheme-card[^"]*"[^>]*>[\s\S]*?<h[1-6][^>]*>([^<]+)<\/h[1-6]>/gi
-      );
-      
-      for (const match of schemeMatches) {
-        const title = match[1]?.trim();
-        if (!title || title.length < 5) continue;
+      // Try multiple patterns to find scheme names
+      const patterns = [
+        /<h([1-6])[^>]*>([^<]+)<\/h\1>/gi,
+        /<a[^>]*href="[^"]*scheme[^"]*"[^>]*>([^<]+)<\/a>/gi,
+        /<[^>]*class="[^"]*(?:scheme|card|scheme-card)[^"]*"[^>]*>([^<]+)<\//gi,
+      ];
 
-        // Skip if already exists
-        const existing = await prisma.scheme.findFirst({
-          where: { title: { contains: title.substring(0, 30) } },
-        });
-        if (existing) continue;
+      const found = new Set<string>();
+      for (const pattern of patterns) {
+        const matches = html.matchAll(pattern);
+        for (const match of matches) {
+          const text = (match[2] || match[1] || '').trim();
+          if (!text || text.length < 5 || text.length > 150) continue;
+          
+          const lower = text.toLowerCase();
+          const isRelevant = schemeKeywords.some(kw => lower.includes(kw));
+          if (!isRelevant) continue;
+          
+          const key = lower.substring(0, 40);
+          if (found.has(key)) continue;
+          found.add(key);
+          
+          if (isDuplicate(text)) continue;
 
-        await prisma.scheme.create({
-          data: {
-            title: title.substring(0, 200),
-            link: `https://www.myscheme.gov.in/search?q=${encodeURIComponent(title)}`,
-            description: `Automatically discovered from myScheme.gov.in`,
-            source: 'CENTRAL',
-            status: 'PENDING',
-          },
-        });
-        results.newSchemes++;
+          await prisma.scheme.create({
+            data: {
+              title: text.substring(0, 200),
+              link: `https://www.myscheme.gov.in/search?q=${encodeURIComponent(text)}`,
+              description: `Auto-discovered from myScheme.gov.in`,
+              source: 'CENTRAL',
+              status: 'PENDING',
+            },
+          });
+          allTitles.add(text.toLowerCase());
+          results.newSchemes++;
+        }
       }
     }
   } catch (e: any) {
     results.errors.push(`myScheme.gov.in: ${e.message}`);
   }
 
+  return results;
+}
+
+export async function GET(request: Request) {
+  if (!(await checkAuth(request))) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  const results = await runCheck();
+  return NextResponse.json(results);
+}
+
+export async function POST(request: Request) {
+  if (!(await checkAuth(request))) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  const results = await runCheck();
   return NextResponse.json(results);
 }
