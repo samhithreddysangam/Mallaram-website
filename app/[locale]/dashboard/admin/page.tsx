@@ -122,8 +122,12 @@ export default function AdminDashboard() {
     capacity: '10',
     location: 'IKP Centre Mallaram'
   });
-  const [newScheme, setNewScheme] = useState({ title: '', link: '', description: '' });
+  const [newScheme, setNewScheme] = useState({ title: '', link: '', description: '', source: '', category: '', eligibility: '', benefits: '' });
   const [editingScheme, setEditingScheme] = useState<string | null>(null);
+  
+  // Scheme Review
+  const [pendingSchemes, setPendingSchemes] = useState<any[]>([]);
+  const [schemeReviewLoading, setSchemeReviewLoading] = useState<string | null>(null);
   
   // Praja Tracker
   const [prajaApplications, setPrajaApplications] = useState<any[]>([]);
@@ -200,11 +204,43 @@ export default function AdminDashboard() {
 
   const fetchSchemes = async () => {
     try {
-      const res = await fetch('/api/schemes');
-      const data = await res.json();
-      setSchemes(Array.isArray(data) ? data : []);
+      // Fetch all approved schemes for the grid
+      const [schemesRes, reviewRes] = await Promise.all([
+        fetch('/api/schemes?status=APPROVED'),
+        fetch('/api/admin/scheme-review'),
+      ]);
+      const schemesData = await schemesRes.json();
+      setSchemes(Array.isArray(schemesData) ? schemesData : []);
+      
+      // Fetch pending schemes for review
+      if (reviewRes.ok) {
+        const reviewData = await reviewRes.json();
+        setPendingSchemes(Array.isArray(reviewData.pendingSchemes) ? reviewData.pendingSchemes : []);
+      }
     } catch (error) {
       console.error('Failed to fetch schemes:', error);
+    }
+  };
+
+  const handleSchemeReview = async (id: string, action: 'approve' | 'reject') => {
+    setSchemeReviewLoading(`${action}-${id}`);
+    try {
+      const res = await fetch('/api/admin/scheme-review', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, action }),
+      });
+      if (res.ok) {
+        setPendingSchemes((prev) => prev.filter((s: any) => s.id !== id));
+        fetchSchemes();
+      } else {
+        const errData = await res.json().catch(() => ({ error: 'Failed' }));
+        alert('Failed to review scheme: ' + (errData.error || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('Failed to review scheme:', error);
+    } finally {
+      setSchemeReviewLoading(null);
     }
   };
 
@@ -437,7 +473,7 @@ export default function AdminDashboard() {
       });
       if (res.ok) {
         setShowSchemeModal(false);
-        setNewScheme({ title: '', link: '', description: '' });
+        setNewScheme({ title: '', link: '', description: '', source: '', category: '', eligibility: '', benefits: '' });
         setEditingScheme(null);
         fetchSchemes();
       }
@@ -618,7 +654,7 @@ export default function AdminDashboard() {
   };
 
   const startEditScheme = (scheme: any) => {
-    setNewScheme({ title: scheme.title, link: scheme.link, description: scheme.description || '' });
+    setNewScheme({ title: scheme.title, link: scheme.link, description: scheme.description || '', source: scheme.source || '', category: scheme.category || '', eligibility: scheme.eligibility || '', benefits: scheme.benefits || '' });
     setEditingScheme(scheme.id);
     setShowSchemeModal(true);
   };
@@ -1042,7 +1078,7 @@ export default function AdminDashboard() {
             <button 
               onClick={() => {
                 setEditingScheme(null);
-                setNewScheme({ title: '', link: '', description: '' });
+                setNewScheme({ title: '', link: '', description: '', source: '', category: '', eligibility: '', benefits: '' });
                 setShowSchemeModal(true);
               }}
               className="px-6 py-3 bg-[#0A0A0A] text-[#22FF88] rounded-2xl text-sm font-bold hover:scale-105 transition-all flex items-center gap-2 shadow-xl shadow-black/10 border border-[#22FF88]/20"
@@ -1780,7 +1816,7 @@ export default function AdminDashboard() {
               <button 
                 onClick={() => {
                   setEditingScheme(null);
-                  setNewScheme({ title: '', link: '', description: '' });
+                  setNewScheme({ title: '', link: '', description: '', source: '', category: '', eligibility: '', benefits: '' });
                   setShowSchemeModal(true);
                 }}
                 className="px-6 py-3 bg-blue-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all flex items-center gap-2 shadow-xl shadow-blue-600/20"
@@ -1790,15 +1826,76 @@ export default function AdminDashboard() {
               </button>
             </div>
 
+            {/* Pending Schemes Review */}
+            {pendingSchemes.length > 0 && (
+              <div className="mb-8 p-6 rounded-2xl bg-amber-50 border border-amber-200">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center">
+                    <Clock className="w-4 h-4 text-amber-600" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-black text-amber-800">Pending Review</h4>
+                    <p className="text-[10px] font-bold text-amber-600">{pendingSchemes.length} scheme(s) awaiting approval</p>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  {pendingSchemes.map((scheme: any) => (
+                    <div key={scheme.id} className="p-4 rounded-xl bg-white border border-amber-100 flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h5 className="font-black text-sm text-[#0A0A0A]">{scheme.title}</h5>
+                          {scheme.source && (
+                            <span className={`px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest ${
+                              scheme.source === 'CENTRAL' ? 'bg-blue-100 text-blue-700' :
+                              scheme.source === 'STATE' ? 'bg-purple-100 text-purple-700' :
+                              'bg-gray-100 text-gray-700'
+                            }`}>
+                              {scheme.source}
+                            </span>
+                          )}
+                          {scheme.category && (
+                            <span className="px-2 py-0.5 rounded-md bg-green-100 text-green-700 text-[8px] font-black uppercase tracking-widest">
+                              {scheme.category}
+                            </span>
+                          )}
+                        </div>
+                        {scheme.description && (
+                          <p className="text-[10px] text-gray-500 line-clamp-1">{scheme.description}</p>
+                        )}
+                      </div>
+                      <div className="flex gap-2 flex-shrink-0">
+                        <button
+                          onClick={() => handleSchemeReview(scheme.id, 'approve')}
+                          disabled={schemeReviewLoading === `approve-${scheme.id}`}
+                          className="p-2 bg-green-100 text-green-600 rounded-lg hover:bg-green-200 transition-all disabled:opacity-50"
+                          title="Approve"
+                        >
+                          <Check className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleSchemeReview(scheme.id, 'reject')}
+                          disabled={schemeReviewLoading === `reject-${scheme.id}`}
+                          className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-all disabled:opacity-50"
+                          title="Reject"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {schemes.length === 0 ? (
                 <div className="col-span-full text-center py-16 text-gray-300 font-bold italic">
-                  No schemes configured yet.
+                  No approved schemes configured yet.
                   <div className="mt-6">
                     <button 
                       onClick={() => {
                         setEditingScheme(null);
-                        setNewScheme({ title: '', link: '', description: '' });
+                        setNewScheme({ title: '', link: '', description: '', source: '', category: '', eligibility: '', benefits: '' });
                         setShowSchemeModal(true);
                       }}
                       className="px-8 py-4 bg-blue-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all inline-flex items-center gap-2 shadow-xl shadow-blue-600/20"
@@ -1829,7 +1926,23 @@ export default function AdminDashboard() {
                       </button>
                     </div>
                   </div>
-                  <h4 className="font-black text-[#0A0A0A] mb-1 line-clamp-1">{scheme.title}</h4>
+                  <div className="flex items-center gap-2 mb-1">
+                    <h4 className="font-black text-[#0A0A0A] line-clamp-1">{scheme.title}</h4>
+                    {scheme.source && (
+                      <span className={`px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-widest flex-shrink-0 ${
+                        scheme.source === 'CENTRAL' ? 'bg-blue-100 text-blue-700' :
+                        scheme.source === 'STATE' ? 'bg-purple-100 text-purple-700' :
+                        'bg-gray-100 text-gray-700'
+                      }`}>
+                        {scheme.source}
+                      </span>
+                    )}
+                  </div>
+                  {scheme.category && (
+                    <span className="inline-block px-1.5 py-0.5 rounded bg-green-100 text-green-700 text-[8px] font-black uppercase tracking-widest mb-1">
+                      {scheme.category}
+                    </span>
+                  )}
                   <p className="text-[10px] text-gray-400 font-medium mb-4 line-clamp-2">{scheme.description || 'No description provided.'}</p>
                   <a href={scheme.link} target="_blank" className="text-[10px] font-black text-blue-600 uppercase tracking-widest flex items-center gap-1 hover:underline">
                     View Link <ExternalLink className="w-3 h-3" />

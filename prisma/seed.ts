@@ -123,63 +123,128 @@ async function main() {
     });
   }
 
-  // Create initial schemes
+  // Create initial schemes with rich metadata
   const initialSchemes = [
     {
       title: 'MGNREGA',
       link: 'https://nrega.dord.gov.in/MGNREGA_new/Nrega_home.aspx',
-      description: 'Mahatma Gandhi National Rural Employment Guarantee Act portal for employment and wage information.'
+      description: 'Mahatma Gandhi National Rural Employment Guarantee Act — provides 100 days of guaranteed wage employment to rural households.',
+      source: 'CENTRAL',
+      category: 'Employment',
+      eligibility: 'Any adult member of a rural household willing to do unskilled manual work',
+      benefits: '100 days of guaranteed wage employment per household per year',
+      status: 'APPROVED',
     },
     {
-      title: 'Swachh Bharat Mission',
+      title: 'PM Awas Yojana (Gramin)',
+      link: 'https://pmayg.nic.in/',
+      description: 'Pradhan Mantri Awas Yojana — Housing for All by 2024. Provides pucca houses with basic amenities.',
+      source: 'CENTRAL',
+      category: 'Housing',
+      eligibility: 'Households with no pucca house, belonging to BPL or vulnerable groups',
+      benefits: 'Financial assistance of up to ₹1.20 lakh for house construction',
+      status: 'APPROVED',
+    },
+    {
+      title: 'PM Kisan Samman Nidhi',
+      link: 'https://pmkisan.gov.in/',
+      description: 'Income support scheme for small and marginal farmers across India.',
+      source: 'CENTRAL',
+      category: 'Agriculture',
+      eligibility: 'All small and marginal farmers with cultivable land',
+      benefits: '₹6,000 per year in three equal installments of ₹2,000 each',
+      status: 'APPROVED',
+    },
+    {
+      title: 'Ayushman Bharat (PM-JAY)',
+      link: 'https://pmjay.gov.in/',
+      description: 'Pradhan Mantri Jan Arogya Yojana — world\'s largest health insurance scheme for poor families.',
+      source: 'CENTRAL',
+      category: 'Health',
+      eligibility: 'Families identified through SECC database (rural and urban poor)',
+      benefits: 'Health coverage of ₹5 lakh per family per year for secondary/tertiary care hospitalization',
+      status: 'APPROVED',
+    },
+    {
+      title: 'Swachh Bharat Mission (Gramin)',
       link: 'https://swachhbharatmission.ddws.gov.in/',
-      description: 'National campaign to clean up the streets, roads and rural areas of India.'
+      description: 'National campaign for cleanliness, hygiene and elimination of open defecation in rural areas.',
+      source: 'CENTRAL',
+      category: 'Infrastructure',
+      eligibility: 'All rural households without individual household toilets',
+      benefits: 'Financial assistance for toilet construction + behavior change programs',
+      status: 'APPROVED',
     },
     {
       title: 'eGramSwaraj',
-      link: 'https://egramswaraj.gov.in/welcome.do',
-      description: 'Simplified work based accounting application for Panchayati Raj Institutions.'
+      link: 'https://egramswaraj.gov.in/',
+      description: 'Work-based accounting and monitoring application for Panchayati Raj Institutions across India.',
+      source: 'CENTRAL',
+      category: 'Digital Services',
+      eligibility: 'For use by Gram Panchayats and village officials',
+      benefits: 'Digital accounting, real-time progress tracking, transparency in fund utilization',
+      status: 'APPROVED',
     },
     {
-      title: 'e-Panchayat Telangana',
-      link: 'https://epanchayat.telangana.gov.in/cs',
-      description: 'Digital services and information for Gram Panchayats in Telangana.'
+      title: 'PM-SVANidhi',
+      link: 'https://pmsvanidhi.mohua.gov.in/',
+      description: 'Pradhan Mantri Street Vendor\'s AatmaNirbhar Nidhi — working capital loans for street vendors.',
+      source: 'CENTRAL',
+      category: 'Employment',
+      eligibility: 'Street vendors in urban and peri-urban areas with a valid certificate of vending',
+      benefits: 'Initial loan of ₹10,000 with 7% interest subsidy, timely repayment bonus',
+      status: 'APPROVED',
+    },
+    {
+      title: 'Ration Card / Food Security',
+      link: 'https://epds.telangana.gov.in/',
+      description: 'Telangana Food Security Act — subsidized food grains through PDS to eligible households.',
+      source: 'STATE',
+      category: 'Social Welfare',
+      eligibility: 'Priority households and Antyodaya Anna Yojana (AAY) families as per SECC data',
+      benefits: 'Rice at ₹2/kg, wheat at ₹2/kg, subsidized kerosene and other essential commodities',
+      status: 'APPROVED',
+    },
+    {
+      title: 'Rythu Bandhu',
+      link: 'https://rythubandhu.telangana.gov.in/',
+      description: 'Telangana\'s flagship farmer investment support scheme providing direct financial assistance.',
+      source: 'STATE',
+      category: 'Agriculture',
+      eligibility: 'All farmers in Telangana state with agricultural land',
+      benefits: '₹10,000 per acre per year (₹5,000 per season) for investment support',
+      status: 'PENDING',
+    },
+    {
+      title: 'Telangana Health Card',
+      link: 'https://tsprize.telangana.gov.in/',
+      description: 'Telangana State health insurance scheme providing cashless treatment for serious ailments.',
+      source: 'STATE',
+      category: 'Health',
+      eligibility: 'All Telangana residents below poverty line and specific vulnerable groups',
+      benefits: 'Health coverage up to ₹5 lakh per family for critical illnesses',
+      status: 'PENDING',
     },
     {
       title: 'Indiramma Indlu Telangana',
       link: 'https://indirammaindlu.telangana.gov.in/',
-      description: 'Housing scheme for the poor in Telangana state.'
+      description: 'Telangana state housing scheme providing financial assistance for house construction to the poor.',
+      source: 'STATE',
+      category: 'Housing',
+      eligibility: 'Homeless poor families in rural and urban areas of Telangana',
+      benefits: '₹1.50 lakh to ₹4 lakh assistance for house construction based on category',
+      status: 'PENDING',
     },
     {
       title: 'SERP Telangana',
       link: 'https://www.serp.telangana.gov.in/',
-      description: 'Society for Elimination of Rural Poverty - Empowering rural poor through SHGs.'
+      description: 'Society for Elimination of Rural Poverty — empowering rural poor through Self Help Groups.',
+      source: 'STATE',
+      category: 'Social Welfare',
+      eligibility: 'Rural poor, especially women members of Self Help Groups (SHGs)',
+      benefits: 'Interest-free loans, skill training, livelihood support, bank linkage',
+      status: 'PENDING',
     },
-    {
-      title: 'Agriculture Telangana',
-      link: 'https://agri.telangana.gov.in/',
-      description: 'Portal for agricultural schemes and farmer support in Telangana.'
-    },
-    {
-      title: 'Society Registration Telangana',
-      link: 'https://registration.telangana.gov.in/societyRegistration.htm',
-      description: 'Online registration portal for societies in Telangana.'
-    },
-    {
-      title: 'TGSWREIS',
-      link: 'https://tgswreis.telangana.gov.in/',
-      description: 'Telangana Social Welfare Residential Educational Institutions Society.'
-    },
-    {
-      title: 'EPDS Food Security',
-      link: 'https://epds.telangana.gov.in/FoodSecurityAct/?wicket:bookmarkablePage=:nic.fsc.foodsecurity.FscSearch',
-      description: 'Check status and manage Food Security (Ration) Cards in Telangana.'
-    },
-    {
-      title: 'TGCESS',
-      link: 'https://tgcessltd.com/',
-      description: 'Telangana Cooperative Electric Supply Society Limited.'
-    }
   ];
 
   // Upsert schemes to avoid foreign key conflicts with beneficiaries

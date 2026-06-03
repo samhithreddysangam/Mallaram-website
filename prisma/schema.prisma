@@ -93,6 +93,14 @@ model Scheme {
   link          String
   description   String?
   type          String    @default("portal") // "portal" or "welfare"
+  status        String    @default("APPROVED") // PENDING, APPROVED, REJECTED
+  source        String?   // CENTRAL, STATE, LOCAL
+  category      String?   // e.g., Agriculture, Education, Health, Social Welfare, Infrastructure
+  eligibility   String?   // brief eligibility criteria
+  benefits      String?   // key benefits summary
+  submittedAt   DateTime  @default(now())
+  reviewedBy    String?   // admin user id who reviewed
+  reviewedAt    DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   applications  WelfareApplication[]

@@ -1,13 +1,24 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    console.log('API: Fetching schemes from database...');
+    const { searchParams } = new URL(request.url);
+    const status = searchParams.get('status');
+    
+    // If status is specified, filter by it (admin view). Otherwise return only APPROVED (public view)
+    const where: any = {};
+    if (status) {
+      where.status = status;
+    } else {
+      where.status = 'APPROVED';
+    }
+
     const schemes = await prisma.scheme.findMany({
-      orderBy: { createdAt: 'desc' },
+      where,
+      orderBy: { submittedAt: 'desc' },
     });
-    console.log(`API: Found ${schemes.length} schemes`);
+
     return NextResponse.json(schemes);
   } catch (error) {
     console.error('Failed to fetch schemes:', error);
@@ -18,7 +29,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { title, link, description } = body;
+    const { title, link, description, source, category, eligibility, benefits } = body;
 
     if (!title || !link) {
       return NextResponse.json({ error: 'Title and link are required' }, { status: 400 });
@@ -29,6 +40,11 @@ export async function POST(request: Request) {
         title,
         link,
         description,
+        source,
+        category,
+        eligibility,
+        benefits,
+        status: 'PENDING', // New schemes start as PENDING, admin must approve
       },
     });
 
@@ -62,7 +78,7 @@ export async function DELETE(request: Request) {
 export async function PUT(request: Request) {
   try {
     const body = await request.json();
-    const { id, title, link, description } = body;
+    const { id, title, link, description, source, category, eligibility, benefits } = body;
 
     if (!id || !title || !link) {
       return NextResponse.json({ error: 'ID, title, and link are required' }, { status: 400 });
@@ -74,6 +90,10 @@ export async function PUT(request: Request) {
         title,
         link,
         description,
+        source,
+        category,
+        eligibility,
+        benefits,
       },
     });
 
