@@ -125,6 +125,18 @@ export default function AdminDashboard() {
   const [newScheme, setNewScheme] = useState({ title: '', link: '', description: '', source: '', category: '', eligibility: '', benefits: '' });
   const [editingScheme, setEditingScheme] = useState<string | null>(null);
   
+  // AI Village Analysis
+  const [analyzing, setAnalyzing] = useState(false);
+  const [showAnalysis, setShowAnalysis] = useState(false);
+  const [analysisResult, setAnalysisResult] = useState<{
+    innovations: { title: string; description: string; location: string; impact: string }[];
+    recommendations: { area: string; suggestion: string; priority: string; expectedImpact: string }[];
+    awardPrograms: { programName: string; description: string; eligibility: string; likelihood: string }[];
+    schemeSuggestions: { title: string; description: string; targetGroup: string; expectedOutcome: string }[];
+    summary: string;
+    error?: string;
+  } | null>(null);
+
   // Scheme Review
   const [pendingSchemes, setPendingSchemes] = useState<any[]>([]);
   const [schemeReviewLoading, setSchemeReviewLoading] = useState<string | null>(null);
@@ -243,6 +255,32 @@ export default function AdminDashboard() {
       console.error('Failed to review scheme:', error);
     } finally {
       setSchemeReviewLoading(null);
+    }
+  };
+
+  const runVillageAnalysis = async () => {
+    setAnalyzing(true);
+    setShowAnalysis(true);
+    setAnalysisResult(null);
+    try {
+      const res = await fetch('/api/admin/village-analysis', { method: 'POST' });
+      const data = await res.json();
+      setAnalysisResult(data);
+      if (!res.ok || data.error) {
+        console.error('Analysis failed:', data.error);
+      }
+    } catch (error) {
+      console.error('Failed to run analysis:', error);
+      setAnalysisResult({
+        innovations: [],
+        recommendations: [],
+        awardPrograms: [],
+        schemeSuggestions: [],
+        summary: 'Network error. Please try again.',
+        error: 'Network error occurred.'
+      });
+    } finally {
+      setAnalyzing(false);
     }
   };
 
@@ -1096,6 +1134,15 @@ export default function AdminDashboard() {
               Praja Tracker
             </Link>
             <button 
+              onClick={runVillageAnalysis}
+              disabled={analyzing}
+              className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-2xl text-sm font-bold hover:scale-105 transition-all flex items-center gap-2 shadow-xl shadow-purple-600/20 disabled:opacity-50 disabled:cursor-not-allowed"
+              title="AI-powered analysis of grama panchayath innovations across India"
+            >
+              <Search className={`w-4 h-4 ${analyzing ? 'animate-spin' : ''}`} />
+              {analyzing ? 'Analyzing...' : 'AI Analysis'}
+            </button>
+            <button 
               onClick={() => setShowSlotModal(true)}
               className="px-6 py-3 bg-[#0A0A0A] text-white rounded-2xl text-sm font-bold hover:bg-black transition-all flex items-center gap-2 shadow-xl shadow-black/10"
             >
@@ -1177,6 +1224,7 @@ export default function AdminDashboard() {
             { id: 'events', label: 'Events', icon: '🎉' },
             { id: 'slots', label: 'IKP Slots', icon: '📅' },
             { id: 'schemes', label: 'Schemes', icon: '🔗' },
+            { id: 'analysis', label: 'AI Analysis', icon: '🤖' },
             { id: 'gallery', label: 'Gallery', icon: '🖼' },
             { id: 'funds', label: 'Fund Usage', icon: '💰' },
             { id: 'allocations', label: 'Allocations', icon: '💵' },
@@ -2018,6 +2066,227 @@ export default function AdminDashboard() {
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+
+        {/* ────────────── AI Village Analysis Section ────────────── */}
+        <div id="section-analysis" className="mb-12 scroll-mt-48">
+          <div className="bg-white rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 p-8 overflow-hidden">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+              <div>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                    <Search className="w-5 h-5 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-black text-[#0A0A0A] tracking-tighter">AI Village Analysis</h3>
+                </div>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-2 ml-[52px]">
+                  AI-powered research on grama panchayath innovations across India
+                </p>
+              </div>
+              <button
+                onClick={runVillageAnalysis}
+                disabled={analyzing}
+                className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all flex items-center gap-2 shadow-xl shadow-purple-600/20 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Search className={`w-4 h-4 ${analyzing ? 'animate-spin' : ''}`} />
+                {analyzing ? 'Analyzing...' : 'Run Analysis'}
+              </button>
+            </div>
+
+            {!showAnalysis ? (
+              <div className="text-center py-16">
+                <div className="w-20 h-20 mx-auto mb-6 rounded-3xl bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center">
+                  <Search className="w-8 h-8 text-purple-500" />
+                </div>
+                <h4 className="text-xl font-black text-[#0A0A0A] mb-2">AI-Powered Village Analysis</h4>
+                <p className="text-sm text-gray-500 max-w-lg mx-auto mb-6">
+                  Click "Run Analysis" to have AI research innovative grama panchayaths across India,
+                  analyze their best practices, and generate personalized recommendations for Mallaram's development.
+                </p>
+                <button
+                  onClick={runVillageAnalysis}
+                  disabled={analyzing}
+                  className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-2xl text-sm font-black hover:scale-105 transition-all inline-flex items-center gap-3 shadow-xl shadow-purple-600/20 disabled:opacity-50"
+                >
+                  <Search className={`w-5 h-5 ${analyzing ? 'animate-spin' : ''}`} />
+                  {analyzing ? 'Analyzing Grama Panchayaths Across India...' : 'Start AI Analysis'}
+                </button>
+              </div>
+            ) : analyzing ? (
+              <div className="text-center py-20">
+                <div className="w-16 h-16 mx-auto mb-6 rounded-full border-4 border-purple-100 border-t-purple-600 animate-spin" />
+                <h4 className="text-lg font-black text-[#0A0A0A] mb-2">AI is Analyzing...</h4>
+                <p className="text-sm text-gray-400">
+                  Researching grama panchayath innovations across India<br />
+                  Generating recommendations for Mallaram...
+                </p>
+              </div>
+            ) : analysisResult ? (
+              <div className="space-y-8">
+                {/* Error Banner */}
+                {analysisResult.error && (
+                  <div className="p-5 rounded-2xl bg-amber-50 border border-amber-200 flex items-start gap-3">
+                    <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-black text-amber-800">Analysis Note</p>
+                      <p className="text-xs text-amber-700 mt-1">{analysisResult.error}</p>
+                      {!analysisResult.summary && (
+                        <p className="text-xs text-amber-600 mt-2">
+                          Add <code className="bg-amber-100 px-1.5 py-0.5 rounded font-mono">OPENAI_API_KEY</code> to your .env file to unlock full AI-powered analysis.
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Executive Summary */}
+                {analysisResult.summary && (
+                  <div className="p-6 rounded-2xl bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-100">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-8 h-8 rounded-xl bg-purple-100 flex items-center justify-center">
+                        <Search className="w-4 h-4 text-purple-600" />
+                      </div>
+                      <h4 className="text-sm font-black text-purple-800">Executive Summary</h4>
+                    </div>
+                    <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">{analysisResult.summary}</p>
+                  </div>
+                )}
+
+                {/* Innovations from India */}
+                {analysisResult.innovations?.length > 0 && (
+                  <div>
+                    <h4 className="text-lg font-black text-[#0A0A0A] mb-4 flex items-center gap-2">
+                      <span className="text-2xl">💡</span>
+                      Innovations from Grama Panchayaths Across India
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {analysisResult.innovations.map((item, i) => (
+                        <div key={i} className="p-5 rounded-2xl bg-gray-50 border border-gray-100 hover:border-purple-200 transition-all">
+                          <div className="flex items-start justify-between gap-3 mb-2">
+                            <h5 className="font-black text-sm text-[#0A0A0A]">{item.title}</h5>
+                            <span className="px-2 py-0.5 rounded-md bg-purple-100 text-purple-700 text-[8px] font-black uppercase tracking-widest flex-shrink-0">
+                              {item.location}
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-gray-500 mb-2">{item.description}</p>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-[9px] font-black text-green-600 uppercase tracking-widest">Impact:</span>
+                            <span className="text-[10px] text-gray-600">{item.impact}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Recommendations for Mallaram */}
+                {analysisResult.recommendations?.length > 0 && (
+                  <div>
+                    <h4 className="text-lg font-black text-[#0A0A0A] mb-4 flex items-center gap-2">
+                      <span className="text-2xl">🎯</span>
+                      Recommendations for Mallaram
+                    </h4>
+                    <div className="space-y-3">
+                      {analysisResult.recommendations.map((item, i) => (
+                        <div key={i} className="p-5 rounded-2xl bg-gray-50 border border-gray-100 hover:border-purple-200 transition-all">
+                          <div className="flex items-start justify-between gap-3 mb-2">
+                            <div className="flex items-center gap-2">
+                              <span className={`w-2 h-2 rounded-full ${
+                                item.priority === 'high' ? 'bg-red-500' :
+                                item.priority === 'medium' ? 'bg-amber-500' : 'bg-green-500'
+                              }`} />
+                              <h5 className="font-black text-sm text-[#0A0A0A]">{item.area}</h5>
+                            </div>
+                            <span className={`px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest flex-shrink-0 ${
+                              item.priority === 'high' ? 'bg-red-100 text-red-700' :
+                              item.priority === 'medium' ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700'
+                            }`}>
+                              {item.priority} priority
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-gray-500 mb-2">{item.suggestion}</p>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-[9px] font-black text-blue-600 uppercase tracking-widest">Expected Impact:</span>
+                            <span className="text-[10px] text-gray-600">{item.expectedImpact}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Award Programs */}
+                {analysisResult.awardPrograms?.length > 0 && (
+                  <div>
+                    <h4 className="text-lg font-black text-[#0A0A0A] mb-4 flex items-center gap-2">
+                      <span className="text-2xl">🏆</span>
+                      Award-Winning Programs & Eligibility
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {analysisResult.awardPrograms.map((item, i) => (
+                        <div key={i} className="p-5 rounded-2xl bg-gray-50 border border-gray-100 hover:border-amber-200 transition-all">
+                          <div className="flex items-start justify-between gap-3 mb-2">
+                            <h5 className="font-black text-sm text-[#0A0A0A]">{item.programName}</h5>
+                            <span className={`px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest flex-shrink-0 ${
+                              item.likelihood === 'High' ? 'bg-green-100 text-green-700' :
+                              item.likelihood === 'Medium' ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-700'
+                            }`}>
+                              {item.likelihood}
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-gray-500 mb-2">{item.description}</p>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-[9px] font-black text-amber-600 uppercase tracking-widest">Eligibility:</span>
+                            <span className="text-[10px] text-gray-600">{item.eligibility}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Scheme Suggestions */}
+                {analysisResult.schemeSuggestions?.length > 0 && (
+                  <div>
+                    <h4 className="text-lg font-black text-[#0A0A0A] mb-4 flex items-center gap-2">
+                      <span className="text-2xl">📋</span>
+                      Suggested Schemes for Mallaram
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {analysisResult.schemeSuggestions.map((item, i) => (
+                        <div key={i} className="p-5 rounded-2xl bg-gray-50 border border-gray-100 hover:border-blue-200 transition-all">
+                          <h5 className="font-black text-sm text-[#0A0A0A] mb-2">{item.title}</h5>
+                          <p className="text-[11px] text-gray-500 mb-3">{item.description}</p>
+                          <div className="flex flex-col gap-1">
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-[9px] font-black text-green-600 uppercase tracking-widest">Target:</span>
+                              <span className="text-[10px] text-gray-600">{item.targetGroup}</span>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-[9px] font-black text-blue-600 uppercase tracking-widest">Outcome:</span>
+                              <span className="text-[10px] text-gray-600">{item.expectedOutcome}</span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Refresh Button */}
+                <div className="text-center pt-4">
+                  <button
+                    onClick={runVillageAnalysis}
+                    disabled={analyzing}
+                    className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all inline-flex items-center gap-2 shadow-xl shadow-purple-600/20 disabled:opacity-50"
+                  >
+                    <Search className={`w-4 h-4 ${analyzing ? 'animate-spin' : ''}`} />
+                    {analyzing ? 'Re-analyzing...' : 'Run Fresh Analysis'}
+                  </button>
+                </div>
+              </div>
+            ) : null}
           </div>
         </div>
 
