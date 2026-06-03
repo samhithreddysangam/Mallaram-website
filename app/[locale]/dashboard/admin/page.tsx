@@ -1839,18 +1839,28 @@ export default function AdminDashboard() {
                   <h3 className="text-2xl font-black text-[#0A0A0A] tracking-tighter">Government Schemes</h3>
                 </div>
                 <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-2 ml-[52px]">Manage links shown on schemes page</p>
-              </div>
-              <button 
-                onClick={() => {
-                  setEditingScheme(null);
-                  setNewScheme({ title: '', link: '', description: '', source: '', category: '', eligibility: '', benefits: '' });
-                  setShowSchemeModal(true);
-                }}
-                className="px-6 py-3 bg-blue-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all flex items-center gap-2 shadow-xl shadow-blue-600/20"
-              >
-                <Plus className="w-4 h-4" />
-                Add Scheme
-              </button>
+              </div>                <div className="flex items-center gap-2">
+                <button
+                  onClick={scanGovernmentPortals}
+                  disabled={scanningSchemes}
+                  className="px-4 py-3 bg-gray-100 text-gray-600 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-gray-200 hover:text-[#0A0A0A] transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Scan government portals for new schemes"
+                >
+                  <Search className={`w-4 h-4 ${scanningSchemes ? 'animate-spin' : ''}`} />
+                  {scanningSchemes ? 'Scanning...' : 'Scan'}
+                </button>
+                <button 
+                  onClick={() => {
+                    setEditingScheme(null);
+                    setNewScheme({ title: '', link: '', description: '', source: '', category: '', eligibility: '', benefits: '' });
+                    setShowSchemeModal(true);
+                  }}
+                  className="px-6 py-3 bg-blue-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all flex items-center gap-2 shadow-xl shadow-blue-600/20"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Scheme
+                </button>
+                </div>
             </div>
 
             {/* Pending Schemes Review */}
