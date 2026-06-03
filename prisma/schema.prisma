@@ -1,331 +1,331 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
-}
-
 model User {
-  id            String    @id @default(cuid())
+  id            String         @id @default(cuid())
   name          String?
-  email         String?   @unique
-  phone         String?   @unique
+  email         String?        @unique
+  phone         String?        @unique
   password      String
-  role          String    @default("FARMER") // ADMIN, FARMER, SCHOOL
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  role          String         @default("FARMER")
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
   bookings      Booking[]
   complaints    Complaint[]
   schoolProfile SchoolProfile?
 }
 
 model Slot {
-  id            String    @id @default(cuid())
-  date          DateTime
-  startTime     String
-  endTime       String
-  capacity      Int       @default(10)
-  currentBookings Int     @default(0)
-  location      String    @default("IKP Centre Mallaram")
-  bookings      Booking[]
-  
+  id              String    @id @default(cuid())
+  date            DateTime
+  startTime       String
+  endTime         String
+  capacity        Int       @default(10)
+  currentBookings Int       @default(0)
+  location        String    @default("IKP Centre Mallaram")
+  bookings        Booking[]
+
   @@unique([date, startTime, endTime])
 }
 
 model Booking {
-  id            String        @id @default(cuid())
-  userId        String
-  user          User          @relation(fields: [userId], references: [id])
-  slotId        String
-  slot          Slot          @relation(fields: [slotId], references: [id])
-  status        String        @default("PENDING") // PENDING, APPROVED, REJECTED, COMPLETED
-  qrCode        String?       // Reference or data for QR
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  id        String   @id @default(cuid())
+  userId    String
+  slotId    String
+  status    String   @default("PENDING")
+  qrCode    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  slot      Slot     @relation(fields: [slotId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model WeatherAlert {
-  id            String    @id @default(cuid())
-  type          String    // e.g., "RAIN", "STORM"
-  severity      String    // e.g., "LOW", "MEDIUM", "HIGH"
-  message       String
-  expiresAt     DateTime
-  createdAt     DateTime  @default(now())
+  id        String   @id @default(cuid())
+  type      String
+  severity  String
+  message   String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 }
 
 model IrrigationSchedule {
-  id            String    @id @default(cuid())
-  title         String
-  description   String?
-  startTime     DateTime
-  endTime       DateTime
-  area          String?   // e.g., "North Canal", "South Fields"
-  createdAt     DateTime  @default(now())
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  startTime   DateTime
+  endTime     DateTime
+  area        String?
+  createdAt   DateTime @default(now())
 }
 
 model CropPrice {
-  id            String    @id @default(cuid())
-  cropName      String
-  price         Float
-  unit          String    @default("Quintal")
-  district      String    @default("Rajanna Sircilla")
-  date          DateTime  @default(now())
-  
+  id       String   @id @default(cuid())
+  cropName String
+  price    Float
+  unit     String   @default("Quintal")
+  district String   @default("Rajanna Sircilla")
+  date     DateTime @default(now())
+
   @@index([cropName, date])
 }
 
 model Complaint {
-  id            String    @id @default(cuid())
-  userId        String?
-  user          User?     @relation(fields: [userId], references: [id])
-  subject       String
-  description   String
-  status        String    @default("OPEN") // OPEN, IN_PROGRESS, RESOLVED
-  createdAt     DateTime  @default(now())
+  id          String   @id @default(cuid())
+  userId      String?
+  subject     String
+  description String
+  status      String   @default("OPEN")
+  createdAt   DateTime @default(now())
+  user        User?    @relation(fields: [userId], references: [id])
 }
 
 model Scheme {
-  id            String    @id @default(cuid())
+  id            String               @id @default(cuid())
   title         String
   link          String
   description   String?
-  type          String    @default("portal") // "portal" or "welfare"
-  status        String    @default("APPROVED") // PENDING, APPROVED, REJECTED
-  source        String?   // CENTRAL, STATE, LOCAL
-  category      String?   // e.g., Agriculture, Education, Health, Social Welfare, Infrastructure
-  eligibility   String?   // brief eligibility criteria
-  benefits      String?   // key benefits summary
-  submittedAt   DateTime  @default(now())
-  reviewedBy    String?   // admin user id who reviewed
+  type          String               @default("portal")
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  benefits      String?
+  category      String?
+  eligibility   String?
   reviewedAt    DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  applications  WelfareApplication[]
+  reviewedBy    String?
+  source        String?
+  status        String               @default("APPROVED")
+  submittedAt   DateTime             @default(now())
   beneficiaries Beneficiary[]
+  applications  WelfareApplication[]
 }
 
 model WelfareApplication {
-  id              String    @id @default(cuid())
-  applicantName   String
-  applicantPhone  String?
-  applicantAadhaar String?  // Only last 4 digits stored for privacy
-  schemeId        String
-  scheme          Scheme    @relation(fields: [schemeId], references: [id])
-  village         String    @default("Mallaram")
-  ward            String?
-  status          String    @default("PENDING") // PENDING, APPROVED, REJECTED
-  benefitAmount   Float?
-  applicationDate DateTime  @default(now())
-  approvalDate    DateTime?
-  rejectionDate   DateTime?
-  rejectionReason String?
-  beneficiary     Beneficiary?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id               String       @id @default(cuid())
+  applicantName    String
+  applicantPhone   String?
+  applicantAadhaar String?
+  schemeId         String
+  village          String       @default("Mallaram")
+  ward             String?
+  status           String       @default("PENDING")
+  benefitAmount    Float?
+  applicationDate  DateTime     @default(now())
+  approvalDate     DateTime?
+  rejectionDate    DateTime?
+  rejectionReason  String?
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  beneficiary      Beneficiary?
+  scheme           Scheme       @relation(fields: [schemeId], references: [id])
 }
 
 model Beneficiary {
-  id              String    @id @default(cuid())
-  name            String
-  phone           String?
-  aadhaarMasked   String?   // Only last 4 digits
-  schemeId        String
-  scheme          Scheme    @relation(fields: [schemeId], references: [id])
-  village         String    @default("Mallaram")
-  ward            String?
-  benefitAmount   Float
-  benefitDate     DateTime  @default(now())
-  applicationId   String?   @unique
-  application     WelfareApplication? @relation(fields: [applicationId], references: [id])
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id            String              @id @default(cuid())
+  name          String
+  phone         String?
+  aadhaarMasked String?
+  schemeId      String
+  village       String              @default("Mallaram")
+  ward          String?
+  benefitAmount Float
+  benefitDate   DateTime            @default(now())
+  applicationId String?             @unique
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  application   WelfareApplication? @relation(fields: [applicationId], references: [id])
+  scheme        Scheme              @relation(fields: [schemeId], references: [id])
 }
 
 model GalleryImage {
-  id            String    @id @default(cuid())
-  url           String
-  alt           String?
-  description   String?
-  createdAt     DateTime  @default(now())
+  id          String   @id @default(cuid())
+  url         String
+  alt         String?
+  description String?
+  createdAt   DateTime @default(now())
 }
 
 model FundUsage {
-  id            String    @id @default(cuid())
-  label         String
-  amount        Float
-  description   String?
-  date          DateTime  @default(now())
-  category      String?   // e.g., Infrastructure, Education, Healthcare
-  phase         String    @default("Completed") // Planning, In Progress, Completed, Approved
-  fundSource    String?   // e.g., State Government, Central Government, 15th Finance Commission
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id          String   @id @default(cuid())
+  label       String
+  amount      Float
+  description String?
+  date        DateTime @default(now())
+  category    String?
+  phase       String   @default("Completed")
+  fundSource  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model FundAllocation {
-  id            String    @id @default(cuid())
-  totalAmount   Float     // Total grant/budget amount from this source
-  source        String?   // e.g., "State Government", "Central Government", "15th Finance Commission"
-  fiscalYear    String    @default("2025-2026") // e.g., "2025-2026"
-  description   String?   // Optional description of this allocation
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id          String   @id @default(cuid())
+  totalAmount Float
+  source      String?
+  fiscalYear  String   @default("2025-2026")
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model VillageMetric {
-  id            String    @id @default(cuid())
-  label         String    // e.g., "Street Lights", "CCTV Network"
-  value         String    // e.g., "142/145", "12 Active"
-  status        String    // e.g., "Working Well", "All Safe"
-  icon          String    // icon name: Lightbulb, Video, Recycle, Zap, Activity
-  color         String    // text color class: text-amber-500
-  bg            String    // bg color class: bg-amber-500/10
-  order         Int       @default(0)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id        String   @id @default(cuid())
+  label     String
+  value     String
+  status    String
+  icon      String
+  color     String
+  bg        String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model VillagePerformance {
-  id            String    @id @default(cuid())
-  label         String    // e.g., "Energy Usage"
-  value         String    // e.g., "12% Reduction"
-  percentage    Int       @default(85) // bar width percentage
-  order         Int       @default(0)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id         String   @id @default(cuid())
+  label      String
+  value      String
+  percentage Int      @default(85)
+  order      Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 model VillageOfficial {
-  id            String    @id @default(cuid())
-  name          String
-  title         String    // e.g., "Sarpanch, Mallaram", "Panchayat Secretary"
-  imageUrl      String?   // path to uploaded image
-  description   String?   // optional bio/description
-  order         Int       @default(0)
-  active        Boolean   @default(true)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id          String   @id @default(cuid())
+  name        String
+  title       String
+  imageUrl    String?
+  description String?
+  order       Int      @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model VillageEvent {
-  id            String    @id @default(cuid())
-  title         String
-  description   String?
-  imageUrl      String?
-  date          String    // e.g., "July 15", "Every 2nd Sun"
-  category      String    @default("local") // "festivals" or "local"
-  order         Int       @default(0)
-  active        Boolean   @default(true)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  imageUrl    String?
+  date        String
+  category    String   @default("local")
+  order       Int      @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model LocalBodyMember {
-  id            String    @id @default(cuid())
-  name          String
-  designation   String    // e.g., "Panchayat Secretary", "Ward Member - Ward 1"
-  imageUrl      String?
-  description   String?
-  category      String    @default("ward_member") // "secretary" or "ward_member"
-  ward          String?   // e.g., "Ward 1", "Ward 2", etc.
-  order         Int       @default(0)
-  active        Boolean   @default(true)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id          String   @id @default(cuid())
+  name        String
+  designation String
+  imageUrl    String?
+  description String?
+  category    String   @default("ward_member")
+  ward        String?
+  order       Int      @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model FarmerEnrollment {
-  id            String    @id @default(cuid())
+  id            String   @id @default(cuid())
   name          String
-  phone         String    @unique
-  village       String    @default("Mallaram")
+  phone         String   @unique
+  village       String   @default("Mallaram")
   ward          String?
-  landArea      String?   // e.g., "5 acres"
-  crops         String?   // e.g., "Paddy, Cotton, Maize"
-  soilType      String?   // e.g., "Black soil", "Red soil"
-  language      String    @default("te") // "en" or "te"
-  consentAlerts Boolean   @default(true)
-  active        Boolean   @default(true)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  landArea      String?
+  crops         String?
+  soilType      String?
+  language      String   @default("te")
+  consentAlerts Boolean  @default(true)
+  active        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model SchoolProfile {
-  id              String    @id @default(cuid())
-  userId          String    @unique
-  user            User      @relation(fields: [userId], references: [id])
-  schoolName      String    @default("MPPS Mallaram")
+  id              String              @id @default(cuid())
+  userId          String              @unique
+  schoolName      String              @default("MPPS Mallaram")
   address         String?
   phone           String?
   email           String?
   establishedYear String?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
   achievements    SchoolAchievement[]
-  events          SchoolEvent[]
   admissions      SchoolAdmission[]
+  events          SchoolEvent[]
+  user            User                @relation(fields: [userId], references: [id])
 }
 
 model SchoolAchievement {
-  id            String    @id @default(cuid())
-  title         String
-  description   String?
-  imageUrl      String?
-  status        String    @default("PENDING") // PENDING, APPROVED, REJECTED
-  schoolId      String
-  school        SchoolProfile @relation(fields: [schoolId], references: [id])
-  submittedAt   DateTime  @default(now())
-  approvedAt    DateTime?
-  reviewedBy    String?   // Admin user id who reviewed
+  id              String        @id @default(cuid())
+  title           String
+  description     String?
+  imageUrl        String?
+  status          String        @default("PENDING")
+  schoolId        String
+  submittedAt     DateTime      @default(now())
+  approvedAt      DateTime?
+  reviewedBy      String?
   rejectionReason String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  school          SchoolProfile @relation(fields: [schoolId], references: [id])
 }
 
 model SchoolEvent {
-  id            String    @id @default(cuid())
-  title         String
-  description   String?
-  date          String    // e.g., "July 15, 2025"
-  time          String?   // e.g., "10:00 AM"
-  imageUrl      String?
-  status        String    @default("PENDING") // PENDING, APPROVED, REJECTED
-  schoolId      String
-  school        SchoolProfile @relation(fields: [schoolId], references: [id])
-  submittedAt   DateTime  @default(now())
-  approvedAt    DateTime?
-  reviewedBy    String?
+  id              String        @id @default(cuid())
+  title           String
+  description     String?
+  date            String
+  time            String?
+  imageUrl        String?
+  status          String        @default("PENDING")
+  schoolId        String
+  submittedAt     DateTime      @default(now())
+  approvedAt      DateTime?
+  reviewedBy      String?
   rejectionReason String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  school          SchoolProfile @relation(fields: [schoolId], references: [id])
 }
 
 model SchoolAdmission {
-  id              String    @id @default(cuid())
-  studentName     String
-  classApplying   String    // e.g., "1st Class", "Anganwadi"
-  parentName      String
-  phone           String
-  address         String?
-  previousSchool  String?
-  status          String    @default("PENDING") // PENDING, APPROVED, REJECTED
-  schoolId        String
-  school          SchoolProfile @relation(fields: [schoolId], references: [id])
-  submittedAt     DateTime  @default(now())
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id             String        @id @default(cuid())
+  studentName    String
+  classApplying  String
+  parentName     String
+  phone          String
+  address        String?
+  previousSchool String?
+  status         String        @default("PENDING")
+  schoolId       String
+  submittedAt    DateTime      @default(now())
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  school         SchoolProfile @relation(fields: [schoolId], references: [id])
 }
 
 model WaterSource {
-  id            String    @id @default(cuid())
-  label         String    // e.g., "Main Reservoir"
-  level         Int       @default(50) // percentage 0-100
-  status        String    // e.g., "Stable", "Normal", "Low"
-  icon          String    // icon name: Waves, Droplets, Droplet
-  order         Int       @default(0)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id        String   @id @default(cuid())
+  label     String
+  level     Int      @default(50)
+  status    String
+  icon      String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

@@ -476,9 +476,13 @@ export default function AdminDashboard() {
         setNewScheme({ title: '', link: '', description: '', source: '', category: '', eligibility: '', benefits: '' });
         setEditingScheme(null);
         fetchSchemes();
+      } else {
+        const errData = await res.json().catch(() => ({ error: 'Unknown error' }));
+        alert('Failed to save scheme: ' + (errData.error || 'Unknown error'));
       }
     } catch (error) {
       console.error('Failed to save scheme:', error);
+      alert('Network error: Could not save scheme. Check console for details.');
     }
   };
 
@@ -3068,7 +3072,7 @@ ${phones}`);
         {/* Scheme Modal */}
         {showSchemeModal && (
           <div className="fixed inset-0 bg-[#0A0A0A]/90 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
-            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-[2.5rem] shadow-2xl p-10 w-full max-w-md relative">
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-[2.5rem] shadow-2xl p-10 w-full max-w-lg relative">
               <button onClick={() => setShowSchemeModal(false)} className="absolute top-8 right-8 text-gray-300 hover:text-[#0A0A0A] transition-colors"><X className="w-6 h-6"/></button>
               <h3 className="text-3xl font-black text-[#0A0A0A] mb-2 tracking-tighter">
                 {editingScheme ? 'Update Scheme' : 'Add New Scheme'}
@@ -3103,11 +3107,66 @@ ${phones}`);
                   <textarea
                     value={newScheme.description}
                     onChange={(e) => setNewScheme({ ...newScheme, description: e.target.value })}
-                    className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 font-bold min-h-[100px]"
+                    className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 font-bold min-h-[80px]"
                     placeholder="What is this scheme about?"
                   />
                 </div>
-                <button type="submit" className="w-full py-5 bg-[#0A0A0A] text-[#22FF88] rounded-[1.5rem] font-black uppercase tracking-widest hover:scale-[1.02] transition-all shadow-xl shadow-black/20 mt-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Source</label>
+                    <select
+                      value={newScheme.source}
+                      onChange={(e) => setNewScheme({ ...newScheme, source: e.target.value })}
+                      className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 font-bold text-sm"
+                    >
+                      <option value="">Select source...</option>
+                      <option value="CENTRAL">Central Government</option>
+                      <option value="STATE">State Government</option>
+                      <option value="LOCAL">Local Body</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Category</label>
+                    <select
+                      value={newScheme.category}
+                      onChange={(e) => setNewScheme({ ...newScheme, category: e.target.value })}
+                      className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 font-bold text-sm"
+                    >
+                      <option value="">Select category...</option>
+                      <option value="Agriculture">Agriculture</option>
+                      <option value="Education">Education</option>
+                      <option value="Health">Health</option>
+                      <option value="Social Welfare">Social Welfare</option>
+                      <option value="Housing">Housing</option>
+                      <option value="Infrastructure">Infrastructure</option>
+                      <option value="Employment">Employment</option>
+                      <option value="Digital Services">Digital Services</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Eligibility</label>
+                    <input
+                      type="text"
+                      value={newScheme.eligibility}
+                      onChange={(e) => setNewScheme({ ...newScheme, eligibility: e.target.value })}
+                      className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 font-bold"
+                      placeholder="e.g., All farmers, BPL families"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Benefits</label>
+                    <input
+                      type="text"
+                      value={newScheme.benefits}
+                      onChange={(e) => setNewScheme({ ...newScheme, benefits: e.target.value })}
+                      className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 font-bold"
+                      placeholder="e.g., ₹6000/year, Free insurance"
+                    />
+                  </div>
+                </div>
+                <button type="submit" className="w-full py-5 bg-[#0A0A0A] text-[#22FF88] rounded-[1.5rem] font-black uppercase tracking-widest hover:scale-[1.02] transition-all shadow-xl shadow-black/20 mt-2">
                   {editingScheme ? 'Save Changes' : 'Publish Scheme'}
                 </button>
               </form>
