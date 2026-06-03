@@ -124,19 +124,19 @@ export default function Footer({ locale }: FooterProps) {
 
          {/* Developer Credit */}
           <div className="text-right">
-            <p className="text-[9px] font-bold text-[#0A0A0A]/20 uppercase tracking-widest leading-relaxed">
+            <p className="text-[9px] font-bold text-[#0A0A0A]/40 uppercase tracking-widest leading-relaxed">
               <Trophy className="w-3.5 h-3.5 inline-block -mt-0.5 mr-1.5 text-[#D4A017]" />
               India's 1st Digital Village<br />
-              <span className="text-[#15803d]/70 font-black">Digitised by </span>
+              <span className="text-[#15803d]/90 font-black">Digitised by </span>
               <a href="https://samhith-portfolio.vercel.app/" target="_blank" rel="noopener noreferrer" className="text-[#15803d] hover:text-[#0A0A0A] transition-colors font-black">
                 Samhithreddy Sangam
               </a>
-              <span className="text-[#0A0A0A]/30"> — </span>
-              <span className="text-[#0A0A0A]/30">Son of Sarpanch, Mallaram</span>
+              <span className="text-[#0A0A0A]/50"> — </span>
+              <span className="text-[#0A0A0A]/50">Son of Sarpanch, Mallaram</span>
             </p>
-            <p className="text-[8px] font-bold text-[#0A0A0A]/10 uppercase tracking-widest mt-1">
+            <p className="text-[8px] font-bold text-[#0A0A0A]/30 uppercase tracking-widest mt-1">
               Powered by{" "}
-              <a href="https://next360.in/" target="_blank" rel="noopener noreferrer" className="text-[#15803d]/40 hover:text-[#15803d] transition-colors">
+              <a href="https://next360.in/" target="_blank" rel="noopener noreferrer" className="text-[#15803d]/70 hover:text-[#15803d] transition-colors">
                 next360
               </a>
             </p>
