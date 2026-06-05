@@ -76,11 +76,10 @@ Provide at least 3 innovations, 5 recommendations, 3 awards, and 3 scheme sugges
             temperature: 0.7,
             max_tokens: 2000,
           }),
-          signal: AbortSignal.timeout(25000),
+          signal: AbortSignal.timeout(15000),
         });
 
         if (response.status === 429 && attempt < retries) {
-          // Rate limited - wait with exponential backoff
           const delay = Math.pow(2, attempt) * 1000;
           console.log(`OpenAI rate limited, retrying in ${delay}ms (attempt ${attempt}/${retries})`);
           await new Promise(resolve => setTimeout(resolve, delay));
@@ -89,9 +88,8 @@ Provide at least 3 innovations, 5 recommendations, 3 awards, and 3 scheme sugges
 
         return response;
       }
-
-      // All retries exhausted - throw
-      throw new Error('Rate limit exceeded after retries');
+      // Fallback - should not reach here
+      return new Response(JSON.stringify({ error: 'All retries exhausted' }), { status: 429 });
     };
 
     const response = await callOpenAI(3);
